@@ -1,0 +1,20 @@
+{
+  "campaign_number": "22V412000",
+  "manufacturer": "Ford Motor Company",
+  "vehicles": [
+    {"make": "Ford", "model": "Mustang Mach-E", "model_year": 2021},
+    {"make": "Ford", "model": "Mustang Mach-E", "model_year": 2022}
+  ],
+  "recall_date": "2022-06-10",
+  "problem": "High voltage battery main contactors may overheat and open while driving, causing immediate loss of motive power.",
+  "target_terms": [
+    "high voltage battery",
+    "contactor",
+    "loss of motive power",
+    "lost power",
+    "stop safely now",
+    "vehicle shut down"
+  ],
+  "status": "candidate_for_backtest",
+  "source_note": "Seeded from NHTSA Recall 22V-412 documentation and ODI Recall Query RQ 23-004. Pre-recall complaint history still needs to be fetched and evaluated before using this case in the final demo."
+}
