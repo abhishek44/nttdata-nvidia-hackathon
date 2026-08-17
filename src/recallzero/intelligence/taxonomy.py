@@ -111,7 +111,7 @@ def _combined_text(complaint: Complaint, signature: FailureSignature) -> str:
     return f"{_signature_text(signature)} {_norm(complaint.narrative)}"
 
 
-def derive_failure_mechanism(complaint: Complaint, signature: FailureSignature) -> str:
+def _derive_failure_mechanism_raw(complaint: Complaint, signature: FailureSignature) -> str:
     text = _combined_text(complaint, signature)
     system_text = _norm(signature.system)
     components = " ".join(_norm(item) for item in complaint.components)
@@ -344,6 +344,68 @@ def derive_consequence_family(complaint: Complaint, signature: FailureSignature)
     if _contains_any(text, ("driver assistance", "adas", "collision avoidance", "lane departure")):
         return "GENERAL_SAFETY_SYSTEM_FAILURE"
     return "OTHER"
+
+
+# Narrow 0.3.3a consistency guard. These mappings cover mechanisms whose observed
+# consequences should stay within a small domain. If a specific mechanism conflicts
+# with a clearly classified consequence, downgrade to a broad component-level
+# mechanism rather than allowing the contradictory assignment into meta aggregation.
+_SPECIFIC_MECHANISM_CONSEQUENCES: dict[str, set[str]] = {
+    "BRAKE_SYSTEM": {
+        "LOSS_OF_BRAKING",
+        "PARKING_BRAKE_FAILURE",
+        "BRAKE_WEAR_OR_VIBRATION",
+        "UNINTENDED_BRAKING",
+    },
+    "STEERING_SYSTEM": {"LOSS_OF_STEERING"},
+    "RESTRAINT_SYSTEM": {"RESTRAINT_FAILURE"},
+    "ADAS_SENSING": {
+        "ADAS_CAMERA_UNAVAILABLE",
+        "ADAS_FALSE_INTERVENTION",
+        "UNINTENDED_BRAKING",
+    },
+    "GLASS_ADHESION": {"GLASS_OR_ADHESION"},
+    "STRUCTURE_CLOSURE": {"STRUCTURE_CLOSURE_FAILURE"},
+    "ACCESS_CONTROL": {"ACCESS_OR_KEY_FAILURE"},
+    "DISPLAY_CONTROL": {"DISPLAY_OR_UI_FAILURE"},
+    "THERMAL_SYSTEM": {"THERMAL_EVENT"},
+    "RECALL_SERVICE": {"RECALL_SERVICE_ISSUE"},
+}
+
+
+def _general_mechanism_for_context(complaint: Complaint, signature: FailureSignature) -> str:
+    system_text = _norm(signature.system)
+    components = " ".join(_norm(item) for item in complaint.components)
+    combined = f"{system_text} {components}"
+    if "electrical" in combined:
+        return "GENERAL_ELECTRICAL"
+    if _contains_any(combined, ("power train", "powertrain", "fuel propulsion", "propulsion", "engine", "transmission")):
+        return "GENERAL_POWERTRAIN"
+    if _contains_any(combined, ("driver assistance", "forward collision", "vehicle speed control", "collision avoidance", "adas")):
+        return "GENERAL_SAFETY"
+    return "OTHER"
+
+
+def mechanism_is_consistent(mechanism: str, consequence: str) -> bool:
+    """Return whether a specific mechanism is compatible with a classified consequence.
+
+    Broad mechanisms and the multi-presentation EV mechanisms intentionally remain
+    unconstrained in this small slice. The guard only catches strong contradictions
+    such as BRAKE_SYSTEM + NO_START_OR_NO_DRIVE.
+    """
+
+    allowed = _SPECIFIC_MECHANISM_CONSEQUENCES.get(mechanism)
+    if allowed is None or consequence == "OTHER":
+        return True
+    return consequence in allowed
+
+
+def derive_failure_mechanism(complaint: Complaint, signature: FailureSignature) -> str:
+    mechanism = _derive_failure_mechanism_raw(complaint, signature)
+    consequence = derive_consequence_family(complaint, signature)
+    if mechanism_is_consistent(mechanism, consequence):
+        return mechanism
+    return _general_mechanism_for_context(complaint, signature)
 
 
 def derive_defect_family(complaint: Complaint, signature: FailureSignature) -> str:

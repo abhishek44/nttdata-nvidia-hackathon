@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import re
+from collections import Counter
 from collections.abc import Sequence
 from typing import Any
 
@@ -10,6 +11,7 @@ from sklearn.metrics.pairwise import cosine_similarity
 from recallzero.intelligence.clustering import canonical_family
 from recallzero.intelligence.taxonomy import (
     consequence_related,
+    derive_consequence_family,
     derive_recall_axes,
     mechanism_related,
 )
@@ -147,6 +149,42 @@ class RecallMatcher:
         right = _token_set(" ".join(value for value in (recall.summary, recall.consequence) if value))
         return _overlap(left, right)
 
+    @staticmethod
+    def _consequence_distribution(
+        signatures: Sequence[FailureSignature],
+        complaints: Sequence[Complaint] | None,
+    ) -> Counter[str]:
+        if not complaints:
+            return Counter()
+        signature_by_id = {item.complaint_id: item for item in signatures}
+        counts: Counter[str] = Counter()
+        for complaint in complaints:
+            signature = signature_by_id.get(complaint.odi_number)
+            if signature is None:
+                continue
+            counts[derive_consequence_family(complaint, signature)] += 1
+        return counts
+
+    @staticmethod
+    def _distribution_consequence_score(
+        dominant_value: str,
+        distribution: Counter[str],
+        recall_consequences: set[str],
+    ) -> tuple[float, float, float]:
+        dominant = consequence_related(dominant_value, recall_consequences)
+        usable = {name: count for name, count in distribution.items() if name != "OTHER" and count > 0}
+        if not usable:
+            return dominant, dominant, dominant
+        total = sum(usable.values())
+        related = {name: consequence_related(name, recall_consequences) for name in usable}
+        weighted = sum(usable[name] * related[name] for name in usable) / max(1, total)
+        best = max(related.values(), default=0.0)
+        # Preserve the dominant-axis behavior while allowing a meta-signal's full
+        # consequence distribution to contribute. This is evaluation/matching logic,
+        # not a detector threshold change.
+        distribution_score = max(dominant, 0.5 * best + 0.5 * weighted)
+        return distribution_score, best, weighted
+
     def score_target_details(
         self,
         cluster: ComplaintCluster,
@@ -160,6 +198,8 @@ class RecallMatcher:
                 "explicit_campaign_reference": 1.0,
                 "failure_mechanism": 1.0,
                 "consequence_family": 1.0,
+                "consequence_family_best": 1.0,
+                "consequence_family_weighted": 1.0,
                 "defect_family": 1.0,
                 "component": 1.0,
                 "component_compatible": 1.0,
@@ -176,6 +216,8 @@ class RecallMatcher:
                 "explicit_campaign_reference": 0.0,
                 "failure_mechanism": 0.0,
                 "consequence_family": 0.0,
+                "consequence_family_best": 0.0,
+                "consequence_family_weighted": 0.0,
                 "defect_family": 0.0,
                 "component": 0.0,
                 "component_compatible": 0.0,
@@ -198,7 +240,10 @@ class RecallMatcher:
         if consequence_value == "OTHER" and cluster.defect_family in recall_consequences:
             consequence_value = cluster.defect_family
         mechanism = mechanism_related(mechanism_value, recall_mechanisms)
-        consequence_family = consequence_related(consequence_value, recall_consequences)
+        consequence_distribution = self._consequence_distribution(signatures, complaints)
+        consequence_family, consequence_family_best, consequence_family_weighted = self._distribution_consequence_score(
+            consequence_value, consequence_distribution, recall_consequences
+        )
         defect_family = max(mechanism, consequence_family)
         subsystem = self._subsystem_score(signatures, recall)
         consequence = self._consequence_text_score(signatures, recall)
@@ -227,6 +272,8 @@ class RecallMatcher:
             "explicit_campaign_reference": 0.0,
             "failure_mechanism": round(mechanism, 4),
             "consequence_family": round(consequence_family, 4),
+            "consequence_family_best": round(consequence_family_best, 4),
+            "consequence_family_weighted": round(consequence_family_weighted, 4),
             "defect_family": round(defect_family, 4),
             "component": round(component, 4),
             "component_compatible": component_compatible,

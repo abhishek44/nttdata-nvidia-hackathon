@@ -62,7 +62,6 @@ def _first_match(text: str, patterns: tuple[str, ...]) -> str | None:
 
 def _hypothetical_or_negated(sentence: str, matched: str) -> bool:
     text = _norm(sentence)
-    # Direct negation near the matched phrase.
     patterns = (
         rf"(?:not|never|no|did not|does not|didn t|doesn t)\s+(?:\w+\s+){{0,4}}{re.escape(matched)}",
         rf"{re.escape(matched)}\s+(?:\w+\s+){{0,3}}(?:not|never)",
@@ -70,8 +69,6 @@ def _hypothetical_or_negated(sentence: str, matched: str) -> bool:
     if any(re.search(pattern, text) for pattern in patterns):
         return True
 
-    # Speculative language should not become an observed safety event. Exempt common
-    # factual constructions such as "would not start" / "could not shift".
     factual_not = any(
         phrase in text
         for phrase in (
@@ -112,9 +109,9 @@ class SeverityEngine:
     """Deterministic event-scoped safety-indicator validator and scorer.
 
     Structured NHTSA crash/injury/fatality/fire fields remain source truth. Semantic
-    indicators are accepted only when explicit language occurs in an incident sentence,
-    not merely somewhere in the complaint background. This avoids treating statements
-    such as "luckily it did not fail while driving" as an in-motion failure.
+    indicators are accepted only when the complaint explicitly supports the incident.
+    Loss-of-motive-power additionally requires incident-scoped motion evidence so parked
+    no-start complaints cannot be promoted to moving propulsion failures.
     """
 
     SEMANTIC_PATTERNS: dict[str, tuple[str, ...]] = {
@@ -124,12 +121,23 @@ class SeverityEngine:
             "lost propulsion",
             "loss of propulsion",
             "lost all power",
+            "lost all drive power",
+            "lost drive power",
             "throttle went dead",
             "car turned itself off",
+            "vehicle turned itself off",
             "vehicle shut down",
             "vehicle shutdown",
             "vehicle stalled",
+            "unexpected vehicle stall",
             "car went dead",
+            "vehicle went dead",
+            "car died",
+            "vehicle died",
+            "vehicle dies",
+            "car dies",
+            "power cut out",
+            "propulsion stopped",
         ),
         "loss_of_braking": (
             "loss of braking",
@@ -191,18 +199,58 @@ class SeverityEngine:
         ),
     }
 
+    # Disabled/no-drive language is safety-relevant as loss of motive power only when
+    # the incident also has explicit motion evidence. The same phrases in a parked
+    # no-start complaint remain non-moving disablement evidence.
+    MOTION_REQUIRED_DISABLED_PATTERNS: tuple[str, ...] = (
+        "could not move vehicle",
+        "could not move",
+        "couldn t move",
+        "would not move",
+        "wouldn t move",
+        "will not move",
+        "unable to move",
+        "could not drive",
+        "would not drive",
+        "wouldn t drive",
+        "will not drive",
+        "would not go forward",
+        "could not go forward",
+        "could not shift into drive",
+        "would not shift into drive",
+        "could not enter drive",
+        "would not enter drive",
+    )
+
     MOTION_PATTERNS: tuple[str, ...] = (
         "while driving",
         "was driving",
+        "started driving",
+        "driving out of",
+        "driving our",
+        "driving my",
+        "driving the",
+        "driving this",
+        "driving down",
+        "driving on",
         "while traveling",
         "while travelling",
         "travelling at",
         "traveling at",
+        "travelling from",
+        "traveling from",
         "driving at",
         "while reversing",
+        "while entering the freeway",
+        "while entering the fwy",
         "while braking",
         "while operating the vehicle",
         "in motion",
+        "had to immediately pull over",
+        "had to pull over",
+        "pulled over",
+        "coast to the side",
+        "coasted to the side",
     )
 
     INCIDENT_CUES: tuple[str, ...] = (
@@ -214,10 +262,21 @@ class SeverityEngine:
         "loss",
         "shut down",
         "shutdown",
+        "turned itself off",
         "stalled",
         "went dead",
+        "vehicle died",
+        "car died",
+        "vehicle dies",
+        "car dies",
         "would not",
+        "wouldn t",
         "could not",
+        "couldn t",
+        "driving",
+        "will not",
+        "cannot",
+        "unable to",
         "accelerat",
         "brak",
         "steer",
@@ -226,6 +285,23 @@ class SeverityEngine:
         "error",
         "locked",
         "stuck",
+        "throttle",
+        "pull over",
+        "coast",
+    )
+
+    PARKED_EVENT_CUES: tuple[str, ...] = (
+        "while parked",
+        "was parked",
+        "car was parked",
+        "vehicle was parked",
+        "parked in",
+        "parked at",
+        "parking lot",
+        "parking structure",
+        "upon returning to my vehicle",
+        "returning to my vehicle",
+        "after a brief stop",
     )
 
     @classmethod
@@ -234,14 +310,12 @@ class SeverityEngine:
         incident = [sentence for sentence in sentences if any(cue in _norm(sentence) for cue in cls.INCIDENT_CUES)]
         if incident:
             return incident
-        # Sparse complaints can be a single fragment without a conventional verb.
         return sentences[:2]
 
     @classmethod
     def _motion_evidence(cls, complaint: Complaint, signature: FailureSignature) -> str | None:
         for sentence in cls._incident_sentences(complaint, signature):
             normalized = _norm(sentence)
-            # Explicit negative/historical phrases are common in safety complaints.
             if any(
                 phrase in normalized
                 for phrase in (
@@ -261,6 +335,14 @@ class SeverityEngine:
             if matched and not _hypothetical_or_negated(sentence, matched):
                 return f"Incident sentence indicates motion: {matched!r}"
         return None
+
+    @classmethod
+    def _parked_event(cls, complaint: Complaint, signature: FailureSignature) -> bool:
+        for sentence in cls._incident_sentences(complaint, signature):
+            normalized = _norm(sentence)
+            if any(phrase in normalized for phrase in cls.PARKED_EVENT_CUES):
+                return True
+        return False
 
     def validate_indicators(self, complaint: Complaint, signature: FailureSignature) -> dict[str, str]:
         evidence: dict[str, str] = {}
@@ -282,10 +364,23 @@ class SeverityEngine:
         for indicator, patterns in self.SEMANTIC_PATTERNS.items():
             if indicator in SOURCE_ONLY_INDICATORS:
                 continue
+            # Loss of motive power is specifically an in-motion consequence. A parked
+            # no-start/no-drive incident must not receive this severity indicator.
+            if indicator == "loss_of_motive_power" and not motion:
+                continue
             for sentence in incident_sentences:
                 matched = _first_match(sentence, patterns)
                 if matched and not _hypothetical_or_negated(sentence, matched):
                     evidence[indicator] = f"Incident narrative support: {matched!r}"
+                    break
+
+        if motion and "loss_of_motive_power" not in evidence:
+            for sentence in incident_sentences:
+                matched = _first_match(sentence, self.MOTION_REQUIRED_DISABLED_PATTERNS)
+                if matched and not _hypothetical_or_negated(sentence, matched):
+                    evidence["loss_of_motive_power"] = (
+                        f"Incident narrative support with motion context: {matched!r}"
+                    )
                     break
 
         return dict(sorted(evidence.items()))

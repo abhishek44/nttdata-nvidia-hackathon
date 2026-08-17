@@ -22,6 +22,11 @@ This repository is a clean rebuild based on the supplied RecallZero design docum
 
 ## Architecture
 
+
+### 0.3.3a scientific slice
+
+0.3.3a1 intentionally changes only severity validation, contradictory-mechanism guarding, consequence-distribution recall matching, and Time Machine diagnostic fields. The alert threshold, risk weights, trend windows, DBSCAN parameters, and leakage boundary stay frozen. The signal-fusion graph and meta-membership confidence heuristics are intentionally deferred so the Mach-E replay can attribute any outcome change to this smaller slice.
+
 ### 0.3.2 signal model
 
 Each complaint is represented on two independent axes: `failure_mechanism` captures root-oriented language such as a high-voltage junction-box/contactor problem, while `consequence_family` captures what the driver experienced such as loss of motive power or a no-start condition. Fine-grained child clusters remain available for ODI drill-down. When the same specific mechanism is split across child clusters, components, or consequences, RecallZero also creates a deterministic `meta` signal that preserves the contributing child-cluster IDs and complaint IDs.
@@ -295,7 +300,7 @@ python -m compileall -q src tests
 
 The suite covers normalization, structured/heuristic extraction, transient NIM retry behavior, dual-axis taxonomy, meta-signal lineage, complete-link max-distance refinement, event-scoped severity provenance, structured recall matching, active-week persistence, NHTSA response parsing, campaign lookup, API health/demo, NAT/AI-Q config integration, and Time Machine anti-leakage/outcome semantics.
 
-The 0.3.2 archive is validated offline before release; live NHTSA/NIM execution and the exact installed NAT runtime must still be smoke-tested on the GB10. See [Release Validation](RELEASE_VALIDATION.md).
+The 0.3.3a1 archive is validated offline before release; live NHTSA/NIM execution and the exact installed NAT runtime must still be smoke-tested on the GB10. See [Release Validation](RELEASE_VALIDATION.md).
 
 ## Risk configuration
 

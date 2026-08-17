@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.3.3a1 — Scientific slice A
+
+- Keep detector calibration frozen: alert threshold 75, risk weights, 28/84-day windows, DBSCAN eps/min_samples, and anti-leakage rules are unchanged.
+- Repair event-scoped severity false negatives for moving shutdown/stall/power-loss narratives while preserving parked no-start/no-drive negatives.
+- Add regression cases based on the Mach-E ODI examples 11415152, 11460408, 11462003, 11465461, 11465548, 11466150 (positive) and 11459506, 11463755, 11464507, 11464559 (negative).
+- Add a narrow taxonomy consistency guard that downgrades contradictory specific mechanism/consequence combinations to component-level GENERAL/OTHER categories instead of feeding them into meta aggregation.
+- Make recall matching consider the observed consequence-family distribution across a signal, while preserving the existing mechanism/component/subsystem/text score structure.
+- Add evaluation-only `earliest_target_like_candidate_date`/score/signal fields and `first_qualified_alert_date`/signal fields so target-pattern recognition is clearly separated from a defensible lead-time claim.
+- Deliberately defer the investigation-signal fusion graph and meta-membership confidence rules to a later isolated experiment.
+
 ## 0.3.2
 
 - Added dual-axis defect representation: root `failure_mechanism` plus driver-visible `consequence_family`.

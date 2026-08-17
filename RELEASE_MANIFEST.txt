@@ -1,20 +1,18 @@
 RecallZero v2 release manifest
 ==============================
 
-Version: 0.3.2
-Release date: 2026-08-17
-Target: NVIDIA GB10 / DGX Spark-compatible Python 3.11-3.13 environment
+Version: 0.3.3a1
+Release date: 2026-08-18
+Target: NVIDIA GB10 compute system / Python 3.11-3.13 environment
 
-Release focus: signal lineage and meta-detection scientific-validity patch
-- Split defect representation into root-oriented failure_mechanism and driver-visible consequence_family axes.
-- Preserve component/consequence child clusters while adding deterministic cross-component meta-signals for specific root mechanisms.
-- Add stable signal lineage IDs across weekly replay snapshots.
-- Enforce complete-link refinement using maximum sampled pairwise distance, not only p90 dispersion.
-- Validate semantic severity in the incident context and reject negated, hypothetical, or background driving references.
-- Replace cutoff-ending persistence with recent active-week density plus maximum consecutive active weeks.
-- Add component-compatible dual-axis recall matching.
-- Record top Time Machine candidates and post-hoc target scores only after each detector snapshot is frozen.
-- Keep the 75-point alert threshold, risk weights, minimum evidence defaults, and anti-leakage boundary unchanged.
+Release focus: Scientific Slice A — isolated severity/taxonomy/evaluation correction
+- Repair event-scoped severity false negatives for moving shutdown/stall/power-loss narratives.
+- Preserve parked no-start/no-drive negatives through deterministic event-context checks.
+- Add a narrow mechanism/consequence consistency guard that downgrades contradictory specific assignments to GENERAL/OTHER.
+- Score recall consequence compatibility from the observed consequence-family distribution, not only the dominant meta label.
+- Separate evaluation-only target-pattern recognition (`earliest_target_like_candidate_date`) from a qualified alert (`first_qualified_alert_date`).
+- Keep alert threshold 75, all risk weights, 28/84-day windows, DBSCAN eps/min_samples, and anti-leakage rules unchanged.
+- Explicitly defer the signal-fusion graph and meta-membership confidence rules to a later isolated experiment.
 
 Included capabilities:
 - NHTSA complaint and recall ingestion with evidence-preserving normalization
@@ -29,24 +27,23 @@ Included capabilities:
 - Optional legacy AIQ registration and current stock AI-Q data-source-registry patching
 
 Offline validation:
-- 47 automated tests passed; 1 optional NAT-runtime integration test skipped because `nat` is not installed in the build container
+- 60 automated tests passed; 1 optional NAT-runtime integration test skipped because `nat` is not installed in the build container
+- 13 new 0.3.3a slice tests cover the six named moving Mach-E positives, four named parked negatives, taxonomy guard, consequence-distribution matching, and dual Time Machine metrics
 - Python compilation passed
 - Synthetic end-to-end analysis and historical replay passed
-- Scientific-validity regression coverage includes hypothetical-event rejection, severity source provenance, taxonomy separation, campaign-reference matching, HV power-loss recall matching, and Time Machine outcome semantics
+- Wheel build and isolated-target installation passed
 
 Wheel:
-- dist/recallzero-0.3.2-py3-none-any.whl
-- SHA-256: 0945247a7f7671ee11b22263a345c2b45cfb83b7cf93601f5bc6725b0bdc128c
+- dist/recallzero-0.3.3a1-py3-none-any.whl
+- SHA-256: 69712149bea2bad7566fbdab6845e71ae512cd99eeb9ee0dbbe26339d3d71c9b
 
 Target-environment validation still required:
-- Live hosted/local NVIDIA NIM behavior on GB10
-- Native NAT tool-calling execution with the installed runtime
-- Re-run the full and pre-recall Mach-E analyses using 0.3.2
-- Re-run campaign 22V412000 and inspect first-any-alert vs first-target-matching-alert
-- Additional historical positive cases and negative controls
+- Re-run the exact 0.3.2 Mach-E current, 2022-06-09 cutoff, and 22V412000 Time Machine commands under 0.3.3a1
+- Compare severity factors and the new target-like-vs-qualified metrics without changing threshold/weights/windows/clustering parameters
+- Native NAT tool-calling smoke test with the installed runtime
 
 Non-claims:
 - Synthetic demo results are not real vehicle safety findings.
-- A risk-qualified pre-recall alert is not automatically a target-recall match.
-- Campaign 22V412000 remains an experiment candidate until the 0.3.2 replay is reviewed.
-- Default risk, clustering, and recall-matching thresholds remain prototype values pending multi-case calibration.
+- `earliest_target_like_candidate_date` is evaluation-only and is not lead time.
+- A lead-time claim requires `first_qualified_alert_date`, a target match, and passing anti-leakage checks.
+- 0.3.3a1 is intentionally not a calibration release; detector thresholds remain frozen.

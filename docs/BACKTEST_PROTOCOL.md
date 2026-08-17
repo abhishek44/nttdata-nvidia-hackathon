@@ -119,3 +119,12 @@ Persist for every reported experiment:
 ## 0.3.2 evaluation-only candidate diagnostics
 
 After each detector snapshot is frozen, the Time Machine records up to five highest-risk candidates with `max_risk_score`, `distance_to_alert_threshold`, stable lineage, and an evaluation-only `posthoc_target_score`. Target recall text is introduced only after the detector output is frozen and never changes clustering, trend, severity, recall-gap scoring, or the alert decision. This allows a negative backtest to distinguish "the detector looked at the right mechanism but stayed below threshold" from "the detector never surfaced a target-like pattern."
+## 0.3.3a diagnostic separation
+
+The Time Machine now emits two explicit evaluation fields in addition to the existing alert fields:
+
+- `earliest_target_like_candidate_date`: earliest frozen top candidate whose post-hoc target score crosses the configured target-match threshold. This is **not** an alert and must not be reported as lead time.
+- `first_qualified_alert_date`: earliest frozen detector alert that also passes the post-hoc target-recall match threshold. This is the alert date eligible for a lead-time claim when all anti-leakage checks pass.
+
+The target recall is still introduced only after each detector snapshot is frozen. 0.3.3a1 keeps the detector threshold, risk weights, trend windows, minimum evidence defaults, DBSCAN parameters, and anti-leakage rules unchanged.
+

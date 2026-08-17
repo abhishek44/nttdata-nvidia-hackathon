@@ -182,6 +182,10 @@ class RecallTimeMachine:
 
         candidate_matches.sort(key=lambda item: (item[0], -item[1], -item[2].risk.final_score))
         all_alerts.sort(key=lambda item: (item[0], -item[1].risk.final_score))
+        target_like_candidates = sorted(
+            (item for item in all_posthoc_candidates if item[1] >= self.target_match_threshold),
+            key=lambda item: (item[0], -item[1], -item[2].risk.final_score),
+        )
         all_posthoc_candidates.sort(key=lambda item: (-item[1], item[0], -item[2].risk.final_score))
 
         first_date = candidate_matches[0][0] if candidate_matches else None
@@ -189,6 +193,7 @@ class RecallTimeMachine:
         matched_signal_id = candidate_matches[0][2].signal_id if candidate_matches else None
         first_any_alert_date = all_alerts[0][0] if all_alerts else None
         first_any_alert_signal_id = all_alerts[0][1].signal_id if all_alerts else None
+        earliest_target_like = target_like_candidates[0] if target_like_candidates else None
         lead_time = (official_recall_date - first_date).days if first_date else None
         best_posthoc = all_posthoc_candidates[0] if all_posthoc_candidates else None
 
@@ -240,6 +245,7 @@ class RecallTimeMachine:
             matched_signal_id = None
             first_any_alert_date = None
             first_any_alert_signal_id = None
+            earliest_target_like = None
             lead_time = None
 
         backtest_id = stable_id(
@@ -261,6 +267,11 @@ class RecallTimeMachine:
             target_match_score=match_score,
             first_any_alert_date=first_any_alert_date,
             first_any_alert_signal_id=first_any_alert_signal_id,
+            earliest_target_like_candidate_date=earliest_target_like[0] if earliest_target_like else None,
+            earliest_target_like_candidate_signal_id=earliest_target_like[2].signal_id if earliest_target_like else None,
+            earliest_target_like_candidate_score=earliest_target_like[1] if earliest_target_like else None,
+            first_qualified_alert_date=first_date,
+            first_qualified_alert_signal_id=matched_signal_id,
             alert_snapshot_count=sum(1 for snapshot in frozen_snapshots if snapshot.alerts),
             max_pre_alert_target_score=best_posthoc[1] if best_posthoc else None,
             max_pre_alert_target_date=best_posthoc[0] if best_posthoc else None,

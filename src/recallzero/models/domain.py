@@ -334,6 +334,13 @@ class BacktestResult(StrictModel):
     target_match_score: float | None
     first_any_alert_date: date | None = None
     first_any_alert_signal_id: str | None = None
+    # 0.3.3a diagnostic pair: target-like pattern recognition is evaluation-only;
+    # a qualified alert requires both the frozen detector gate and post-hoc target match.
+    earliest_target_like_candidate_date: date | None = None
+    earliest_target_like_candidate_signal_id: str | None = None
+    earliest_target_like_candidate_score: float | None = Field(default=None, ge=0.0, le=1.0)
+    first_qualified_alert_date: date | None = None
+    first_qualified_alert_signal_id: str | None = None
     alert_snapshot_count: int = 0
     max_pre_alert_target_score: float | None = Field(default=None, ge=0.0, le=1.0)
     max_pre_alert_target_date: date | None = None

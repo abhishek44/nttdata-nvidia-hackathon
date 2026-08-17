@@ -281,6 +281,11 @@ def backtest(
         )
         console.print(f"[bold]Status:[/bold] {result.status}")
         console.print(f"[bold]First any alert:[/bold] {result.first_any_alert_date or 'none'}")
+        console.print(
+            f"[bold]Earliest target-like candidate:[/bold] "
+            f"{result.earliest_target_like_candidate_date or 'none'}"
+        )
+        console.print(f"[bold]First qualified alert:[/bold] {result.first_qualified_alert_date or 'none'}")
         console.print(f"[bold]First matching alert:[/bold] {result.first_matching_alert_date or 'none'}")
         console.print(f"[bold]Lead time:[/bold] {result.lead_time_days if result.lead_time_days is not None else 'not measured'}")
         console.print(f"[bold]Best post-hoc pre-alert target score:[/bold] {result.max_pre_alert_target_score if result.max_pre_alert_target_score is not None else 'none'}")
