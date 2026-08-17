@@ -178,10 +178,18 @@ class RecallZeroPipeline:
         if unknown_recall_dates:
             warnings.append(f"Excluded {unknown_recall_dates} recall record(s) with no usable report date from cutoff logic.")
         methods = extraction_method_counts(visible_signatures)
-        if methods.get("heuristic"):
+        heuristic_count = methods.get("heuristic", 0)
+        if heuristic_count:
             warnings.append(
-                f"{methods['heuristic']} signature(s) used the deterministic heuristic path. Review these before relying on semantic labels."
+                f"{heuristic_count} signature(s) used the deterministic heuristic path. Review these before relying on semantic labels."
             )
+            fallback_ratio = heuristic_count / max(1, len(visible_signatures))
+            if self.extractor.nim is not None and fallback_ratio > 0.20:
+                warnings.append(
+                    "DEGRADED SEMANTIC QUALITY: "
+                    f"{fallback_ratio:.0%} of visible signatures used heuristic fallback. "
+                    "Treat cluster labels and engineering alerts as unvalidated until NIM extraction succeeds."
+                )
         run_id = stable_id("run", vehicle.slug, cutoff_date, datetime.now(UTC).isoformat(), len(visible_complaints))
         run = AnalysisRun(
             run_id=run_id,

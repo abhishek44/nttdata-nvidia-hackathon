@@ -1,17 +1,18 @@
 RecallZero v2 release manifest
 ==============================
 
-Version: 0.2.1
+Version: 0.2.2
 Release date: 2026-08-17
 Target: NVIDIA GB10 / DGX Spark-compatible Python 3.11-3.13 environment
 
 Patch focus:
-- Resolve NHTSA complaint/recall model punctuation mismatches, including
-  MUSTANG MACH-E -> MUSTANG MACH E.
-- Fail fast on non-transient HTTP 400 responses instead of retrying them.
-- Parse NHTSA complaint and recall slash dates using endpoint-specific order.
-- Mark the deprecated aiq module as optional; current AI-Q uses nat.
-- Support NAT 1.8+ public plugin imports and the documented NAT 1.5-1.7 imports.
+- Fix Nemotron 3.5 structured extraction by disabling thinking for extraction calls.
+- Constrain complaint extraction with NVIDIA NIM guided JSON and Pydantic validation.
+- Improve NIM empty-content and malformed-JSON diagnostics.
+- Fix NeMo Agent Toolkit FunctionInfo registration with eager annotations and explicit input schemas.
+- Explicitly disable thinking for the standalone NAT ReAct investigator.
+- Preserve the 0.2.1 NHTSA model-punctuation/date/retry fixes.
+- Mark runs with excessive heuristic fallbacks as semantically degraded.
 
 Included capabilities:
 - NHTSA complaint and recall ingestion with evidence-preserving normalization
@@ -26,15 +27,15 @@ Included capabilities:
 - Optional legacy AIQ registration and current stock AI-Q data-source-registry patching
 
 Offline validation:
-- 24 automated tests passed
+- 30 automated tests passed; 1 optional NAT-runtime integration test skipped because `nvidia-nat` is not installed in the build container
 - Python compilation passed
 - Synthetic end-to-end analysis and historical replay passed
 - Wheel install, entry points, packaged dashboard, CLI version, and wheel-based demo passed
 - Regression coverage includes model alias resolution and non-retryable HTTP 400 behavior
 
 Wheel:
-- dist/recallzero-0.2.1-py3-none-any.whl
-- SHA-256: f7313b7afee52add3253a93556c30dff8ad34c02b47e9526da4bd238cd146764
+- dist/recallzero-0.2.2-py3-none-any.whl
+- SHA-256: dc6fbe41118699371bd0ab828f56864f17e4b4825dff1ccde30c8c82272300a8
 
 Target-environment validation still required:
 - Live patched NHTSA recall retrieval on GB10

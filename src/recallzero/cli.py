@@ -158,7 +158,8 @@ def doctor(
             text = await client.chat_completion(
                 model=settings.llm_model,
                 messages=[{"role": "user", "content": "Reply with exactly: RECALLZERO_OK"}],
-                max_tokens=20,
+                max_tokens=64,
+                disable_thinking=True,
             )
             console.print(f"NIM response: [bold]{text}[/bold]")
 

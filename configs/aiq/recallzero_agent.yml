@@ -29,22 +29,19 @@ llms:
     temperature: 0.0
     max_tokens: 4096
 
+
 workflow:
-  _type: react_agent
+  _type: tool_calling_agent
+
   tool_names:
     - recallzero_fetch_vehicle_data
     - recallzero_analyze_vehicle
     - recallzero_run_backtest
     - recallzero_get_evidence
     - recallzero_engineering_brief
+
   llm_name: investigator_llm
+
   verbose: true
-  parse_agent_response_max_retries: 3
-  tool_call_max_retries: 2
-  additional_instructions: |
-    You are the RecallZero vehicle-safety investigation agent. Use RecallZero tools rather than estimating
-    counts, dates, trends, risk scores, recall matches, or lead time yourself. Distinguish an early-warning
-    signal from proof of a defect. Never say that a complaint-associated crash, fire, or injury was caused by
-    the suspected failure unless the evidence explicitly establishes causation. Cite ODI complaint identifiers
-    when explaining evidence. For historical questions, use the leakage-safe backtest tool and report its
-    anti-leakage checks. If a tool reports NO_EARLY_SIGNAL, preserve that result without tuning it into success.
+  handle_tool_errors: true
+  max_iterations: 8

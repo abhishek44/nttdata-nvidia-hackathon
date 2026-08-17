@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 
-from recallzero.models import DefectSignal
+from recallzero.models import DefectSignal, ExtractionMethod
 
 
 @dataclass(slots=True)
@@ -59,6 +59,20 @@ class EngineeringBriefRenderer:
             ids += f", plus {len(signal.evidence) - 12} more"
         critic_text = "PASS" if audit.passed else "REVIEW REQUIRED"
         notes = "\n".join(f"- {note}" for note in audit.notes) or "- No additional critic notes."
+        nim_count = sum(
+            1 for item in signal.evidence if item.signature.extraction_method == ExtractionMethod.NIM
+        )
+        heuristic_count = len(signal.evidence) - nim_count
+        heuristic_ratio = heuristic_count / max(1, len(signal.evidence))
+        if heuristic_ratio > 0.20:
+            semantic_quality = (
+                f"DEGRADED — {heuristic_count}/{len(signal.evidence)} supporting signatures used heuristic fallback. "
+                "Treat the semantic cluster label and alert interpretation as unvalidated until NIM extraction succeeds."
+            )
+        else:
+            semantic_quality = (
+                f"ACCEPTABLE — {nim_count}/{len(signal.evidence)} supporting signatures were extracted with NIM."
+            )
         return f"""# RecallZero Engineering Investigation Brief
 
 **Vehicle:** {signal.vehicle.display_name}  
@@ -75,6 +89,10 @@ class EngineeringBriefRenderer:
 - Smoothed recent/baseline ratio: {signal.trend.trend_ratio:.2f}x
 - Consecutive recent weeks with evidence: {signal.trend.persistence_weeks}
 - Complaint IDs: {ids or 'None'}
+
+## Semantic extraction quality
+
+{semantic_quality}
 
 ## Recall cross-reference
 

@@ -1,10 +1,10 @@
 # RecallZero v2 Release Validation
 
-Release version: **0.2.1**
+Release version: **0.2.2**
 
 ## Validated in the build environment
 
-- `pytest -q`: **24 tests passed**.
+- `pytest -q`: **30 tests passed, 1 optional NAT-runtime test skipped** because `nvidia-nat` is not installed in the build container.
 - `python -m compileall -q src tests`: passed.
 - `recallzero --help`: command entry point loaded.
 - `recallzero demo`: synthetic end-to-end analysis and Time Machine replay completed.
@@ -17,6 +17,8 @@ Release version: **0.2.1**
 - NHTSA complaint response parsing, campaign-number lookup, recall-catalog model resolution, endpoint-specific date parsing, and non-transient retry behavior.
 - Heuristic failure extraction and multi-component selection.
 - NIM/local-endpoint configuration detection.
+- NIM guided-JSON request payloads, thinking-disabled structured extraction, fenced-JSON recovery, and empty-content diagnostics.
+- NAT tool schema registration uses eager runtime annotations and explicit `input_schema` values.
 - Cache upgrade from heuristic signatures to a configured NIM model.
 - TF-IDF/DBSCAN semantic grouping.
 - Deterministic trend, severity, and risk behavior.

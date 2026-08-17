@@ -87,9 +87,9 @@ recallzero serve --port 8080
 - Alert volume per vehicle/time period.
 - Backtest anti-leakage status.
 
-## 8. Upgrade an existing 0.2.0 checkout
+## 8. Upgrade an existing 0.2.0/0.2.1 checkout
 
-Replace the source files with the 0.2.1 archive, then reinstall the editable package in the existing virtual environment:
+Replace the source files with the 0.2.2 archive, then reinstall the editable package in the existing virtual environment:
 
 ```bash
 cd recallzero_v2
@@ -102,7 +102,7 @@ recallzero --version
 Expected output:
 
 ```text
-RecallZero 0.2.1
+RecallZero 0.2.2
 ```
 
-The old `data/` directory can be retained. A failed 0.2.0 fetch normally cached the successful complaint response but did not create a recall cache, so the same fetch command can be rerun without `--refresh` to retrieve only the missing recalls.
+The old `data/` directory can be retained. A failed older fetch normally cached the successful complaint response but did not create a recall cache, so the same fetch command can be rerun without `--refresh` to retrieve only the missing recalls.

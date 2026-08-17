@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from pydantic import Field
 
 # NeMo Agent Toolkit 1.8+ exposes a stable plugin-authoring facade. AI-Q 2.1
@@ -59,6 +57,7 @@ async def fetch_vehicle_data(config: FetchConfig, _builder: Builder):
 
     yield FunctionInfo.from_fn(
         _run,
+        input_schema=VehicleToolInput,
         description=(
             "Fetch and cache public NHTSA complaints and recalls for an exact make, model, and set of model years. "
             "Use before analysis when data availability is uncertain."
@@ -73,6 +72,7 @@ async def analyze_vehicle(config: AnalyzeConfig, _builder: Builder):
 
     yield FunctionInfo.from_fn(
         _run,
+        input_schema=AnalyzeVehicleToolInput,
         description=(
             "Run RecallZero's full evidence-first investigation: NHTSA ingestion, failure-signature extraction, "
             "semantic clustering, deterministic trend/severity/risk scoring, and visible-recall cross-reference. "
@@ -88,6 +88,7 @@ async def run_backtest(config: BacktestConfig, _builder: Builder):
 
     yield FunctionInfo.from_fn(
         _run,
+        input_schema=BacktestToolInput,
         description=(
             "Run the leakage-safe Recall Time Machine against a known NHTSA campaign. The target recall text is "
             "withheld during detection and used only for post-hoc matching after weekly signals are frozen."
@@ -102,6 +103,7 @@ async def get_evidence(config: EvidenceConfig, _builder: Builder):
 
     yield FunctionInfo.from_fn(
         _run,
+        input_schema=EvidenceToolInput,
         description="Retrieve the original cached NHTSA complaint record for a specific ODI identifier.",
     )
 
@@ -113,6 +115,7 @@ async def engineering_brief(config: BriefConfig, _builder: Builder):
 
     yield FunctionInfo.from_fn(
         _run,
+        input_schema=BriefToolInput,
         description=(
             "Render a traceable engineering investigation brief for a saved RecallZero signal and run. "
             "The brief includes a deterministic evidence-critic consistency check."

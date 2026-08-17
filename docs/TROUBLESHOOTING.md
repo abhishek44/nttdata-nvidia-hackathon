@@ -67,3 +67,14 @@ python -c "import recallzero; print(recallzero.__version__, recallzero.__file__)
 ```
 
 All three should refer to the intended virtual environment and version.
+
+
+## NIM returns HTTP 200 but every extraction falls back to heuristics
+
+RecallZero 0.2.2 sends a guided JSON schema and disables model thinking for the extraction call. This is important for reasoning-capable models such as ``nvidia/nemotron-3.5-lightning-30b-a3b`` because reasoning and visible output share the completion budget. If extraction still falls back, rerun with ``RECALLZERO_LOG_LEVEL=DEBUG`` and inspect the structured-extraction warning.
+
+A healthy bounded validation should report NIM signatures in ``extraction_method_counts``. If more than 20% of signatures use heuristics, the run is marked with a ``DEGRADED SEMANTIC QUALITY`` warning and should not be used as a validated defect claim.
+
+## NAT fails with ``VehicleToolInput is not defined``
+
+RecallZero 0.2.2 fixes the plugin registration by supplying explicit Pydantic input schemas to ``FunctionInfo.from_fn`` and avoiding deferred annotations in the registration module. Reinstall the editable package after upgrading so the NAT entry point loads the patched module.

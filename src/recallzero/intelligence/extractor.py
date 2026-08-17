@@ -6,9 +6,9 @@ import logging
 import re
 from collections import Counter
 from collections.abc import Iterable, Sequence
-from typing import Any, Protocol
+from typing import Any, Literal, Protocol
 
-from pydantic import ValidationError
+from pydantic import BaseModel, ConfigDict, ValidationError, field_validator
 
 from recallzero.intelligence.nim_client import NIMClient, NIMError
 from recallzero.models import Complaint, ExtractionMethod, FailureSignature
@@ -171,6 +171,55 @@ Required JSON keys:
 """
 
 
+SeverityIndicator = Literal[
+    "crash_reported",
+    "fire_or_thermal_event",
+    "injury_reported",
+    "fatality_reported",
+    "loss_of_braking",
+    "loss_of_steering",
+    "loss_of_motive_power",
+    "loss_of_control",
+    "restraint_failure",
+    "unintended_acceleration",
+    "unintended_braking",
+    "vehicle_in_motion",
+]
+
+
+class NIMFailureSignaturePayload(BaseModel):
+    """Schema supplied to NIM guided generation for one complaint."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    system: str
+    subsystem: str | None
+    failure_mode: str
+    symptom: str | None
+    operating_state: str | None
+    consequence: str | None
+    severity_indicators: list[SeverityIndicator]
+    confidence: float
+
+    @field_validator("system", "failure_mode")
+    @classmethod
+    def require_nonempty(cls, value: str) -> str:
+        normalized = " ".join(value.split())
+        if not normalized:
+            raise ValueError("must not be empty")
+        return normalized
+
+    @field_validator("confidence")
+    @classmethod
+    def validate_confidence(cls, value: float) -> float:
+        if not 0.0 <= value <= 1.0:
+            raise ValueError("confidence must be between 0 and 1")
+        return value
+
+
+NIM_FAILURE_SIGNATURE_SCHEMA: dict[str, Any] = NIMFailureSignaturePayload.model_json_schema()
+
+
 class NIMFailureExtractor:
     def __init__(self, client: NIMClient, model_name: str):
         self.client = client
@@ -210,17 +259,28 @@ class NIMFailureExtractor:
                 {"role": "user", "content": json.dumps(incident_context, ensure_ascii=False)},
             ],
             temperature=0.0,
-            max_tokens=650,
+            max_tokens=900,
+            guided_json=NIM_FAILURE_SIGNATURE_SCHEMA,
+            disable_thinking=True,
         )
-        parsed = self._extract_json(content)
-        parsed.update(
-            {
-                "complaint_id": complaint.odi_number,
-                "extraction_method": ExtractionMethod.NIM,
-                "model_name": self.model_name,
-            }
+        try:
+            # Guided generation should already produce pure JSON. Keep the tolerant
+            # parser for hosted/local endpoints that still wrap JSON in fences.
+            parsed = self._extract_json(content)
+            payload = NIMFailureSignaturePayload.model_validate(parsed)
+        except (ValidationError, ValueError, json.JSONDecodeError):
+            logger.warning(
+                "NIM returned an invalid structured extraction for ODI %s; raw response prefix=%r",
+                complaint.odi_number,
+                content[:500],
+            )
+            raise
+        return FailureSignature(
+            complaint_id=complaint.odi_number,
+            **payload.model_dump(),
+            extraction_method=ExtractionMethod.NIM,
+            model_name=self.model_name,
         )
-        return FailureSignature.model_validate(parsed)
 
 
 class HybridFailureExtractor:

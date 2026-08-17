@@ -8,7 +8,6 @@ from urllib.parse import urlparse
 import httpx
 
 
-
 class NIMError(RuntimeError):
     pass
 
@@ -88,23 +87,55 @@ class NIMClient:
         messages: list[dict[str, str]],
         temperature: float = 0.0,
         max_tokens: int = 800,
+        guided_json: dict[str, Any] | None = None,
+        disable_thinking: bool = False,
     ) -> str:
-        payload = {
+        """Create a non-streaming chat completion.
+
+        ``guided_json`` is sent using NVIDIA NIM's guided JSON structured-generation
+        request field. For concise extraction tasks with reasoning-capable Nemotron
+        models, ``disable_thinking`` prevents the reasoning trace from consuming the
+        output-token budget before the final JSON answer is emitted.
+        """
+
+        payload: dict[str, Any] = {
             "model": model,
             "messages": messages,
             "temperature": temperature,
             "max_tokens": max_tokens,
             "stream": False,
         }
+        if guided_json is not None:
+            payload["guided_json"] = guided_json
+        if disable_thinking:
+            payload["chat_template_kwargs"] = {"enable_thinking": False}
+
         response = await self._post("chat/completions", payload)
         choices = response.get("choices") or []
         if not choices:
             raise NIMError("NIM chat response contained no choices")
-        content = choices[0].get("message", {}).get("content")
+
+        choice = choices[0] if isinstance(choices[0], dict) else {}
+        message = choice.get("message") or {}
+        content = message.get("content") if isinstance(message, dict) else None
         if isinstance(content, list):
             content = "".join(str(item.get("text", "")) if isinstance(item, dict) else str(item) for item in content)
         if not isinstance(content, str) or not content.strip():
-            raise NIMError("NIM chat response contained no text")
+            finish_reason = choice.get("finish_reason") or "unknown"
+            reasoning = None
+            if isinstance(message, dict):
+                reasoning = message.get("reasoning_content") or message.get("reasoning")
+            reasoning_chars = len(reasoning) if isinstance(reasoning, str) else 0
+            hint = ""
+            if finish_reason == "length" or reasoning_chars:
+                hint = (
+                    " Reasoning-capable models can consume the output budget before emitting visible content; "
+                    "disable thinking for structured extraction or increase max_tokens."
+                )
+            raise NIMError(
+                "NIM chat response contained no visible text "
+                f"(finish_reason={finish_reason}, reasoning_chars={reasoning_chars}).{hint}"
+            )
         return content.strip()
 
     async def embeddings(
