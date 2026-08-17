@@ -1,5 +1,33 @@
 # Changelog
 
+## 0.3.1
+
+- Add deterministic canonical defect families for cross-wording normalization while preserving raw NIM failure modes as evidence.
+- Refine clustering to component family -> canonical defect family -> DBSCAN, then split DBSCAN density chains with complete-link cosine refinement.
+- Add canonical defect-family purity and per-cluster cosine-distance diagnostics alongside raw failure-mode purity.
+- Replace LLM-trusted severity flags with deterministic validation: crash/injury/fatality/fire source truth comes from NHTSA structured fields; other safety indicators require explicit narrative support.
+- Expose validated severity indicators and evidence provenance on each evidence item; unsupported LLM safety indicators are rejected from risk scoring.
+- Replace lexical-only recall matching with structured scoring across defect family, component, subsystem, consequence, and semantic text, with exact campaign-reference sanity checks.
+- Raise the Time Machine post-hoc target-match threshold to 0.45 for the new structured score.
+- Distinguish `EARLY_ALERT_TARGET_UNMATCHED` from true `NO_EARLY_SIGNAL`, and expose the first risk-qualified alert separately from the first target-matching alert.
+- Preserve all anti-leakage rules; target recall text is still introduced only after each snapshot signal is frozen.
+- Add scientific-validity regression tests for hypothetical crash rejection, parked-motion rejection, taxonomy separation, explicit campaign matching, HV power-loss recall matching, and backtest outcome semantics.
+
+## 0.3.0
+
+- Add hosted-NIM rate-limit resilience with Retry-After support, exponential backoff, jitter, and transient HTTP classification.
+- Reduce default LLM extraction concurrency from 4 to 2 and raise the retry budget for long complaint runs.
+- Refuse silent heuristic/TF-IDF fallback after exhausted 429/5xx transient failures by default; this can be explicitly overridden with `RECALLZERO_TRANSIENT_NIM_FALLBACK=true`.
+- Persist successful failure signatures incrementally and checkpoint small batches so interrupted/rate-limited runs resume without repeating completed ODI records.
+- Replace flat semantic clustering with hierarchical NHTSA component-family -> DBSCAN clustering.
+- Add cluster diagnostics: component-group sizes, DBSCAN cluster/noise counts, cosine-distance summaries, largest-cluster share, and failure-mode purity.
+- Mark suspicious one-cluster or dominant-cluster results with explicit quality warnings and expose `semantic_quality` on analysis runs.
+- Prevent degraded semantic snapshots from producing a positive Recall Time Machine lead-time claim.
+- Compact NAT tool output by truncating evidence-ID arrays and adding representative evidence IDs, exact metric-window definitions, quality diagnostics, and grounding rules.
+- Switch the modern NAT workflow to `tool_calling_agent`, remove the unsupported `thinking` YAML field, and use only NAT 1.8 documented workflow fields.
+- Strengthen deterministic evidence-critic checks with NHTSA component-family alignment and generic-cluster warnings.
+- Add regression tests for 429 retry behavior, permanent-4xx behavior, transient-fallback refusal, hierarchical component separation, and NAT 1.8 configuration.
+
 ## 0.2.2
 
 - Fix structured complaint extraction for reasoning-capable Nemotron 3.5 models by disabling thinking for extraction requests.

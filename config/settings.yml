@@ -2,11 +2,22 @@
 models:
   llm: nvidia/nemotron-3.5-lightning-30b-a3b
   embeddings: nvidia/nv-embedqa-e5-v5
+nim:
+  llm_concurrency: 2
+  signature_batch_size: 20
+  max_retries: 7
+  retry_base_delay_seconds: 1.5
+  retry_max_delay_seconds: 30
+  transient_nim_fallback: false
 windows:
   recent_days: 28
   baseline_days: 84
 clustering:
-  algorithm: DBSCAN
+  algorithm: hierarchical taxonomy DBSCAN + complete-link refinement
+  hierarchy: NHTSA component family -> canonical defect family -> semantic failure cluster
   metric: cosine
-  eps: 0.34
+  eps: 0.27
   min_samples: 2
+  taxonomy_grouping: true
+  refine_max_distance: 0.34
+  suspicious_cluster_share: 0.70

@@ -43,15 +43,24 @@ The original complaint is not mutated by GenAI output.
 `HybridFailureExtractor` uses:
 
 1. NVIDIA NIM LLM structured extraction when configured.
-2. A deterministic heuristic extractor when NIM is unavailable or returns invalid output.
+2. A deterministic heuristic extractor when NIM is not configured or when a non-transient structured-output failure is explicitly allowed to fall back.
+
+Hosted 429/5xx and transport failures are retried with Retry-After awareness, exponential backoff, and jitter. After the retry budget is exhausted, 0.3.1 fails the run by default rather than silently mixing heuristic signatures into a NIM validation set. Successful ODI signatures are checkpointed incrementally so the next run resumes from completed work.
 
 The extraction prompt explicitly forbids the model from inventing trend, risk, recall status, causation, or complaint counts.
 
 ### 4. Semantic representation and grouping
 
-`HybridEmbedder` uses NVIDIA embeddings when available and TF-IDF otherwise. `ComplaintClusterer` runs DBSCAN using cosine distance. The cluster document weights the normalized failure signature more heavily than the raw narrative to reduce fragmentation caused by narrative length and incidental details.
+`HybridEmbedder` uses NVIDIA embeddings when available and TF-IDF when NIM is not configured or a non-transient embedding failure is allowed to fall back. `ComplaintClusterer` uses a two-level design:
 
-DBSCAN noise points are retained as singleton/noise clusters for transparency, but the evidence gate prevents them from becoming alerts under normal defaults.
+1. Resolve a stable first-level **component family** from NHTSA component evidence plus the normalized signature.
+2. Derive a deterministic, campaign-agnostic **canonical defect family** while preserving the raw NIM failure mode.
+3. Run DBSCAN with cosine distance inside each component + defect-family partition.
+4. Split DBSCAN density chains with complete-link cosine refinement when within-cluster distances are too broad.
+
+This prevents a generic LLM label from merging unrelated brake, propulsion, and electrical complaints into one fleet-wide cluster. Cluster documents emphasize failure mode, symptom, operating state, consequence, safety indicators, and a bounded narrative excerpt.
+
+Each analysis records component-group sizes, canonical defect-family groups, DBSCAN/noise counts, sampled cosine-distance summaries, complete-link refinement parameters, largest-cluster share, raw failure-mode purity, and canonical defect-family purity. One-cluster and dominant-cluster outcomes emit quality warnings. Noise points are retained as singleton/noise clusters for transparency.
 
 ### 5. Deterministic analytics
 
@@ -73,6 +82,8 @@ Final risk = 0.30 severity
            + 0.15 persistence
            + 0.20 evidence
            + 0.10 recall gap
+
+Severity provenance is deterministic in 0.3.1: NHTSA structured crash/injury/fatality/fire fields are source truth, while semantic indicators such as loss of motive power or unintended braking require explicit narrative support. Unsupported LLM indicators are retained in the raw signature but rejected from numerical risk scoring.
 ```
 
 The default alert gate is `risk >= 75` with at least four supporting complaints. All values are configurable and should be calibrated.
@@ -90,7 +101,7 @@ The Time Machine:
 3. Runs extraction, clustering, trend, risk, and visible-recall matching without target recall text.
 4. Freezes each snapshot.
 5. Introduces target recall text only for post-hoc matching of already-frozen alerts.
-6. Records the first matching alert and lead time, or `NO_EARLY_SIGNAL`.
+6. Separately records the first risk-qualified alert and the first target-matching alert. A risk alert with no post-hoc target match is `EARLY_ALERT_TARGET_UNMATCHED`; `NO_EARLY_SIGNAL` is reserved for cases with no risk-qualified alert.
 
 See `BACKTEST_PROTOCOL.md` for experimental controls.
 
@@ -104,7 +115,7 @@ See `BACKTEST_PROTOCOL.md` for experimental controls.
 - Risk contributions sum to the final score.
 - Recall claims have a campaign identifier when marked matched.
 
-It also adds causation caveats for crash/fire associations and warns on DBSCAN noise clusters.
+It also adds causation caveats for crash/fire associations, checks NHTSA component-family alignment, warns on generic MALFUNCTION labels, and warns on DBSCAN noise clusters.
 
 ### 9. Interfaces
 

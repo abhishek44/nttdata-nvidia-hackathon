@@ -6,11 +6,11 @@ import logging
 import re
 from collections import Counter
 from collections.abc import Iterable, Sequence
-from typing import Any, Literal, Protocol
+from typing import Any, Callable, Literal, Protocol
 
 from pydantic import BaseModel, ConfigDict, ValidationError, field_validator
 
-from recallzero.intelligence.nim_client import NIMClient, NIMError
+from recallzero.intelligence.nim_client import NIMClient, NIMError, NIMTransientError
 from recallzero.models import Complaint, ExtractionMethod, FailureSignature
 
 logger = logging.getLogger(__name__)
@@ -163,10 +163,13 @@ Required JSON keys:
 - symptom: observed symptom or null
 - operating_state: condition such as VEHICLE IN MOTION, PARKED, STARTUP, CHARGING, or null
 - consequence: observed or directly stated consequence, or null
-- severity_indicators: array containing only supported labels from:
+- severity_indicators: array containing only directly supported labels from:
   crash_reported, fire_or_thermal_event, injury_reported, fatality_reported, loss_of_braking,
   loss_of_steering, loss_of_motive_power, loss_of_control, restraint_failure,
   unintended_acceleration, unintended_braking, vehicle_in_motion
+  For crash_reported/injury_reported/fatality_reported, use the structured NHTSA fields only.
+  Do not label a hypothetical risk (for example, "could cause a crash") as a reported event.
+  Use vehicle_in_motion only when the narrative explicitly states that the vehicle was moving/driving.
 - confidence: number between 0 and 1 reflecting confidence in normalization
 """
 
@@ -289,19 +292,35 @@ class HybridFailureExtractor:
         *,
         heuristic: HeuristicFailureExtractor,
         nim: NIMFailureExtractor | None,
-        concurrency: int = 4,
+        concurrency: int = 2,
         fallback_on_error: bool = True,
+        fallback_on_transient_error: bool = False,
     ):
         self.heuristic = heuristic
         self.nim = nim
         self.concurrency = concurrency
         self.fallback_on_error = fallback_on_error
+        self.fallback_on_transient_error = fallback_on_transient_error
 
     async def extract(self, complaint: Complaint) -> FailureSignature:
         if self.nim is None:
             return await self.heuristic.extract(complaint)
         try:
             return await self.nim.extract(complaint)
+        except NIMTransientError as exc:
+            if not self.fallback_on_transient_error:
+                logger.error(
+                    "Transient NIM extraction failure exhausted retries for ODI %s; refusing heuristic fallback to preserve semantic consistency: %s",
+                    complaint.odi_number,
+                    exc,
+                )
+                raise
+            logger.warning(
+                "Transient NIM extraction failure for ODI %s; using explicitly enabled heuristic fallback: %s",
+                complaint.odi_number,
+                exc,
+            )
+            return await self.heuristic.extract(complaint)
         except (NIMError, ValidationError, ValueError, json.JSONDecodeError) as exc:
             if not self.fallback_on_error:
                 raise
@@ -312,6 +331,7 @@ class HybridFailureExtractor:
         self,
         complaints: Sequence[Complaint],
         cached: dict[str, FailureSignature] | None = None,
+        on_result: Callable[[FailureSignature], None] | None = None,
     ) -> list[FailureSignature]:
         cached = cached or {}
         semaphore = asyncio.Semaphore(self.concurrency)
@@ -329,7 +349,10 @@ class HybridFailureExtractor:
             if cached_signature is not None and _cache_is_usable(cached_signature):
                 return cached_signature
             async with semaphore:
-                return await self.extract(complaint)
+                result = await self.extract(complaint)
+                if on_result is not None:
+                    on_result(result)
+                return result
 
         return list(await asyncio.gather(*(_one(complaint) for complaint in complaints)))
 

@@ -82,8 +82,20 @@ def print_run(run) -> None:
     console.print(
         f"[bold]Complaints:[/bold] {run.complaint_count}  "
         f"[bold]Clusters:[/bold] {run.cluster_count}  "
-        f"[bold]Visible recalls:[/bold] {run.recall_count_visible}"
+        f"[bold]Visible recalls:[/bold] {run.recall_count_visible}  "
+        f"[bold]Semantic quality:[/bold] {run.semantic_quality}"
     )
+    diagnostics = run.clustering_diagnostics or {}
+    if diagnostics:
+        groups = diagnostics.get("component_groups") or {}
+        group_summary = ", ".join(
+            f"{name}:{values.get('count', 0)}" for name, values in sorted(groups.items())
+        )
+        console.print(
+            f"[dim]Clustering: {diagnostics.get('algorithm')} eps={diagnostics.get('eps')} "
+            f"largest_cluster_share={diagnostics.get('largest_cluster_share')} "
+            f"groups=[{group_summary}][/dim]"
+        )
     table = Table(title="Defect signals")
     table.add_column("Alert")
     table.add_column("Risk", justify="right")
@@ -154,6 +166,8 @@ def doctor(
                 base_url=settings.nim_base_url,
                 timeout_seconds=settings.request_timeout_seconds,
                 max_retries=1,
+                retry_base_delay_seconds=settings.retry_base_delay_seconds,
+                retry_max_delay_seconds=settings.retry_max_delay_seconds,
             )
             text = await client.chat_completion(
                 model=settings.llm_model,
@@ -263,6 +277,7 @@ def backtest(
             use_signature_cache=not refresh,
         )
         console.print(f"[bold]Status:[/bold] {result.status}")
+        console.print(f"[bold]First any alert:[/bold] {result.first_any_alert_date or 'none'}")
         console.print(f"[bold]First matching alert:[/bold] {result.first_matching_alert_date or 'none'}")
         console.print(f"[bold]Lead time:[/bold] {result.lead_time_days if result.lead_time_days is not None else 'not measured'}")
         console.print(f"[bold]Anti-leakage checks:[/bold] {json.dumps(result.anti_leakage_checks)}")

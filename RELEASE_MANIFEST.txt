@@ -1,50 +1,52 @@
 RecallZero v2 release manifest
 ==============================
 
-Version: 0.2.2
+Version: 0.3.1
 Release date: 2026-08-17
 Target: NVIDIA GB10 / DGX Spark-compatible Python 3.11-3.13 environment
 
-Patch focus:
-- Fix Nemotron 3.5 structured extraction by disabling thinking for extraction calls.
-- Constrain complaint extraction with NVIDIA NIM guided JSON and Pydantic validation.
-- Improve NIM empty-content and malformed-JSON diagnostics.
-- Fix NeMo Agent Toolkit FunctionInfo registration with eager annotations and explicit input schemas.
-- Explicitly disable thinking for the standalone NAT ReAct investigator.
-- Preserve the 0.2.1 NHTSA model-punctuation/date/retry fixes.
-- Mark runs with excessive heuristic fallbacks as semantically degraded.
+Release focus: scientific-validity patch
+- Add campaign-agnostic canonical defect families while preserving raw NIM failure modes.
+- Partition by NHTSA component family and canonical defect family before semantic DBSCAN.
+- Split DBSCAN density chains using complete-link cosine refinement.
+- Add raw failure-mode purity, canonical defect-family purity, and cluster-distance diagnostics.
+- Validate numerical severity deterministically: NHTSA source flags are authoritative for crash/injury/fatality/fire, and semantic safety indicators require explicit narrative support.
+- Expose validated severity indicators and evidence provenance; unsupported LLM indicators do not affect the risk score.
+- Replace lexical-only recall matching with structured component/defect/subsystem/consequence/semantic scoring plus campaign-reference sanity checks.
+- Distinguish EARLY_ALERT_TARGET_UNMATCHED from true NO_EARLY_SIGNAL.
+- Preserve leakage-safe post-hoc target matching and all existing anti-leakage checks.
 
 Included capabilities:
 - NHTSA complaint and recall ingestion with evidence-preserving normalization
 - NVIDIA NIM structured complaint extraction and embedding integrations
-- Heuristic and TF-IDF fallbacks
-- DBSCAN semantic clustering
-- Deterministic trend, persistence, severity, evidence, and recall-gap risk scoring
-- Leakage-safe Recall Time Machine historical replay
+- Deterministic heuristic and TF-IDF fallbacks for explicitly allowed/offline modes
+- Component-family + canonical defect-family + DBSCAN + complete-link clustering
+- Deterministic trend, persistence, severity, evidence and recall-gap risk scoring
+- Structured visible-recall matching and leakage-safe Recall Time Machine historical replay
 - Evidence critic and engineering brief
 - FastAPI service and Safety Radar dashboard
-- NeMo Agent Toolkit plugin tools and standalone ReAct workflow
+- NeMo Agent Toolkit plugin tools and standalone native tool-calling workflow
 - Optional legacy AIQ registration and current stock AI-Q data-source-registry patching
 
 Offline validation:
-- 30 automated tests passed; 1 optional NAT-runtime integration test skipped because `nvidia-nat` is not installed in the build container
+- 42 automated tests passed; 1 optional NAT-runtime integration test skipped because `nat` is not installed in the build container
 - Python compilation passed
 - Synthetic end-to-end analysis and historical replay passed
-- Wheel install, entry points, packaged dashboard, CLI version, and wheel-based demo passed
-- Regression coverage includes model alias resolution and non-retryable HTTP 400 behavior
+- Scientific-validity regression coverage includes hypothetical-event rejection, severity source provenance, taxonomy separation, campaign-reference matching, HV power-loss recall matching, and Time Machine outcome semantics
 
 Wheel:
-- dist/recallzero-0.2.2-py3-none-any.whl
-- SHA-256: dc6fbe41118699371bd0ab828f56864f17e4b4825dff1ccde30c8c82272300a8
+- dist/recallzero-0.3.1-py3-none-any.whl
+- SHA-256: 3d0368898b510d376a3d2bd3ff6897fa4954d47361a1a8f0193ae738c0f769d9
 
 Target-environment validation still required:
-- Live patched NHTSA recall retrieval on GB10
-- Hosted or local NVIDIA NIM calls
-- nat plugin discovery and execution in the user's installed NeMo Agent Toolkit
-- The user's exact stock AI-Q Blueprint command/configuration
-- Real historical recall experiments and negative controls
+- Live hosted/local NVIDIA NIM behavior on GB10
+- Native NAT tool-calling execution with the installed runtime
+- Re-run the full and pre-recall Mach-E analyses using 0.3.1
+- Re-run campaign 22V412000 and inspect first-any-alert vs first-target-matching-alert
+- Additional historical positive cases and negative controls
 
 Non-claims:
 - Synthetic demo results are not real vehicle safety findings.
-- Campaign 22V412000 is an unvalidated experiment candidate.
-- Default risk and matching thresholds are prototype values.
+- A risk-qualified pre-recall alert is not automatically a target-recall match.
+- Campaign 22V412000 remains an experiment candidate until the 0.3.1 replay is reviewed.
+- Default risk, clustering, and recall-matching thresholds remain prototype values pending multi-case calibration.

@@ -20,7 +20,7 @@ from recallzero.utils import stable_id
 class RecallTimeMachine:
     """Leakage-safe weekly replay against a known historical recall outcome."""
 
-    def __init__(self, pipeline: RecallZeroPipeline, target_match_threshold: float = 0.20):
+    def __init__(self, pipeline: RecallZeroPipeline, target_match_threshold: float = 0.45):
         self.pipeline = pipeline
         self.target_match_threshold = target_match_threshold
 
@@ -70,6 +70,7 @@ class RecallTimeMachine:
                 vehicle, pre_recall, use_cache=use_signature_cache
             )
         signature_by_id = {item.complaint_id: item for item in signatures}
+        complaint_by_id = {item.odi_number: item for item in pre_recall}
 
         risk_config: RiskConfig = self.pipeline.risk_config.model_copy(deep=True)
         if alert_threshold is not None:
@@ -79,6 +80,8 @@ class RecallTimeMachine:
 
         frozen_snapshots: list[BacktestSnapshot] = []
         candidate_matches: list[tuple[date, float, DefectSignal]] = []
+        all_alerts: list[tuple[date, DefectSignal]] = []
+        degraded_snapshot_count = 0
 
         # The target campaign is explicitly removed from the detector's recall set. If it
         # was already public before the declared boundary, the experiment is marked invalid
@@ -102,7 +105,11 @@ class RecallTimeMachine:
                 risk_config=risk_config,
                 save=False,
             )
-            alerts = tuple(signal for signal in run.signals if signal.risk.alert)
+            if run.semantic_quality == "DEGRADED":
+                degraded_snapshot_count += 1
+                alerts = tuple()
+            else:
+                alerts = tuple(signal for signal in run.signals if signal.risk.alert)
             frozen_snapshots.append(
                 BacktestSnapshot(
                     cutoff_date=cutoff,
@@ -112,22 +119,38 @@ class RecallTimeMachine:
                 )
             )
             for signal in alerts:
+                all_alerts.append((cutoff, signal))
                 member_signatures = [
                     signature_by_id[item_id]
                     for item_id in signal.cluster.member_ids
                     if item_id in signature_by_id
                 ]
+                member_complaints = [
+                    complaint_by_id[item_id]
+                    for item_id in signal.cluster.member_ids
+                    if item_id in complaint_by_id
+                ]
                 # Post-hoc evaluation only: target recall text is introduced after the signal has been frozen.
-                target_score = self.pipeline.recall_matcher.score_target(signal.cluster, member_signatures, target_recall)
+                target_score = self.pipeline.recall_matcher.score_target(
+                    signal.cluster, member_signatures, target_recall, member_complaints
+                )
                 if target_score >= self.target_match_threshold:
                     candidate_matches.append((cutoff, target_score, signal))
 
         candidate_matches.sort(key=lambda item: (item[0], -item[1], -item[2].risk.final_score))
+        all_alerts.sort(key=lambda item: (item[0], -item[1].risk.final_score))
         first_date = candidate_matches[0][0] if candidate_matches else None
         match_score = candidate_matches[0][1] if candidate_matches else None
         matched_signal_id = candidate_matches[0][2].signal_id if candidate_matches else None
+        first_any_alert_date = all_alerts[0][0] if all_alerts else None
+        first_any_alert_signal_id = all_alerts[0][1].signal_id if all_alerts else None
         lead_time = (official_recall_date - first_date).days if first_date else None
-        status = "EARLY_SIGNAL_DETECTED" if first_date else "NO_EARLY_SIGNAL"
+        if first_date:
+            status = "EARLY_SIGNAL_DETECTED"
+        elif all_alerts:
+            status = "EARLY_ALERT_TARGET_UNMATCHED"
+        else:
+            status = "NO_EARLY_SIGNAL"
 
         checks = {
             "complaints_strictly_before_official_recall": all(
@@ -148,9 +171,17 @@ class RecallTimeMachine:
         warnings: list[str] = []
         if not pre_recall:
             warnings.append("No complaints were available before the official recall date.")
-        if not candidate_matches:
+        if degraded_snapshot_count:
             warnings.append(
-                "No alert both passed the configured risk gate and matched the target recall in post-hoc evaluation."
+                f"Withheld alerts from {degraded_snapshot_count} replay snapshot(s) because semantic/clustering quality was DEGRADED."
+            )
+        if all_alerts and not candidate_matches:
+            warnings.append(
+                "One or more quality-qualified pre-recall alerts passed the risk gate, but none passed the configured post-hoc target-recall match threshold."
+            )
+        elif not all_alerts:
+            warnings.append(
+                "No quality-qualified pre-recall alert passed the configured risk gate."
             )
         if not all(checks.values()):
             warnings.append("One or more anti-leakage checks failed; do not report a lead-time result.")
@@ -158,6 +189,8 @@ class RecallTimeMachine:
             first_date = None
             match_score = None
             matched_signal_id = None
+            first_any_alert_date = None
+            first_any_alert_signal_id = None
             lead_time = None
 
         backtest_id = stable_id(
@@ -177,6 +210,9 @@ class RecallTimeMachine:
             lead_time_days=lead_time,
             matched_signal_id=matched_signal_id,
             target_match_score=match_score,
+            first_any_alert_date=first_any_alert_date,
+            first_any_alert_signal_id=first_any_alert_signal_id,
+            alert_snapshot_count=sum(1 for snapshot in frozen_snapshots if snapshot.alerts),
             status=status,
             snapshots=tuple(frozen_snapshots),
             complaints_considered=len(pre_recall),

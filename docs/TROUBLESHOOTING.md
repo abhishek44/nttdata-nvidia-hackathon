@@ -78,3 +78,49 @@ A healthy bounded validation should report NIM signatures in ``extraction_method
 ## NAT fails with ``VehicleToolInput is not defined``
 
 RecallZero 0.2.2 fixes the plugin registration by supplying explicit Pydantic input schemas to ``FunctionInfo.from_fn`` and avoiding deferred annotations in the registration module. Reinstall the editable package after upgrading so the NAT entry point loads the patched module.
+
+## Hosted NIM returns many HTTP 429 responses
+
+RecallZero 0.3.1 treats 429 as a transient capacity/rate-limit condition rather than a semantic extraction failure. The default hosted-NIM behavior is:
+
+```text
+LLM concurrency: 2
+retry budget:    7
+backoff:         Retry-After when supplied, otherwise exponential + jitter
+signature cache: checkpoint successful ODI results incrementally
+transient fallback: disabled
+```
+
+A healthy retry sequence may show temporary 429 warnings followed by HTTP 200 responses. If the retry budget is exhausted, the analysis fails instead of silently converting the remaining records with heuristics. Rerun the same command: completed NIM signatures are already cached and only unfinished/heuristic ODI records are retried.
+
+If you deliberately prefer availability over semantic consistency, set:
+
+```bash
+export RECALLZERO_TRANSIENT_NIM_FALLBACK=true
+```
+
+Do not use that mode for a headline historical validation result unless the mixed extraction rate is explicitly reported and reviewed.
+
+## Analysis still produces one giant cluster
+
+0.3.1 performs component-family → canonical defect-family → DBSCAN clustering with complete-link refinement and records `clustering_diagnostics`. Inspect:
+
+- component-group counts;
+- canonical defect-family groups and DBSCAN clusters/noise by component;
+- `largest_cluster_share`;
+- sampled cosine-distance summaries;
+- failure-mode purity.
+
+A suspicious all-in-one result is marked `semantic_quality=DEGRADED` and emits a `CLUSTER QUALITY WARNING`. Do not run a headline Time Machine claim from a degraded snapshot.
+
+## NAT 1.8 rejects `thinking` or loops in ReAct parsing
+
+The modern `configs/aiq/recallzero_agent.yml` in 0.3.1 uses NAT's documented `tool_calling_agent` fields and deliberately has **no `thinking` YAML key**. Thinking is disabled only inside RecallZero's direct structured-extraction HTTP request when needed; that request option is separate from NAT's LLM configuration schema.
+
+Verify:
+
+```bash
+nat --version
+nat run --config_file configs/aiq/recallzero_agent.yml \
+  --input "Investigate emerging safety concerns for the 2021 and 2022 Ford Mustang Mach-E."
+```

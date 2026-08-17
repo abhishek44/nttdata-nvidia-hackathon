@@ -49,7 +49,7 @@ recallzero analyze \
   --max-complaints 25
 ```
 
-Review `extraction_method_counts`; a high heuristic fallback count indicates NIM errors or invalid structured responses.
+Review `extraction_method_counts`, `semantic_quality`, and the clustering summary. With 0.3.1, configured hosted-NIM 429/5xx failures are retried and do not silently become heuristic signatures by default.
 
 ## 4. Run the full experiment
 
@@ -87,9 +87,9 @@ recallzero serve --port 8080
 - Alert volume per vehicle/time period.
 - Backtest anti-leakage status.
 
-## 8. Upgrade an existing 0.2.0/0.2.1 checkout
+## 8. Upgrade an existing 0.2.x / 0.3.0 checkout
 
-Replace the source files with the 0.2.2 archive, then reinstall the editable package in the existing virtual environment:
+Replace the source files with the 0.3.1 archive, retain your existing `.env` and `data/` directory, then reinstall the editable package:
 
 ```bash
 cd recallzero_v2
@@ -102,7 +102,7 @@ recallzero --version
 Expected output:
 
 ```text
-RecallZero 0.2.2
+RecallZero 0.3.1
 ```
 
-The old `data/` directory can be retained. A failed older fetch normally cached the successful complaint response but did not create a recall cache, so the same fetch command can be rerun without `--refresh` to retrieve only the missing recalls.
+Retaining `data/cache/*_signatures.json` is useful: successful NIM signatures from 0.2.2/0.3.0 can be reused, while heuristic fallback entries are automatically retried when NIM is enabled. In 0.3.1, severity validation, canonical defect taxonomy, clustering refinement, recall matching, and backtest status semantics are recomputed at analysis time, so rerun analysis/backtests rather than reusing prior run JSON as evidence.

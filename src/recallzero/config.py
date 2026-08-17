@@ -42,9 +42,14 @@ class RiskConfig(BaseModel):
 
 
 class ClusteringConfig(BaseModel):
-    eps: float = Field(default=0.34, gt=0, lt=1)
+    eps: float = Field(default=0.27, gt=0, lt=1)
     min_samples: int = Field(default=2, ge=1)
     max_representatives: int = Field(default=3, ge=1, le=10)
+    hierarchical: bool = True
+    taxonomy_grouping: bool = True
+    refine_max_distance: float = Field(default=0.34, gt=0.0, lt=1.0)
+    diagnostics_sample_size: int = Field(default=160, ge=20, le=1000)
+    suspicious_cluster_share: float = Field(default=0.70, gt=0.0, le=1.0)
 
 
 class TrendConfig(BaseModel):
@@ -70,9 +75,13 @@ class Settings(BaseSettings):
     llm_model: str = "nvidia/nemotron-3.5-lightning-30b-a3b"
     embedding_model: str = "nvidia/nv-embedqa-e5-v5"
     use_nim: bool = True
-    llm_concurrency: int = Field(default=4, ge=1, le=32)
+    llm_concurrency: int = Field(default=2, ge=1, le=32)
+    signature_batch_size: int = Field(default=20, ge=1, le=250)
     request_timeout_seconds: float = Field(default=90, ge=5, le=600)
-    max_retries: int = Field(default=3, ge=0, le=10)
+    max_retries: int = Field(default=7, ge=0, le=12)
+    retry_base_delay_seconds: float = Field(default=1.5, ge=0.1, le=30.0)
+    retry_max_delay_seconds: float = Field(default=30.0, ge=1.0, le=180.0)
+    transient_nim_fallback: bool = False
     log_level: str = "INFO"
     nvidia_api_key: str | None = Field(default=None, validation_alias="NVIDIA_API_KEY")
     risk_file: Path = Path("config/risk.yml")

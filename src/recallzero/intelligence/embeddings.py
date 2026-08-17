@@ -8,7 +8,7 @@ import numpy as np
 from scipy import sparse
 from sklearn.feature_extraction.text import TfidfVectorizer
 
-from recallzero.intelligence.nim_client import NIMClient, NIMError
+from recallzero.intelligence.nim_client import NIMClient, NIMError, NIMTransientError
 from recallzero.models import EmbeddingMethod
 
 logger = logging.getLogger(__name__)
@@ -67,14 +67,28 @@ class NIMEmbedder:
 
 
 class HybridEmbedder:
-    def __init__(self, nim: NIMEmbedder | None, fallback: TFIDFEmbedder | None = None):
+    def __init__(
+        self,
+        nim: NIMEmbedder | None,
+        fallback: TFIDFEmbedder | None = None,
+        fallback_on_transient_error: bool = False,
+    ):
         self.nim = nim
         self.fallback = fallback or TFIDFEmbedder()
+        self.fallback_on_transient_error = fallback_on_transient_error
 
     async def embed(self, texts: Sequence[str]) -> EmbeddingResult:
         if self.nim is not None:
             try:
                 return await self.nim.embed(texts)
+            except NIMTransientError as exc:
+                if not self.fallback_on_transient_error:
+                    logger.error(
+                        "Transient NIM embedding failure exhausted retries; refusing TF-IDF fallback to preserve run consistency: %s",
+                        exc,
+                    )
+                    raise
+                logger.warning("Transient NIM embedding failure; using explicitly enabled TF-IDF fallback: %s", exc)
             except (NIMError, ValueError) as exc:
                 logger.warning("NIM embedding failed; using TF-IDF fallback: %s", exc)
         return await self.fallback.embed(texts)

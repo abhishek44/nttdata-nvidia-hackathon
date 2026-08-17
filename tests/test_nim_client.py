@@ -82,3 +82,60 @@ async def test_chat_completion_empty_visible_content_has_reasoning_diagnostic() 
                 model="nvidia/nemotron-3.5-lightning-30b-a3b",
                 messages=[{"role": "user", "content": "extract"}],
             )
+
+
+@pytest.mark.asyncio
+async def test_nim_retries_429_then_succeeds() -> None:
+    calls = 0
+
+    async def handler(_request: httpx.Request) -> httpx.Response:
+        nonlocal calls
+        calls += 1
+        if calls == 1:
+            return httpx.Response(429, headers={"Retry-After": "0"}, json={"status": 429, "title": "Too Many Requests"})
+        return httpx.Response(
+            200,
+            json={"choices": [{"finish_reason": "stop", "message": {"content": "RECALLZERO_OK"}}]},
+        )
+
+    async with httpx.AsyncClient(transport=httpx.MockTransport(handler)) as http_client:
+        client = NIMClient(
+            api_key="nvapi-test",
+            base_url="https://integrate.api.nvidia.com/v1",
+            max_retries=1,
+            retry_base_delay_seconds=0.1,
+            retry_max_delay_seconds=0.1,
+            client=http_client,
+        )
+        result = await client.chat_completion(
+            model="test-model",
+            messages=[{"role": "user", "content": "ping"}],
+        )
+
+    assert result == "RECALLZERO_OK"
+    assert calls == 2
+
+
+@pytest.mark.asyncio
+async def test_nim_permanent_client_error_is_not_retried() -> None:
+    calls = 0
+
+    async def handler(_request: httpx.Request) -> httpx.Response:
+        nonlocal calls
+        calls += 1
+        return httpx.Response(400, json={"error": "bad request"})
+
+    async with httpx.AsyncClient(transport=httpx.MockTransport(handler)) as http_client:
+        client = NIMClient(
+            api_key="nvapi-test",
+            base_url="https://integrate.api.nvidia.com/v1",
+            max_retries=5,
+            client=http_client,
+        )
+        with pytest.raises(Exception, match="400"):
+            await client.chat_completion(
+                model="test-model",
+                messages=[{"role": "user", "content": "ping"}],
+            )
+
+    assert calls == 1

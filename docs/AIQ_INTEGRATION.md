@@ -6,7 +6,7 @@
 - **AI-Q Blueprint:** NVIDIA deep-research blueprint built on NAT.
 - **Legacy AIQ Toolkit:** earlier package/CLI using the `aiq` namespace.
 
-RecallZero includes modern NAT registration, a legacy compatibility registration, a standalone ReAct workflow, and a stock AI-Q Blueprint YAML patcher. The modern registration prefers the NAT 1.8+ `nat.plugin_api` facade and falls back to the documented NAT 1.5-1.7 import locations. The deprecated `aiq` module is not required for current AI-Q Blueprint releases.
+RecallZero includes modern NAT registration, a legacy compatibility registration, a standalone native tool-calling workflow, and a stock AI-Q Blueprint YAML patcher. The modern registration prefers the NAT 1.8+ `nat.plugin_api` facade and falls back to the documented NAT 1.5-1.7 import locations. The deprecated `aiq` module is not required for current AI-Q Blueprint releases.
 
 ## Registered tools
 
@@ -48,7 +48,7 @@ nat run \
   --input "Investigate the 2021 and 2022 Ford Mustang Mach-E."
 ```
 
-The workflow is a ReAct agent with a NIM LLM. It is instructed to use tools rather than calculate counts, risk, recall matches, or lead time itself.
+The NAT 1.8 workflow uses `tool_calling_agent` with a NIM LLM. The YAML contains only fields documented for the NAT 1.8 tool-calling agent; the unsupported `thinking` key is intentionally absent. Grounding rules and metric definitions are also returned inside the `recallzero_analyze_vehicle` tool payload so the final response preserves deterministic semantics.
 
 ## Local NIM with NAT
 
@@ -115,16 +115,18 @@ NO_EARLY_SIGNAL if that is the result, report all anti-leakage checks, and cite 
 for any supporting evidence.
 ```
 
-## Agent safety instructions
+## Agent grounding contract
 
-The standalone config instructs the agent to:
+The analysis tool returns explicit `agent_grounding_rules` and `metric_definitions`. They require the agent to:
 
-- Never estimate numerical fields itself.
-- Distinguish an alert from proof of a defect.
+- Use returned deterministic numerical fields rather than estimating them.
+- Preserve the configured recent/baseline windows and never rename `trend_ratio` as week-over-week unless that is literally the configured window.
+- Distinguish an engineering-prioritization signal from proof of a defect.
 - Avoid causal claims from crash/fire/injury association flags.
-- Use ODI identifiers when discussing evidence.
-- Preserve `NO_EARLY_SIGNAL` rather than manipulating thresholds.
-- Report anti-leakage checks for historical results.
+- Treat low recall similarity as insufficient evidence of a recall-scope gap.
+- Prefer representative ODI identifiers for evidence drill-down rather than flooding the context with all complaint IDs.
+- Treat `DEGRADED` semantic/clustering quality as provisional.
+- Preserve `NO_EARLY_SIGNAL`/`INVALID_BACKTEST` and anti-leakage checks for historical results.
 
 ## Compatibility notes
 

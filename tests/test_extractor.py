@@ -128,3 +128,31 @@ async def test_nim_extractor_accepts_markdown_fenced_json_as_defensive_fallback(
     signature = await NIMFailureExtractor(StubClient(), "test-model").extract(complaint)  # type: ignore[arg-type]
     assert signature.system == "STEERING"
     assert signature.failure_mode == "LOSS OF STEERING ASSIST"
+
+
+@pytest.mark.asyncio
+async def test_transient_nim_failure_does_not_silently_fallback() -> None:
+    from recallzero.intelligence.extractor import HybridFailureExtractor
+    from recallzero.intelligence.nim_client import NIMRateLimitError
+
+    complaint = Complaint(
+        odi_number="rate-limit-1",
+        vehicle=Vehicle(make="Demo", model="EV", model_years=(2022,)),
+        received_date="2022-05-12",
+        components=("POWER TRAIN",),
+        narrative="Vehicle lost motive power while driving.",
+    )
+
+    class StubNIMExtractor:
+        model_name = "test-model"
+
+        async def extract(self, _item: Complaint):
+            raise NIMRateLimitError("429 exhausted")
+
+    hybrid = HybridFailureExtractor(
+        heuristic=HeuristicFailureExtractor(),
+        nim=StubNIMExtractor(),  # type: ignore[arg-type]
+        fallback_on_transient_error=False,
+    )
+    with pytest.raises(NIMRateLimitError):
+        await hybrid.extract(complaint)

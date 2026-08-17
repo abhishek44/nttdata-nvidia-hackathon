@@ -1,4 +1,5 @@
-# Modern NVIDIA NeMo Agent Toolkit configuration (`nat` CLI).
+# NeMo Agent Toolkit 1.8+ configuration.
+# RecallZero 0.3 uses native tool calling instead of text-parsed ReAct actions.
 functions:
   recallzero_fetch_vehicle_data:
     _type: recallzero_fetch_vehicle_data
@@ -29,19 +30,15 @@ llms:
     temperature: 0.0
     max_tokens: 4096
 
-
 workflow:
   _type: tool_calling_agent
-
   tool_names:
     - recallzero_fetch_vehicle_data
     - recallzero_analyze_vehicle
     - recallzero_run_backtest
     - recallzero_get_evidence
     - recallzero_engineering_brief
-
   llm_name: investigator_llm
-
   verbose: true
   handle_tool_errors: true
   max_iterations: 8

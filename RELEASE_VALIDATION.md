@@ -1,15 +1,15 @@
 # RecallZero v2 Release Validation
 
-Release version: **0.2.2**
+Release version: **0.3.1**
 
 ## Validated in the build environment
 
-- `pytest -q`: **30 tests passed, 1 optional NAT-runtime test skipped** because `nvidia-nat` is not installed in the build container.
+- `pytest -q -ra`: **42 tests passed, 1 optional NAT-runtime test skipped** because `nat` is not installed in the build container.
 - `python -m compileall -q src tests`: passed.
-- `recallzero --help`: command entry point loaded.
-- `recallzero demo`: synthetic end-to-end analysis and Time Machine replay completed.
-- Python wheel built, installed into an isolated package target using the build environment's dependencies, inspected for package files/dashboard assets/CLI and plugin entry points, and used to run the synthetic demo.
-- Stock AI-Q configuration patcher tested against representative shallow/deep researcher and ReAct YAML structures, plus the current AI-Q `data_source_registry` inheritance pattern.
+- `python -m recallzero.cli --version`: command entry point loaded and reported version 0.3.1.
+- `python -m recallzero.cli demo`: synthetic end-to-end analysis and Time Machine replay completed.
+- Python wheel built successfully without network build isolation and was inspected for package files, dashboard assets, CLI and plugin entry points.
+- Wheel SHA-256: `3d0368898b510d376a3d2bd3ff6897fa4954d47361a1a8f0193ae738c0f769d9`.
 
 ## Covered by automated tests
 
@@ -18,29 +18,37 @@ Release version: **0.2.2**
 - Heuristic failure extraction and multi-component selection.
 - NIM/local-endpoint configuration detection.
 - NIM guided-JSON request payloads, thinking-disabled structured extraction, fenced-JSON recovery, and empty-content diagnostics.
-- NAT tool schema registration uses eager runtime annotations and explicit `input_schema` values.
-- Cache upgrade from heuristic signatures to a configured NIM model.
-- TF-IDF/DBSCAN semantic grouping.
-- Deterministic trend, severity, and risk behavior.
-- Prevention of source-flag double counting.
-- Recall Time Machine exclusion of post-recall records.
-- Target-recall leakage invalidation.
-- Evidence-level cutoff checks.
-- FastAPI health, dashboard, and offline demo routes.
-- AI-Q/NAT configuration patching.
+- Retry handling for transient NVIDIA errors, including HTTP 429 followed by success, and no retry for permanent HTTP 400 errors.
+- Transient hosted-NIM failures are not silently converted into heuristic signatures by default.
+- Incremental signature checkpointing and cache upgrade from heuristic signatures to a configured NIM model.
+- Component-family + canonical defect-family grouping before DBSCAN.
+- Complete-link cosine refinement to prevent DBSCAN density-chain over-merging.
+- Raw failure-mode purity, canonical defect-family purity, component-group diagnostics, distance summaries, noise and dominant-cluster checks.
+- Deterministic severity provenance: hypothetical crash/injury text is rejected, parked events do not get motion credit without explicit evidence, and structured NHTSA crash/injury flags are authoritative.
+- Explicit campaign-reference sanity matching and structured recall matching for high-voltage power-loss patterns.
+- Deterministic trend, persistence, evidence and risk behavior.
+- Recall Time Machine exclusion of post-recall records and withholding of alerts from semantically degraded snapshots.
+- Target-recall leakage invalidation and evidence-level cutoff checks.
+- Distinction between `EARLY_ALERT_TARGET_UNMATCHED` and true `NO_EARLY_SIGNAL`.
+- Evidence critic checks including component-family alignment and generic large-cluster labels.
+- FastAPI health, dashboard and offline demo routes.
+- AI-Q/NAT configuration patching and NAT tool schemas using module-level Pydantic input types.
 
 ## Requires validation on the target GB10 environment
 
-The build environment did not contain the user's NVIDIA credentials or installed stock AI-Q runtime. Therefore these checks must be run on GB10:
+The build environment does not contain the user's NVIDIA credentials or installed NAT runtime. Therefore these checks must be run on GB10:
 
-1. Live NHTSA retrieval.
-2. Hosted NVIDIA NIM chat and embedding calls, or local NIM endpoints.
-3. NeMo Agent Toolkit plugin discovery with `nat info`/`nat run`.
-4. The user's exact stock AI-Q Blueprint version and custom CLI using the patched configuration.
-5. The real Mustang Mach-E historical experiment and additional positive/negative controls.
+1. Reinstall 0.3.1 while preserving `.env` and `data/cache`.
+2. Re-run the full 2021-2022 Mustang Mach-E analysis and inspect canonical defect-family groups, cluster sizes, raw/canonical purity and per-cluster distance summaries.
+3. Re-run the pre-recall cutoff analysis for 2022-06-09.
+4. Re-run campaign `22V412000` and compare `first_any_alert_date` with `first_matching_alert_date`.
+5. Verify native NAT tool-calling execution with the installed runtime.
+6. Repeat across additional historical positive cases and negative controls before calibrating thresholds.
 
 ## Non-claims
 
 - The synthetic demo is an installation smoke test, not a real safety result.
-- The configured Mustang Mach-E campaign is an experiment candidate, not a validated early-warning result.
-- Prototype thresholds and recall-matching similarity must be calibrated before production use.
+- A high deterministic risk score is an investigation ranking, not proof that a safety defect exists.
+- A pre-recall alert does not count as a target-recall prediction unless post-hoc matching qualifies it without leakage.
+- Campaign `22V412000` remains an experiment candidate until the 0.3.1 replay is reviewed.
+- Prototype clustering, risk and recall-match thresholds must be calibrated on multiple positive and negative cases before production use.

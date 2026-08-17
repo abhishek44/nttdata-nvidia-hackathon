@@ -183,6 +183,7 @@ class ComplaintCluster(StrictModel):
     label: str
     system: str
     failure_mode: str
+    defect_family: str = "OTHER"
     member_ids: tuple[str, ...]
     members: tuple[ClusterMember, ...] = Field(default_factory=tuple)
     representative_complaint_ids: tuple[str, ...] = Field(default_factory=tuple)
@@ -217,6 +218,7 @@ class RecallMatch(StrictModel):
     score: float = Field(default=0.0, ge=0.0, le=1.0)
     reason: str
     recall_date: date | None = None
+    score_breakdown: dict[str, float] = Field(default_factory=dict)
 
 
 class RiskFactor(StrictModel):
@@ -247,6 +249,8 @@ class EvidenceItem(StrictModel):
     injuries: int
     deaths: int
     signature: FailureSignature
+    validated_severity_indicators: tuple[str, ...] = Field(default_factory=tuple)
+    severity_evidence: dict[str, str] = Field(default_factory=dict)
 
 
 class DefectSignal(StrictModel):
@@ -272,6 +276,8 @@ class AnalysisRun(StrictModel):
     signals: tuple[DefectSignal, ...]
     extraction_method_counts: dict[str, int]
     embedding_method: EmbeddingMethod
+    semantic_quality: str = "UNKNOWN"
+    clustering_diagnostics: dict[str, Any] = Field(default_factory=dict)
     warnings: tuple[str, ...] = Field(default_factory=tuple)
     created_at: datetime = Field(default_factory=lambda: datetime.now(UTC))
 
@@ -292,6 +298,9 @@ class BacktestResult(StrictModel):
     lead_time_days: int | None
     matched_signal_id: str | None
     target_match_score: float | None
+    first_any_alert_date: date | None = None
+    first_any_alert_signal_id: str | None = None
+    alert_snapshot_count: int = 0
     status: str
     snapshots: tuple[BacktestSnapshot, ...]
     complaints_considered: int

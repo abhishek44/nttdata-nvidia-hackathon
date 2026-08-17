@@ -75,8 +75,10 @@ async def analyze_vehicle(config: AnalyzeConfig, _builder: Builder):
         input_schema=AnalyzeVehicleToolInput,
         description=(
             "Run RecallZero's full evidence-first investigation: NHTSA ingestion, failure-signature extraction, "
-            "semantic clustering, deterministic trend/severity/risk scoring, and visible-recall cross-reference. "
-            "Use this tool for questions about emerging issues in a selected vehicle population."
+            "hierarchical semantic clustering, deterministic trend/severity/risk scoring, and visible-recall cross-reference. "
+            "Use this tool for questions about emerging issues in a selected vehicle population. Preserve the returned "
+            "metric names and agent_grounding_rules exactly; a risk signal is not proof of a defect and low recall "
+            "similarity is not proof of a recall-scope gap."
         ),
     )
 

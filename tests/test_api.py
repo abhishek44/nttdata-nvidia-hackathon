@@ -21,5 +21,5 @@ def test_offline_demo_endpoint(tmp_path) -> None:
     payload = response.json()
     assert payload["analysis"]["complaint_count"] > 0
     assert payload["analysis"]["signals"]
-    assert payload["backtest"]["status"] in {"EARLY_SIGNAL_DETECTED", "NO_EARLY_SIGNAL"}
+    assert payload["backtest"]["status"] in {"EARLY_SIGNAL_DETECTED", "EARLY_ALERT_TARGET_UNMATCHED", "NO_EARLY_SIGNAL"}
     assert all(payload["backtest"]["anti_leakage_checks"].values())

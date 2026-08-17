@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 
+from recallzero.intelligence.clustering import canonical_family
 from recallzero.models import DefectSignal, ExtractionMethod
 
 
@@ -18,6 +19,17 @@ class EvidenceCritic:
     def audit(self, signal: DefectSignal) -> CriticFinding:
         evidence_ids = {item.complaint_id for item in signal.evidence}
         cluster_ids = set(signal.cluster.member_ids)
+        component_aligned = 0
+        component_checkable = 0
+        for item in signal.evidence:
+            families = {canonical_family(component) for component in item.components}
+            families.discard("UNKNOWN")
+            if families:
+                component_checkable += 1
+                if signal.cluster.system in families:
+                    component_aligned += 1
+        component_alignment_ratio = component_aligned / max(1, component_checkable)
+
         checks = {
             "cluster_count_matches_evidence": signal.cluster.evidence_count == len(evidence_ids),
             "all_cluster_members_have_evidence": cluster_ids == evidence_ids,
@@ -27,6 +39,7 @@ class EvidenceCritic:
             ) < 0.11,
             "recall_claim_has_campaign": (not signal.recall_match.matched)
             or bool(signal.recall_match.campaign_number),
+            "component_family_alignment": component_checkable == 0 or component_alignment_ratio >= 0.50,
         }
         notes: list[str] = []
         if any(item.crash for item in signal.evidence):
@@ -36,6 +49,15 @@ class EvidenceCritic:
         if any(item.fire for item in signal.evidence):
             notes.append(
                 "Fire flags are presented as associated reports; the evidence package does not establish root cause."
+            )
+        if component_checkable and component_alignment_ratio < 0.75:
+            notes.append(
+                f"Only {component_alignment_ratio:.0%} of evidence records with NHTSA component labels align with "
+                f"the cluster family {signal.cluster.system}; review semantic grouping before escalation."
+            )
+        if "MALFUNCTION" in signal.cluster.failure_mode.upper() and signal.cluster.evidence_count >= 10:
+            notes.append(
+                "The cluster failure mode is generic (MALFUNCTION); inspect representative ODI narratives before treating it as a specific failure signature."
             )
         if signal.cluster.is_noise:
             notes.append("This is a DBSCAN noise/singleton cluster and should not be treated as a stable pattern.")

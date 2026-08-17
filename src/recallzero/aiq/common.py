@@ -57,6 +57,33 @@ def settings_for_tool(data_dir: str, use_nim: bool) -> Settings:
 
 
 def analysis_tool_payload(run) -> dict[str, Any]:
+    """Compact, metric-preserving payload for agent consumption.
+
+    Large evidence arrays are intentionally truncated. The agent can call
+    ``recallzero_get_evidence`` for specific ODI identifiers instead of receiving
+    hundreds of complaint IDs and narratives in its context window.
+    """
+
+    diagnostics = run.clustering_diagnostics or {}
+    component_groups = diagnostics.get("component_groups") or {}
+    compact_diagnostics = {
+        "algorithm": diagnostics.get("algorithm"),
+        "eps": diagnostics.get("eps"),
+        "min_samples": diagnostics.get("min_samples"),
+        "largest_cluster_share": diagnostics.get("largest_cluster_share"),
+        "suspicious_single_cluster": diagnostics.get("suspicious_single_cluster"),
+        "suspicious_dominant_cluster": diagnostics.get("suspicious_dominant_cluster"),
+        "component_groups": {
+            name: {
+                "count": values.get("count"),
+                "dbscan_clusters": values.get("dbscan_clusters"),
+                "noise_points": values.get("noise_points"),
+            }
+            for name, values in sorted(component_groups.items())
+        },
+        "largest_cluster_sizes": list(diagnostics.get("cluster_sizes") or [])[:12],
+    }
+
     return {
         "run_id": run.run_id,
         "vehicle": run.vehicle.model_dump(mode="json"),
@@ -66,6 +93,26 @@ def analysis_tool_payload(run) -> dict[str, Any]:
         "cluster_count": run.cluster_count,
         "extraction_methods": run.extraction_method_counts,
         "embedding_method": run.embedding_method.value,
+        "semantic_quality": run.semantic_quality,
+        "clustering_diagnostics": compact_diagnostics,
+        "agent_grounding_rules": [
+            "Use only returned deterministic values for counts, dates, windows, trends, persistence, risk, recall similarity, and lead time.",
+            "Preserve metric names: trend_ratio is recent-rate divided by baseline-rate, not week-over-week unless the returned window is seven days.",
+            "Risk is an engineering-prioritization score and does not prove a defect.",
+            "A low or absent recall similarity does not establish a recall coverage gap.",
+            "Owner statements about recall applicability remain owner-reported allegations unless independently verified by a RecallZero recall-scope tool.",
+            "Crash, fire, injury, and component fields do not by themselves establish causation.",
+            "If semantic_quality is DEGRADED or clustering diagnostics are suspicious, describe cluster labels and downstream conclusions as provisional.",
+            "Prefer representative_evidence_ids for ODI drill-down and do not request every complaint record.",
+        ],
+        "metric_definitions": {
+            "recent_count": "Complaint records in the configured recent window for this cluster, not necessarily one week.",
+            "baseline_count": "Complaint records in the configured preceding baseline window for this cluster.",
+            "trend_ratio": "Smoothed recent complaint rate divided by baseline complaint rate; do not call it week-over-week.",
+            "persistence_weeks": "Consecutive recent weeks containing evidence for this cluster.",
+            "risk_score": "Deterministic prioritization score for engineering investigation; it is not proof of a defect.",
+            "recall_match": "Text/component similarity against recalls visible at the cutoff; a low score does not establish a recall coverage gap.",
+        },
         "warnings": list(run.warnings),
         "signals": [
             {
@@ -76,12 +123,18 @@ def analysis_tool_payload(run) -> dict[str, Any]:
                 "risk_score": signal.risk.final_score,
                 "evidence_count": signal.cluster.evidence_count,
                 "recent_count": signal.trend.recent_count,
+                "recent_window_days": signal.trend.recent_window_days,
                 "baseline_count": signal.trend.baseline_count,
+                "baseline_window_days": signal.trend.baseline_window_days,
+                "recent_rate_per_28d": signal.trend.recent_rate_per_28d,
+                "baseline_rate_per_28d": signal.trend.baseline_rate_per_28d,
                 "trend_ratio": signal.trend.trend_ratio,
                 "persistence_weeks": signal.trend.persistence_weeks,
                 "recall_match": signal.recall_match.model_dump(mode="json"),
                 "rationale": signal.risk.rationale,
-                "evidence_ids": [item.complaint_id for item in signal.evidence],
+                "representative_evidence_ids": list(signal.cluster.representative_complaint_ids),
+                "evidence_ids": [item.complaint_id for item in signal.evidence[:12]],
+                "evidence_ids_truncated": len(signal.evidence) > 12,
             }
             for signal in run.signals[:12]
         ],
@@ -147,7 +200,9 @@ async def execute_backtest(input_data: BacktestToolInput, *, data_dir: str, use_
         "status": result.status,
         "campaign": result.target_campaign_number,
         "official_recall_date": result.official_recall_date,
+        "first_any_alert_date": result.first_any_alert_date,
         "first_matching_alert_date": result.first_matching_alert_date,
+        "alert_snapshot_count": result.alert_snapshot_count,
         "lead_time_days": result.lead_time_days,
         "target_match_score": result.target_match_score,
         "complaints_considered": result.complaints_considered,

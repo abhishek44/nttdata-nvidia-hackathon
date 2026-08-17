@@ -48,7 +48,8 @@ Post-hoc target recall matching
               |
               v
 First matching alert -> lead time
-No matching alert   -> NO_EARLY_SIGNAL
+Risk alert exists but target unmatched -> EARLY_ALERT_TARGET_UNMATCHED
+No risk-qualified alert                -> NO_EARLY_SIGNAL
 ```
 
 By default the replay begins no more than one year before the recall. A different start date can be supplied, but it must be declared before inspecting results.
@@ -56,7 +57,8 @@ By default the replay begins no more than one year before the recall. A differen
 ## Outcome definitions
 
 - `EARLY_SIGNAL_DETECTED`: at least one frozen alert passes the target post-hoc match threshold before the official date and all anti-leakage checks pass.
-- `NO_EARLY_SIGNAL`: no frozen alert both passes the alert gate and matches the target.
+- `EARLY_ALERT_TARGET_UNMATCHED`: at least one frozen pre-recall alert passes the risk gate, but none passes the post-hoc target-recall match threshold.
+- `NO_EARLY_SIGNAL`: no frozen pre-recall alert passes the risk gate.
 - `INVALID_BACKTEST`: one or more anti-leakage checks fail.
 
 Lead time is:
@@ -104,7 +106,7 @@ Persist for every reported experiment:
 - Model names/endpoints.
 - Extraction method counts.
 - Embedding method.
-- DBSCAN parameters.
+- canonical defect-family rules, DBSCAN parameters, and complete-link refinement threshold.
 - Risk configuration.
 - Official recall date source.
 - Replay start date.
