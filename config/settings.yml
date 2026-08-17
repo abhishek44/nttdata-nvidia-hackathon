@@ -1,0 +1,12 @@
+# Informational defaults. Runtime values are read from environment variables.
+models:
+  llm: nvidia/nemotron-3.5-lightning-30b-a3b
+  embeddings: nvidia/nv-embedqa-e5-v5
+windows:
+  recent_days: 28
+  baseline_days: 84
+clustering:
+  algorithm: DBSCAN
+  metric: cosine
+  eps: 0.34
+  min_samples: 2

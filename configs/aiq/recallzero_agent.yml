@@ -1,0 +1,50 @@
+# Modern NVIDIA NeMo Agent Toolkit configuration (`nat` CLI).
+functions:
+  recallzero_fetch_vehicle_data:
+    _type: recallzero_fetch_vehicle_data
+    data_dir: ${RECALLZERO_DATA_DIR:-data}
+    use_nim: true
+  recallzero_analyze_vehicle:
+    _type: recallzero_analyze_vehicle
+    data_dir: ${RECALLZERO_DATA_DIR:-data}
+    use_nim: true
+  recallzero_run_backtest:
+    _type: recallzero_run_backtest
+    data_dir: ${RECALLZERO_DATA_DIR:-data}
+    use_nim: true
+  recallzero_get_evidence:
+    _type: recallzero_get_evidence
+    data_dir: ${RECALLZERO_DATA_DIR:-data}
+    use_nim: true
+  recallzero_engineering_brief:
+    _type: recallzero_engineering_brief
+    data_dir: ${RECALLZERO_DATA_DIR:-data}
+    use_nim: true
+
+llms:
+  investigator_llm:
+    _type: nim
+    model_name: ${RECALLZERO_AGENT_MODEL:-nvidia/nemotron-3.5-lightning-30b-a3b}
+    base_url: ${RECALLZERO_NIM_BASE_URL:-https://integrate.api.nvidia.com/v1}
+    temperature: 0.0
+    max_tokens: 4096
+
+workflow:
+  _type: react_agent
+  tool_names:
+    - recallzero_fetch_vehicle_data
+    - recallzero_analyze_vehicle
+    - recallzero_run_backtest
+    - recallzero_get_evidence
+    - recallzero_engineering_brief
+  llm_name: investigator_llm
+  verbose: true
+  parse_agent_response_max_retries: 3
+  tool_call_max_retries: 2
+  additional_instructions: |
+    You are the RecallZero vehicle-safety investigation agent. Use RecallZero tools rather than estimating
+    counts, dates, trends, risk scores, recall matches, or lead time yourself. Distinguish an early-warning
+    signal from proof of a defect. Never say that a complaint-associated crash, fire, or injury was caused by
+    the suspected failure unless the evidence explicitly establishes causation. Cite ODI complaint identifiers
+    when explaining evidence. For historical questions, use the leakage-safe backtest tool and report its
+    anti-leakage checks. If a tool reports NO_EARLY_SIGNAL, preserve that result without tuning it into success.

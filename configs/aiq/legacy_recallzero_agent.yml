@@ -1,0 +1,41 @@
+# NVIDIA Agent Intelligence Toolkit 1.1 compatibility configuration (`aiq` CLI).
+functions:
+  recallzero_fetch_vehicle_data:
+    _type: recallzero_fetch_vehicle_data
+    data_dir: ${RECALLZERO_DATA_DIR:-data}
+    use_nim: true
+  recallzero_analyze_vehicle:
+    _type: recallzero_analyze_vehicle
+    data_dir: ${RECALLZERO_DATA_DIR:-data}
+    use_nim: true
+  recallzero_run_backtest:
+    _type: recallzero_run_backtest
+    data_dir: ${RECALLZERO_DATA_DIR:-data}
+    use_nim: true
+  recallzero_get_evidence:
+    _type: recallzero_get_evidence
+    data_dir: ${RECALLZERO_DATA_DIR:-data}
+    use_nim: true
+  recallzero_engineering_brief:
+    _type: recallzero_engineering_brief
+    data_dir: ${RECALLZERO_DATA_DIR:-data}
+    use_nim: true
+
+llms:
+  investigator_llm:
+    _type: nim
+    model_name: ${RECALLZERO_AGENT_MODEL:-nvidia/nemotron-3.5-lightning-30b-a3b}
+    temperature: 0.0
+    max_tokens: 4096
+
+workflow:
+  _type: react_agent
+  tool_names:
+    - recallzero_fetch_vehicle_data
+    - recallzero_analyze_vehicle
+    - recallzero_run_backtest
+    - recallzero_get_evidence
+    - recallzero_engineering_brief
+  llm_name: investigator_llm
+  verbose: true
+  parse_agent_response_max_retries: 3

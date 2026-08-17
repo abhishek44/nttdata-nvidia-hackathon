@@ -1,0 +1,132 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>RecallZero Safety Radar</title>
+  <style>
+    :root { color-scheme: dark; --bg:#07111f; --panel:#0d1a2b; --panel2:#13243b; --line:#27415e; --text:#edf5ff; --muted:#99abc0; --green:#76b900; --amber:#ffb347; --red:#ff5c68; --blue:#5ab0ff; }
+    * { box-sizing:border-box; }
+    body { margin:0; background:radial-gradient(circle at top right,#17345a 0,#07111f 45%); color:var(--text); font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif; min-height:100vh; }
+    header { padding:34px clamp(18px,5vw,72px) 20px; border-bottom:1px solid var(--line); background:rgba(5,14,26,.72); backdrop-filter:blur(12px); position:sticky; top:0; z-index:2; }
+    .brand { display:flex; align-items:center; gap:14px; }
+    .mark { width:44px; height:44px; border-radius:12px; display:grid; place-items:center; background:var(--green); color:#07111f; font-weight:900; font-size:22px; }
+    h1 { margin:0; font-size:clamp(24px,4vw,40px); letter-spacing:-.03em; }
+    .tagline { margin:6px 0 0 58px; color:var(--muted); }
+    main { width:min(1200px,calc(100% - 32px)); margin:30px auto 80px; }
+    .panel { background:linear-gradient(145deg,rgba(19,36,59,.96),rgba(10,24,42,.96)); border:1px solid var(--line); border-radius:18px; box-shadow:0 18px 55px rgba(0,0,0,.24); }
+    .query { padding:22px; display:grid; grid-template-columns:1fr 1.2fr .8fr .9fr auto auto; gap:14px; align-items:end; }
+    label { display:block; color:var(--muted); font-size:12px; text-transform:uppercase; letter-spacing:.12em; margin-bottom:7px; }
+    input,select,button { width:100%; border-radius:10px; border:1px solid var(--line); background:#071321; color:var(--text); padding:12px 13px; font:inherit; }
+    input:focus,select:focus { outline:2px solid rgba(118,185,0,.35); border-color:var(--green); }
+    button { border:none; background:var(--green); color:#07111f; font-weight:800; cursor:pointer; padding-inline:22px; }
+    button:disabled { opacity:.55; cursor:wait; }
+    .status { margin-top:18px; padding:14px 18px; color:var(--muted); display:none; }
+    .summary { margin-top:24px; display:grid; grid-template-columns:repeat(5,1fr); gap:12px; }
+    .metric { padding:17px; }
+    .metric strong { display:block; font-size:26px; margin-top:6px; }
+    .metric span { color:var(--muted); font-size:12px; text-transform:uppercase; letter-spacing:.1em; }
+    .signals { margin-top:24px; display:grid; gap:16px; }
+    .signal { padding:22px; position:relative; overflow:hidden; }
+    .signal::before { content:""; position:absolute; inset:0 auto 0 0; width:5px; background:var(--blue); }
+    .signal.alert::before { background:var(--red); }
+    .topline { display:flex; gap:16px; justify-content:space-between; align-items:flex-start; }
+    .issue { font-size:21px; font-weight:800; }
+    .vehicle { color:var(--muted); margin-top:5px; }
+    .badge { padding:7px 11px; border-radius:999px; background:#0a1727; border:1px solid var(--line); white-space:nowrap; font-weight:800; }
+    .badge.HIGH,.badge.CRITICAL { color:#ffd3d6; border-color:rgba(255,92,104,.55); background:rgba(255,92,104,.13); }
+    .badge.MEDIUM { color:#ffe0b6; border-color:rgba(255,179,71,.55); background:rgba(255,179,71,.12); }
+    .grid { display:grid; grid-template-columns:repeat(5,1fr); gap:10px; margin-top:18px; }
+    .fact { padding:12px; background:rgba(5,15,27,.55); border:1px solid rgba(39,65,94,.7); border-radius:10px; }
+    .fact b { display:block; font-size:18px; }
+    .fact small { color:var(--muted); }
+    .rationale { margin-top:16px; line-height:1.55; color:#d4e1ef; }
+    .evidence { margin-top:14px; color:var(--muted); font-size:13px; }
+    .empty { text-align:center; padding:48px; color:var(--muted); }
+    .notice { margin-top:22px; color:var(--muted); font-size:13px; line-height:1.55; }
+    @media (max-width:900px) { .query { grid-template-columns:1fr 1fr; } .query button { grid-column:1/-1; } .summary,.grid { grid-template-columns:repeat(2,1fr); } }
+    @media (max-width:560px) { .query { grid-template-columns:1fr; } .summary,.grid { grid-template-columns:1fr; } .tagline { margin-left:0; } }
+  </style>
+</head>
+<body>
+<header>
+  <div class="brand"><div class="mark">R0</div><h1>RecallZero Safety Radar</h1></div>
+  <p class="tagline">AI understands the complaint language. Deterministic analytics decide the signal.</p>
+</header>
+<main>
+  <section class="panel query">
+    <div><label for="make">Make</label><input id="make" value="FORD" /></div>
+    <div><label for="model">Model</label><input id="model" value="MUSTANG MACH-E" /></div>
+    <div><label for="years">Model years</label><input id="years" value="2021,2022" /></div>
+    <div><label for="cutoff">Cutoff date</label><input id="cutoff" type="date" /></div>
+    <div><button id="analyze">Investigate</button></div>
+    <div><button id="demo" type="button" style="background:#5ab0ff">Offline demo</button></div>
+  </section>
+  <section id="status" class="panel status"></section>
+  <section id="summary" class="summary"></section>
+  <section id="signals" class="signals"><div class="panel empty">Enter a vehicle and run an investigation.</div></section>
+  <p class="notice">RecallZero produces an engineering triage signal, not proof that a safety defect exists. Raw complaint counts are not exposure-adjusted failure rates. Verify complaint records, recall scope, and analytical thresholds before operational use.</p>
+</main>
+<script>
+const $ = (id) => document.getElementById(id);
+const statusBox = $('status');
+const btn = $('analyze');
+const demoBtn = $('demo');
+$('cutoff').valueAsDate = new Date();
+function esc(v){ return String(v ?? '').replace(/[&<>'"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c])); }
+function setStatus(text, error=false){ statusBox.style.display='block'; statusBox.textContent=text; statusBox.style.color=error?'#ff9aa3':'#99abc0'; }
+function metric(label,value){ return `<div class="panel metric"><span>${esc(label)}</span><strong>${esc(value)}</strong></div>`; }
+function signalCard(s){
+  const r=s.risk,t=s.trend,c=s.cluster,m=s.recall_match;
+  const ids=(s.evidence||[]).slice(0,8).map(e=>esc(e.complaint_id)).join(', ');
+  return `<article class="panel signal ${r.alert?'alert':''}">
+    <div class="topline"><div><div class="issue">${esc(c.label)}</div><div class="vehicle">${esc(s.vehicle.model_years.join(', '))} ${esc(s.vehicle.make)} ${esc(s.vehicle.model)}</div></div><div class="badge ${esc(r.level)}">${esc(r.level)} · ${Number(r.final_score).toFixed(1)}</div></div>
+    <div class="grid">
+      <div class="fact"><b>${c.evidence_count}</b><small>supporting records</small></div>
+      <div class="fact"><b>${t.recent_count}</b><small>recent window</small></div>
+      <div class="fact"><b>${Number(t.trend_ratio).toFixed(2)}×</b><small>trend ratio</small></div>
+      <div class="fact"><b>${t.persistence_weeks}</b><small>persistent weeks</small></div>
+      <div class="fact"><b>${m.matched?esc(m.campaign_number):'No match'}</b><small>visible recall</small></div>
+    </div>
+    <div class="rationale">${esc(r.rationale)}</div>
+    <div class="evidence"><strong>Evidence IDs:</strong> ${ids || 'none'}</div>
+  </article>`;
+}
+function renderRun(data, prefix='Completed run') {
+  const alerts=(data.signals||[]).filter(s=>s.risk.alert).length;
+  $('summary').innerHTML=metric('Complaints',data.complaint_count)+metric('Clusters',data.cluster_count)+metric('Alerts',alerts)+metric('Visible recalls',data.recall_count_visible)+metric('Embedding',data.embedding_method);
+  $('signals').innerHTML=(data.signals||[]).length?(data.signals.map(signalCard).join('')):'<div class="panel empty">No clusters were produced for this cutoff.</div>';
+  setStatus(`${prefix} ${data.run_id}. ${data.warnings?.join(' ')||''}`);
+}
+
+demoBtn.addEventListener('click', async () => {
+  demoBtn.disabled=true; btn.disabled=true;
+  setStatus('Running the entirely offline synthetic installation test…');
+  $('summary').innerHTML=''; $('signals').innerHTML='';
+  try {
+    const response=await fetch('/api/v1/demo');
+    const payload=await response.json();
+    if(!response.ok) throw new Error(payload.detail||'Offline demo failed');
+    renderRun(payload.analysis, `Synthetic demo (${payload.backtest.status}, lead=${payload.backtest.lead_time_days ?? 'n/a'} days). Run`);
+  } catch(err) {
+    setStatus(err.message,true);
+    $('signals').innerHTML='<div class="panel empty">The offline demo did not complete.</div>';
+  } finally { demoBtn.disabled=false; btn.disabled=false; }
+});
+
+btn.addEventListener('click', async () => {
+  btn.disabled=true; setStatus('Retrieving NHTSA data, extracting failure signatures, clustering, and calculating deterministic risk…');
+  $('summary').innerHTML=''; $('signals').innerHTML='';
+  const years=$('years').value.split(',').map(v=>Number(v.trim())).filter(Number.isFinite);
+  const body={make:$('make').value,model:$('model').value,model_years:years,cutoff_date:$('cutoff').value||null,refresh:false};
+  try {
+    const response=await fetch('/api/v1/analyze',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
+    const data=await response.json();
+    if(!response.ok) throw new Error(data.detail||'Analysis failed');
+    renderRun(data);
+  } catch(err){ setStatus(err.message,true); $('signals').innerHTML='<div class="panel empty">The investigation did not complete. Check API connectivity and configuration.</div>'; }
+  finally { btn.disabled=false; }
+});
+</script>
+</body>
+</html>

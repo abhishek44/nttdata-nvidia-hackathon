@@ -1,0 +1,12 @@
+risk:
+  weights:
+    severity: 0.30
+    trend: 0.25
+    persistence: 0.15
+    evidence: 0.20
+    recall_gap: 0.10
+  alert_threshold: 75.0
+  minimum_evidence: 4
+  medium_threshold: 45.0
+  high_threshold: 70.0
+  critical_threshold: 88.0

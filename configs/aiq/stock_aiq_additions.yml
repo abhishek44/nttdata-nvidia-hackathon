@@ -1,0 +1,47 @@
+# Human-readable merge fragment for stock NVIDIA AI-Q Blueprint configurations.
+# Prefer `recallzero-aiq-patch`, which handles both current data-source registries
+# and older explicit agent tool lists without overwriting the source YAML.
+functions:
+  recallzero_fetch_vehicle_data:
+    _type: recallzero_fetch_vehicle_data
+    data_dir: ${RECALLZERO_DATA_DIR:-data}
+    use_nim: true
+  recallzero_analyze_vehicle:
+    _type: recallzero_analyze_vehicle
+    data_dir: ${RECALLZERO_DATA_DIR:-data}
+    use_nim: true
+  recallzero_run_backtest:
+    _type: recallzero_run_backtest
+    data_dir: ${RECALLZERO_DATA_DIR:-data}
+    use_nim: true
+  recallzero_get_evidence:
+    _type: recallzero_get_evidence
+    data_dir: ${RECALLZERO_DATA_DIR:-data}
+    use_nim: true
+  recallzero_engineering_brief:
+    _type: recallzero_engineering_brief
+    data_dir: ${RECALLZERO_DATA_DIR:-data}
+    use_nim: true
+
+  # Merge this source into an existing `_type: data_source_registry` in AI-Q 2.x.
+  # Do not create a second registry if the stock config already has one.
+  data_sources:
+    _type: data_source_registry
+    sources:
+      - id: recallzero_vehicle_safety
+        name: RecallZero Vehicle Safety
+        description: >-
+          Investigate public NHTSA complaints, emerging failure patterns, visible recalls,
+          source ODI evidence, and leakage-safe historical recall backtests.
+        tools:
+          - recallzero_fetch_vehicle_data
+          - recallzero_analyze_vehicle
+          - recallzero_run_backtest
+          - recallzero_get_evidence
+          - recallzero_engineering_brief
+        requires_auth: false
+        default_enabled: true
+
+# For older AI-Q configurations without a data-source registry, append the five
+# tool names above to the explicit `tools` list of shallow_research_agent and
+# deep_research_agent. The automated patcher does this version-aware merge.

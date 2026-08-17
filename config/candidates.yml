@@ -1,0 +1,11 @@
+candidates:
+  - name: Mustang Mach-E high-voltage contactor recall
+    make: FORD
+    model: MUSTANG MACH-E
+    model_years: [2021, 2022]
+    campaign_number: 22V412000
+    official_recall_date: 2022-06-10
+    status: unvalidated_candidate
+    note: >-
+      This candidate comes from the recovered RecallZero design documents. The project must not claim
+      early-warning lead time until a real leakage-safe backtest is executed and reviewed.

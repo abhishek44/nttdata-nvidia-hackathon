@@ -1,0 +1,49 @@
+RecallZero v2 release manifest
+==============================
+
+Version: 0.2.1
+Release date: 2026-08-17
+Target: NVIDIA GB10 / DGX Spark-compatible Python 3.11-3.13 environment
+
+Patch focus:
+- Resolve NHTSA complaint/recall model punctuation mismatches, including
+  MUSTANG MACH-E -> MUSTANG MACH E.
+- Fail fast on non-transient HTTP 400 responses instead of retrying them.
+- Parse NHTSA complaint and recall slash dates using endpoint-specific order.
+- Mark the deprecated aiq module as optional; current AI-Q uses nat.
+- Support NAT 1.8+ public plugin imports and the documented NAT 1.5-1.7 imports.
+
+Included capabilities:
+- NHTSA complaint and recall ingestion with evidence-preserving normalization
+- NVIDIA NIM structured complaint extraction and embedding integrations
+- Heuristic and TF-IDF fallbacks
+- DBSCAN semantic clustering
+- Deterministic trend, persistence, severity, evidence, and recall-gap risk scoring
+- Leakage-safe Recall Time Machine historical replay
+- Evidence critic and engineering brief
+- FastAPI service and Safety Radar dashboard
+- NeMo Agent Toolkit plugin tools and standalone ReAct workflow
+- Optional legacy AIQ registration and current stock AI-Q data-source-registry patching
+
+Offline validation:
+- 24 automated tests passed
+- Python compilation passed
+- Synthetic end-to-end analysis and historical replay passed
+- Wheel install, entry points, packaged dashboard, CLI version, and wheel-based demo passed
+- Regression coverage includes model alias resolution and non-retryable HTTP 400 behavior
+
+Wheel:
+- dist/recallzero-0.2.1-py3-none-any.whl
+- SHA-256: f7313b7afee52add3253a93556c30dff8ad34c02b47e9526da4bd238cd146764
+
+Target-environment validation still required:
+- Live patched NHTSA recall retrieval on GB10
+- Hosted or local NVIDIA NIM calls
+- nat plugin discovery and execution in the user's installed NeMo Agent Toolkit
+- The user's exact stock AI-Q Blueprint command/configuration
+- Real historical recall experiments and negative controls
+
+Non-claims:
+- Synthetic demo results are not real vehicle safety findings.
+- Campaign 22V412000 is an unvalidated experiment candidate.
+- Default risk and matching thresholds are prototype values.
