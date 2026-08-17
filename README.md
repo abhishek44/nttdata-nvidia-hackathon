@@ -9,7 +9,7 @@ This repository is a clean rebuild based on the supplied RecallZero design docum
 - Public NHTSA complaint and recall ingestion with local caching.
 - Typed Pydantic evidence contracts that preserve original ODI complaint identifiers and raw payloads.
 - NVIDIA NIM failure-signature extraction with a deterministic heuristic fallback.
-- NVIDIA embedding support with TF-IDF fallback and hierarchical component-family → canonical defect-family → DBSCAN/cosine clustering with complete-link chain refinement.
+- NVIDIA embedding support with TF-IDF fallback, component/consequence child clustering, root-mechanism meta-signals, and DBSCAN/cosine complete-link refinement.
 - Deterministic 28-day recent vs. 84-day baseline trend analytics.
 - Explainable risk scoring: 30% severity, 25% trend, 15% persistence, 20% evidence, 10% recall gap.
 - Leakage-safe weekly historical replay and post-hoc recall matching.
@@ -21,6 +21,13 @@ This repository is a clean rebuild based on the supplied RecallZero design docum
 > RecallZero identifies **signals for engineering review**. It does not establish that a defect exists, prove causation, or estimate an exposure-adjusted failure rate.
 
 ## Architecture
+
+### 0.3.2 signal model
+
+Each complaint is represented on two independent axes: `failure_mechanism` captures root-oriented language such as a high-voltage junction-box/contactor problem, while `consequence_family` captures what the driver experienced such as loss of motive power or a no-start condition. Fine-grained child clusters remain available for ODI drill-down. When the same specific mechanism is split across child clusters, components, or consequences, RecallZero also creates a deterministic `meta` signal that preserves the contributing child-cluster IDs and complaint IDs.
+
+Time Machine snapshots record stable `lineage_id` values, the highest risk at each cutoff, distance to the unchanged 75-point alert threshold, and up to five frozen top candidates. Only after a snapshot is frozen is the known target recall used for evaluation-only `posthoc_target_score` diagnostics.
+
 
 ```text
 NHTSA complaints + recalls
@@ -43,7 +50,7 @@ NHTSA component-family partition
 Canonical defect-family normalization
           |
           v
-DBSCAN + complete-link failure clusters + diagnostics
+Child clusters + root-mechanism meta-signals + diagnostics
           |
           v
 Deterministic trend + severity + risk
@@ -120,7 +127,7 @@ RECALLZERO_LLM_MODEL=<model exposed by local chat endpoint>
 RECALLZERO_EMBEDDING_MODEL=<model exposed by local embedding endpoint>
 ```
 
-If NIM is not configured, the pipeline can run with heuristic extraction plus TF-IDF. If a configured hosted/local NIM returns invalid non-transient output, the deterministic fallback remains available. **Transient hosted failures such as exhausted HTTP 429/502/503 retries do not silently fall back by default in 0.3.1**, because mixing extraction methods can corrupt an experimental clustering result. Set `RECALLZERO_TRANSIENT_NIM_FALLBACK=true` only when availability is more important than semantic consistency.
+If NIM is not configured, the pipeline can run with heuristic extraction plus TF-IDF. If a configured hosted/local NIM returns invalid non-transient output, the deterministic fallback remains available. **Transient hosted failures such as exhausted HTTP 429/502/503 retries do not silently fall back by default in 0.3.2**, because mixing extraction methods can corrupt an experimental clustering result. Set `RECALLZERO_TRANSIENT_NIM_FALLBACK=true` only when availability is more important than semantic consistency.
 
 Successful NIM signatures are cached and checkpointed incrementally. Re-running a vehicle analysis reuses completed ODI signatures for the same model and retries only missing/heuristic records when NIM is enabled.
 
@@ -286,9 +293,9 @@ ruff check src tests
 python -m compileall -q src tests
 ```
 
-The suite covers normalization, structured/heuristic extraction, transient NIM retry behavior, canonical taxonomy clustering, complete-link chain refinement, deterministic severity provenance, structured recall matching, trend/risk behavior, NHTSA response parsing, campaign lookup, API health/demo, NAT/AI-Q config integration, and Time Machine anti-leakage/outcome semantics.
+The suite covers normalization, structured/heuristic extraction, transient NIM retry behavior, dual-axis taxonomy, meta-signal lineage, complete-link max-distance refinement, event-scoped severity provenance, structured recall matching, active-week persistence, NHTSA response parsing, campaign lookup, API health/demo, NAT/AI-Q config integration, and Time Machine anti-leakage/outcome semantics.
 
-The 0.3.1 archive is validated offline before release; live NHTSA/NIM execution and the exact installed NAT runtime must still be smoke-tested on the GB10. See [Release Validation](RELEASE_VALIDATION.md).
+The 0.3.2 archive is validated offline before release; live NHTSA/NIM execution and the exact installed NAT runtime must still be smoke-tested on the GB10. See [Release Validation](RELEASE_VALIDATION.md).
 
 ## Risk configuration
 

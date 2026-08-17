@@ -82,6 +82,7 @@ def print_run(run) -> None:
     console.print(
         f"[bold]Complaints:[/bold] {run.complaint_count}  "
         f"[bold]Clusters:[/bold] {run.cluster_count}  "
+        f"[bold]Meta signals:[/bold] {run.meta_signal_count}  "
         f"[bold]Visible recalls:[/bold] {run.recall_count_visible}  "
         f"[bold]Semantic quality:[/bold] {run.semantic_quality}"
     )
@@ -99,6 +100,7 @@ def print_run(run) -> None:
     table = Table(title="Defect signals")
     table.add_column("Alert")
     table.add_column("Risk", justify="right")
+    table.add_column("Scope")
     table.add_column("Issue")
     table.add_column("Evidence", justify="right")
     table.add_column("Trend", justify="right")
@@ -107,6 +109,7 @@ def print_run(run) -> None:
         table.add_row(
             "YES" if signal.risk.alert else "no",
             f"{signal.risk.level.value} {signal.risk.final_score:.1f}",
+            signal.signal_scope,
             signal.cluster.label,
             str(signal.cluster.evidence_count),
             f"{signal.trend.trend_ratio:.2f}x",
@@ -280,6 +283,8 @@ def backtest(
         console.print(f"[bold]First any alert:[/bold] {result.first_any_alert_date or 'none'}")
         console.print(f"[bold]First matching alert:[/bold] {result.first_matching_alert_date or 'none'}")
         console.print(f"[bold]Lead time:[/bold] {result.lead_time_days if result.lead_time_days is not None else 'not measured'}")
+        console.print(f"[bold]Best post-hoc pre-alert target score:[/bold] {result.max_pre_alert_target_score if result.max_pre_alert_target_score is not None else 'none'}")
+        console.print(f"[bold]Best post-hoc candidate date:[/bold] {result.max_pre_alert_target_date or 'none'}")
         console.print(f"[bold]Anti-leakage checks:[/bold] {json.dumps(result.anti_leakage_checks)}")
         for warning in result.warnings:
             console.print(f"[yellow]Warning:[/yellow] {warning}")

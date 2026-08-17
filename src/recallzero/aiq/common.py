@@ -91,6 +91,7 @@ def analysis_tool_payload(run) -> dict[str, Any]:
         "complaint_count": run.complaint_count,
         "recall_count_visible": run.recall_count_visible,
         "cluster_count": run.cluster_count,
+        "meta_signal_count": run.meta_signal_count,
         "extraction_methods": run.extraction_method_counts,
         "embedding_method": run.embedding_method.value,
         "semantic_quality": run.semantic_quality,
@@ -109,7 +110,8 @@ def analysis_tool_payload(run) -> dict[str, Any]:
             "recent_count": "Complaint records in the configured recent window for this cluster, not necessarily one week.",
             "baseline_count": "Complaint records in the configured preceding baseline window for this cluster.",
             "trend_ratio": "Smoothed recent complaint rate divided by baseline complaint rate; do not call it week-over-week.",
-            "persistence_weeks": "Consecutive recent weeks containing evidence for this cluster.",
+            "persistence_weeks": "Maximum consecutive active-week run within the recent eight-week persistence horizon.",
+            "active_weeks_recent_4": "Number of active weeks in the most recent four-week horizon.",
             "risk_score": "Deterministic prioritization score for engineering investigation; it is not proof of a defect.",
             "recall_match": "Text/component similarity against recalls visible at the cutoff; a low score does not establish a recall coverage gap.",
         },
@@ -117,7 +119,11 @@ def analysis_tool_payload(run) -> dict[str, Any]:
         "signals": [
             {
                 "signal_id": signal.signal_id,
+                "lineage_id": signal.lineage_id,
+                "signal_scope": signal.signal_scope,
                 "issue": signal.cluster.label,
+                "failure_mechanism": signal.cluster.failure_mechanism,
+                "consequence_family": signal.cluster.consequence_family,
                 "alert": signal.risk.alert,
                 "risk_level": signal.risk.level.value,
                 "risk_score": signal.risk.final_score,
@@ -130,6 +136,8 @@ def analysis_tool_payload(run) -> dict[str, Any]:
                 "baseline_rate_per_28d": signal.trend.baseline_rate_per_28d,
                 "trend_ratio": signal.trend.trend_ratio,
                 "persistence_weeks": signal.trend.persistence_weeks,
+                "active_weeks_recent_4": signal.trend.active_weeks_recent_4,
+                "max_consecutive_weeks_recent_8": signal.trend.max_consecutive_weeks_recent_8,
                 "recall_match": signal.recall_match.model_dump(mode="json"),
                 "rationale": signal.risk.rationale,
                 "representative_evidence_ids": list(signal.cluster.representative_complaint_ids),
@@ -205,6 +213,9 @@ async def execute_backtest(input_data: BacktestToolInput, *, data_dir: str, use_
         "alert_snapshot_count": result.alert_snapshot_count,
         "lead_time_days": result.lead_time_days,
         "target_match_score": result.target_match_score,
+        "max_pre_alert_target_score": result.max_pre_alert_target_score,
+        "max_pre_alert_target_date": result.max_pre_alert_target_date,
+        "max_pre_alert_signal_id": result.max_pre_alert_signal_id,
         "complaints_considered": result.complaints_considered,
         "anti_leakage_checks": result.anti_leakage_checks,
         "warnings": result.warnings,
@@ -212,6 +223,9 @@ async def execute_backtest(input_data: BacktestToolInput, *, data_dir: str, use_
             {
                 "cutoff_date": snapshot.cutoff_date,
                 "visible_complaints": snapshot.complaint_count_visible,
+                "max_risk_score": snapshot.max_risk_score,
+                "distance_to_alert_threshold": snapshot.distance_to_alert_threshold,
+                "top_candidates": [item.model_dump(mode="json") for item in snapshot.top_candidates],
                 "alerts": [
                     {
                         "signal_id": signal.signal_id,

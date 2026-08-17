@@ -22,16 +22,26 @@ class TrendEngine:
     def _count_between(complaints: Sequence[Complaint], start: date, end: date) -> int:
         return sum(1 for complaint in complaints if start <= complaint.received_date <= end)
 
-    def _persistence_weeks(self, complaints: Sequence[Complaint], cutoff_date: date) -> int:
-        count = 0
+    def _weekly_activity(self, complaints: Sequence[Complaint], cutoff_date: date, weeks: int = 8) -> list[int]:
+        activity: list[int] = []
         end = cutoff_date
-        for _ in range(12):
+        for _ in range(weeks):
             start = end - timedelta(days=6)
-            if self._count_between(complaints, start, end) == 0:
-                break
-            count += 1
+            activity.append(self._count_between(complaints, start, end))
             end = start - timedelta(days=1)
-        return count
+        return activity
+
+    @staticmethod
+    def _max_consecutive_active(activity: Sequence[int]) -> int:
+        best = 0
+        current = 0
+        for count in activity:
+            if count > 0:
+                current += 1
+                best = max(best, current)
+            else:
+                current = 0
+        return best
 
     def calculate(self, complaints: Sequence[Complaint], cutoff_date: date) -> TrendMetrics:
         visible = [complaint for complaint in complaints if complaint.received_date <= cutoff_date]
@@ -44,11 +54,20 @@ class TrendEngine:
         recent_rate = recent_count * (28.0 / self.recent_window_days)
         baseline_rate = baseline_count * (28.0 / self.baseline_window_days)
 
-        # Add-one smoothing avoids an infinite ratio while preserving the direction of a new signal.
         trend_ratio = (recent_rate + 1.0) / (baseline_rate + 1.0)
         acceleration_score = min(100.0, max(0.0, 35.0 * math.log2(max(1.0, trend_ratio))))
-        persistence_weeks = self._persistence_weeks(visible, cutoff_date)
-        persistence_score = min(100.0, 100.0 * persistence_weeks / self.persistence_weeks_to_full_score)
+
+        weekly = self._weekly_activity(visible, cutoff_date, weeks=8)
+        active_weeks_recent_4 = sum(1 for count in weekly[:4] if count > 0)
+        max_consecutive_weeks_recent_8 = self._max_consecutive_active(weekly)
+        active_score = 100.0 * active_weeks_recent_4 / 4.0
+        consecutive_score = min(
+            100.0,
+            100.0 * max_consecutive_weeks_recent_8 / self.persistence_weeks_to_full_score,
+        )
+        # Avoid resetting persistence to zero merely because the final seven days are
+        # quiet. Both density of active recent weeks and sustained runs are retained.
+        persistence_score = 0.5 * active_score + 0.5 * consecutive_score
         evidence_score = min(100.0, 100.0 * (1.0 - math.exp(-len(visible) / 6.0)))
 
         return TrendMetrics(
@@ -61,7 +80,9 @@ class TrendEngine:
             baseline_rate_per_28d=round(baseline_rate, 4),
             trend_ratio=round(trend_ratio, 4),
             acceleration_score=round(acceleration_score, 2),
-            persistence_weeks=persistence_weeks,
+            persistence_weeks=max_consecutive_weeks_recent_8,
+            active_weeks_recent_4=active_weeks_recent_4,
+            max_consecutive_weeks_recent_8=max_consecutive_weeks_recent_8,
             persistence_score=round(persistence_score, 2),
             evidence_score=round(evidence_score, 2),
         )

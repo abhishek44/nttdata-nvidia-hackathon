@@ -183,13 +183,20 @@ class ComplaintCluster(StrictModel):
     label: str
     system: str
     failure_mode: str
+    # Backward-compatible 0.3.1 grouping label. New code should prefer the
+    # orthogonal failure_mechanism and consequence_family axes below.
     defect_family: str = "OTHER"
+    failure_mechanism: str = "OTHER"
+    consequence_family: str = "OTHER"
     member_ids: tuple[str, ...]
     members: tuple[ClusterMember, ...] = Field(default_factory=tuple)
     representative_complaint_ids: tuple[str, ...] = Field(default_factory=tuple)
+    source_systems: tuple[str, ...] = Field(default_factory=tuple)
+    source_cluster_ids: tuple[str, ...] = Field(default_factory=tuple)
     first_received_date: date
     last_received_date: date
     is_noise: bool = False
+    is_meta: bool = False
     embedding_method: EmbeddingMethod
 
     @property
@@ -207,7 +214,12 @@ class TrendMetrics(StrictModel):
     baseline_rate_per_28d: float = Field(ge=0)
     trend_ratio: float = Field(ge=0)
     acceleration_score: float = Field(ge=0, le=100)
+    # Backward-compatible name. In 0.3.2 this is the maximum consecutive
+    # active-week run inside the recent eight-week persistence horizon, not
+    # only the streak ending exactly at the cutoff.
     persistence_weeks: int = Field(ge=0)
+    active_weeks_recent_4: int = Field(default=0, ge=0, le=4)
+    max_consecutive_weeks_recent_8: int = Field(default=0, ge=0, le=8)
     persistence_score: float = Field(ge=0, le=100)
     evidence_score: float = Field(ge=0, le=100)
 
@@ -255,6 +267,8 @@ class EvidenceItem(StrictModel):
 
 class DefectSignal(StrictModel):
     signal_id: str
+    lineage_id: str = ""
+    signal_scope: str = "cluster"
     vehicle: Vehicle
     cutoff_date: date
     cluster: ComplaintCluster
@@ -273,6 +287,7 @@ class AnalysisRun(StrictModel):
     recall_count_visible: int
     signature_count: int
     cluster_count: int
+    meta_signal_count: int = 0
     signals: tuple[DefectSignal, ...]
     extraction_method_counts: dict[str, int]
     embedding_method: EmbeddingMethod
@@ -282,11 +297,30 @@ class AnalysisRun(StrictModel):
     created_at: datetime = Field(default_factory=lambda: datetime.now(UTC))
 
 
+class BacktestCandidate(StrictModel):
+    signal_id: str
+    lineage_id: str = ""
+    signal_scope: str = "cluster"
+    issue: str
+    failure_mechanism: str = "OTHER"
+    consequence_family: str = "OTHER"
+    evidence_count: int = 0
+    risk_score: float = Field(ge=0, le=100)
+    alert: bool = False
+    distance_to_alert_threshold: float = Field(ge=0)
+    posthoc_target_score: float = Field(ge=0.0, le=1.0)
+    posthoc_target_breakdown: dict[str, float] = Field(default_factory=dict)
+
+
 class BacktestSnapshot(StrictModel):
     cutoff_date: date
     complaint_count_visible: int
     signal_count: int
     alerts: tuple[DefectSignal, ...]
+    max_risk_score: float = Field(default=0.0, ge=0, le=100)
+    max_risk_signal_id: str | None = None
+    distance_to_alert_threshold: float | None = Field(default=None, ge=0)
+    top_candidates: tuple[BacktestCandidate, ...] = Field(default_factory=tuple)
 
 
 class BacktestResult(StrictModel):
@@ -301,6 +335,9 @@ class BacktestResult(StrictModel):
     first_any_alert_date: date | None = None
     first_any_alert_signal_id: str | None = None
     alert_snapshot_count: int = 0
+    max_pre_alert_target_score: float | None = Field(default=None, ge=0.0, le=1.0)
+    max_pre_alert_target_date: date | None = None
+    max_pre_alert_signal_id: str | None = None
     status: str
     snapshots: tuple[BacktestSnapshot, ...]
     complaints_considered: int

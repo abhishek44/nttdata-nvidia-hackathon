@@ -45,20 +45,76 @@ def _norm(text: str | None) -> str:
     return " ".join(re.findall(r"[a-z0-9]+", text.lower()))
 
 
+def _sentences(text: str) -> list[str]:
+    # Keep context windows small enough to distinguish the incident from background,
+    # owner speculation, or a later sentence about what could have happened.
+    parts = re.split(r"(?<=[.!?;])\s+|\n+", text)
+    return [part.strip() for part in parts if part.strip()]
+
+
 def _first_match(text: str, patterns: tuple[str, ...]) -> str | None:
+    normalized = _norm(text)
     for pattern in patterns:
-        if pattern in text:
+        if pattern in normalized:
             return pattern
     return None
 
 
-class SeverityEngine:
-    """Deterministic safety-indicator validator and scorer.
+def _hypothetical_or_negated(sentence: str, matched: str) -> bool:
+    text = _norm(sentence)
+    # Direct negation near the matched phrase.
+    patterns = (
+        rf"(?:not|never|no|did not|does not|didn t|doesn t)\s+(?:\w+\s+){{0,4}}{re.escape(matched)}",
+        rf"{re.escape(matched)}\s+(?:\w+\s+){{0,3}}(?:not|never)",
+    )
+    if any(re.search(pattern, text) for pattern in patterns):
+        return True
 
-    Crash, injury, fatality, and fire source flags are treated as structured NHTSA
-    evidence. Semantic indicators from the LLM are accepted only when the complaint
-    narrative contains explicit supporting language. This prevents hypothetical text
-    such as "could cause a crash" from being converted into a reported crash.
+    # Speculative language should not become an observed safety event. Exempt common
+    # factual constructions such as "would not start" / "could not shift".
+    factual_not = any(
+        phrase in text
+        for phrase in (
+            "would not start",
+            "could not start",
+            "would not move",
+            "could not move",
+            "would not shift",
+            "could not shift",
+            "would not stop",
+            "could not stop",
+        )
+    )
+    if not factual_not and any(
+        phrase in text
+        for phrase in (
+            "could cause",
+            "may cause",
+            "might cause",
+            "could result",
+            "may result",
+            "might result",
+            "potential for",
+            "potentially",
+            "afraid of",
+            "fear of",
+            "worried that",
+            "concern that",
+            "if this happens",
+            "if it happens",
+        )
+    ):
+        return True
+    return False
+
+
+class SeverityEngine:
+    """Deterministic event-scoped safety-indicator validator and scorer.
+
+    Structured NHTSA crash/injury/fatality/fire fields remain source truth. Semantic
+    indicators are accepted only when explicit language occurs in an incident sentence,
+    not merely somewhere in the complaint background. This avoids treating statements
+    such as "luckily it did not fail while driving" as an in-motion failure.
     """
 
     SEMANTIC_PATTERNS: dict[str, tuple[str, ...]] = {
@@ -67,9 +123,8 @@ class SeverityEngine:
             "lost motive power",
             "lost propulsion",
             "loss of propulsion",
-            "lost all power while driving",
+            "lost all power",
             "throttle went dead",
-            "no acceleration",
             "car turned itself off",
             "vehicle shut down",
             "vehicle shutdown",
@@ -132,37 +187,84 @@ class SeverityEngine:
             "overheated",
             "overheating",
             "thermal event",
+            "melted",
         ),
     }
 
     MOTION_PATTERNS: tuple[str, ...] = (
         "while driving",
         "was driving",
-        "driving",
-        "driving at",
-        "driving on",
         "while traveling",
-        "travelling",
-        "traveling",
-        "highway",
-        "freeway",
-        "mph",
-        "in motion",
+        "while travelling",
+        "travelling at",
+        "traveling at",
+        "driving at",
         "while reversing",
         "while braking",
         "while operating the vehicle",
-        "on the road",
+        "in motion",
     )
 
-    def validate_indicators(
-        self,
-        complaint: Complaint,
-        signature: FailureSignature,
-    ) -> dict[str, str]:
-        text = _norm(complaint.narrative)
+    INCIDENT_CUES: tuple[str, ...] = (
+        "fail",
+        "fault",
+        "malfunction",
+        "stop safely",
+        "lost",
+        "loss",
+        "shut down",
+        "shutdown",
+        "stalled",
+        "went dead",
+        "would not",
+        "could not",
+        "accelerat",
+        "brak",
+        "steer",
+        "crash",
+        "warning",
+        "error",
+        "locked",
+        "stuck",
+    )
+
+    @classmethod
+    def _incident_sentences(cls, complaint: Complaint, signature: FailureSignature) -> list[str]:
+        sentences = _sentences(complaint.narrative)
+        incident = [sentence for sentence in sentences if any(cue in _norm(sentence) for cue in cls.INCIDENT_CUES)]
+        if incident:
+            return incident
+        # Sparse complaints can be a single fragment without a conventional verb.
+        return sentences[:2]
+
+    @classmethod
+    def _motion_evidence(cls, complaint: Complaint, signature: FailureSignature) -> str | None:
+        for sentence in cls._incident_sentences(complaint, signature):
+            normalized = _norm(sentence)
+            # Explicit negative/historical phrases are common in safety complaints.
+            if any(
+                phrase in normalized
+                for phrase in (
+                    "not while driving",
+                    "did not happen while driving",
+                    "didn t happen while driving",
+                    "did not fail while driving",
+                    "didn t fail while driving",
+                    "fortunately not while driving",
+                    "luckily not while driving",
+                    "if this happened while driving",
+                    "if it happened while driving",
+                )
+            ):
+                continue
+            matched = _first_match(sentence, cls.MOTION_PATTERNS)
+            if matched and not _hypothetical_or_negated(sentence, matched):
+                return f"Incident sentence indicates motion: {matched!r}"
+        return None
+
+    def validate_indicators(self, complaint: Complaint, signature: FailureSignature) -> dict[str, str]:
         evidence: dict[str, str] = {}
 
-        # Structured source truth. These do not depend on LLM labels.
         if complaint.crash:
             evidence["crash_reported"] = "NHTSA structured crash flag=true"
         if complaint.injuries > 0:
@@ -172,43 +274,23 @@ class SeverityEngine:
         if complaint.fire:
             evidence["fire_or_thermal_event"] = "NHTSA structured fire flag=true"
 
-        candidate_indicators = set(signature.severity_indicators)
+        motion = self._motion_evidence(complaint, signature)
+        if motion:
+            evidence["vehicle_in_motion"] = motion
 
-        # vehicle_in_motion must have explicit motion support. A model label alone is
-        # insufficient because many prior false positives occurred on parked events.
-        motion_match = _first_match(text, self.MOTION_PATTERNS)
-        if motion_match:
-            evidence["vehicle_in_motion"] = f"Narrative explicitly indicates motion: {motion_match!r}"
-
+        incident_sentences = self._incident_sentences(complaint, signature)
         for indicator, patterns in self.SEMANTIC_PATTERNS.items():
             if indicator in SOURCE_ONLY_INDICATORS:
                 continue
-            # Structured fire is already handled; semantic thermal language can also
-            # support a thermal event even when the source flag is absent.
-            if indicator not in candidate_indicators and indicator != "fire_or_thermal_event":
-                continue
-            matched = _first_match(text, patterns)
-            if matched:
-                evidence[indicator] = f"Narrative support: {matched!r}"
-
-        # Conservative deterministic recovery: if the LLM missed a strongly explicit
-        # semantic indicator, the validator may still add it from the narrative. This
-        # keeps the numerical scorer deterministic and avoids dependence on one model
-        # wording choice.
-        for indicator, patterns in self.SEMANTIC_PATTERNS.items():
-            if indicator in SOURCE_ONLY_INDICATORS or indicator in evidence:
-                continue
-            matched = _first_match(text, patterns)
-            if matched:
-                evidence[indicator] = f"Narrative support: {matched!r}"
+            for sentence in incident_sentences:
+                matched = _first_match(sentence, patterns)
+                if matched and not _hypothetical_or_negated(sentence, matched):
+                    evidence[indicator] = f"Incident narrative support: {matched!r}"
+                    break
 
         return dict(sorted(evidence.items()))
 
-    def calculate(
-        self,
-        complaints: Sequence[Complaint],
-        signatures: Sequence[FailureSignature],
-    ) -> SeverityResult:
+    def calculate(self, complaints: Sequence[Complaint], signatures: Sequence[FailureSignature]) -> SeverityResult:
         signatures_by_id = {item.complaint_id: item for item in signatures}
         counts: Counter[str] = Counter()
         rejected: Counter[str] = Counter()
@@ -246,7 +328,7 @@ class SeverityEngine:
         explanation = (
             f"Severity is driven by validated indicators: {top_text}. "
             "Crash/injury/fatality/fire source flags come from NHTSA structured fields; "
-            "other indicators require explicit narrative support and are counted at most once per complaint."
+            "other indicators require event-scoped narrative support and are counted at most once per complaint."
         )
         if rejected:
             explanation += f" Rejected {sum(rejected.values())} unsupported LLM indicator occurrence(s)."

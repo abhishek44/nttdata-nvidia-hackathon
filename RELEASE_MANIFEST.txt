@@ -1,26 +1,26 @@
 RecallZero v2 release manifest
 ==============================
 
-Version: 0.3.1
+Version: 0.3.2
 Release date: 2026-08-17
 Target: NVIDIA GB10 / DGX Spark-compatible Python 3.11-3.13 environment
 
-Release focus: scientific-validity patch
-- Add campaign-agnostic canonical defect families while preserving raw NIM failure modes.
-- Partition by NHTSA component family and canonical defect family before semantic DBSCAN.
-- Split DBSCAN density chains using complete-link cosine refinement.
-- Add raw failure-mode purity, canonical defect-family purity, and cluster-distance diagnostics.
-- Validate numerical severity deterministically: NHTSA source flags are authoritative for crash/injury/fatality/fire, and semantic safety indicators require explicit narrative support.
-- Expose validated severity indicators and evidence provenance; unsupported LLM indicators do not affect the risk score.
-- Replace lexical-only recall matching with structured component/defect/subsystem/consequence/semantic scoring plus campaign-reference sanity checks.
-- Distinguish EARLY_ALERT_TARGET_UNMATCHED from true NO_EARLY_SIGNAL.
-- Preserve leakage-safe post-hoc target matching and all existing anti-leakage checks.
+Release focus: signal lineage and meta-detection scientific-validity patch
+- Split defect representation into root-oriented failure_mechanism and driver-visible consequence_family axes.
+- Preserve component/consequence child clusters while adding deterministic cross-component meta-signals for specific root mechanisms.
+- Add stable signal lineage IDs across weekly replay snapshots.
+- Enforce complete-link refinement using maximum sampled pairwise distance, not only p90 dispersion.
+- Validate semantic severity in the incident context and reject negated, hypothetical, or background driving references.
+- Replace cutoff-ending persistence with recent active-week density plus maximum consecutive active weeks.
+- Add component-compatible dual-axis recall matching.
+- Record top Time Machine candidates and post-hoc target scores only after each detector snapshot is frozen.
+- Keep the 75-point alert threshold, risk weights, minimum evidence defaults, and anti-leakage boundary unchanged.
 
 Included capabilities:
 - NHTSA complaint and recall ingestion with evidence-preserving normalization
 - NVIDIA NIM structured complaint extraction and embedding integrations
 - Deterministic heuristic and TF-IDF fallbacks for explicitly allowed/offline modes
-- Component-family + canonical defect-family + DBSCAN + complete-link clustering
+- Component/consequence child clustering + root-mechanism meta-signals + DBSCAN + complete-link refinement
 - Deterministic trend, persistence, severity, evidence and recall-gap risk scoring
 - Structured visible-recall matching and leakage-safe Recall Time Machine historical replay
 - Evidence critic and engineering brief
@@ -29,24 +29,24 @@ Included capabilities:
 - Optional legacy AIQ registration and current stock AI-Q data-source-registry patching
 
 Offline validation:
-- 42 automated tests passed; 1 optional NAT-runtime integration test skipped because `nat` is not installed in the build container
+- 47 automated tests passed; 1 optional NAT-runtime integration test skipped because `nat` is not installed in the build container
 - Python compilation passed
 - Synthetic end-to-end analysis and historical replay passed
 - Scientific-validity regression coverage includes hypothetical-event rejection, severity source provenance, taxonomy separation, campaign-reference matching, HV power-loss recall matching, and Time Machine outcome semantics
 
 Wheel:
-- dist/recallzero-0.3.1-py3-none-any.whl
-- SHA-256: 3d0368898b510d376a3d2bd3ff6897fa4954d47361a1a8f0193ae738c0f769d9
+- dist/recallzero-0.3.2-py3-none-any.whl
+- SHA-256: 0945247a7f7671ee11b22263a345c2b45cfb83b7cf93601f5bc6725b0bdc128c
 
 Target-environment validation still required:
 - Live hosted/local NVIDIA NIM behavior on GB10
 - Native NAT tool-calling execution with the installed runtime
-- Re-run the full and pre-recall Mach-E analyses using 0.3.1
+- Re-run the full and pre-recall Mach-E analyses using 0.3.2
 - Re-run campaign 22V412000 and inspect first-any-alert vs first-target-matching-alert
 - Additional historical positive cases and negative controls
 
 Non-claims:
 - Synthetic demo results are not real vehicle safety findings.
 - A risk-qualified pre-recall alert is not automatically a target-recall match.
-- Campaign 22V412000 remains an experiment candidate until the 0.3.1 replay is reviewed.
+- Campaign 22V412000 remains an experiment candidate until the 0.3.2 replay is reviewed.
 - Default risk, clustering, and recall-matching thresholds remain prototype values pending multi-case calibration.

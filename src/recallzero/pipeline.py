@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import logging
+from collections import Counter, defaultdict
 from collections.abc import Sequence
 from datetime import UTC, date, datetime
 
@@ -17,10 +18,18 @@ from recallzero.intelligence import (
     TFIDFEmbedder,
     extraction_method_counts,
 )
-from recallzero.intelligence.clustering import ComplaintClusterer
+from recallzero.intelligence.clustering import ComplaintClusterer, resolve_component_family
+from recallzero.intelligence.taxonomy import (
+    FAILURE_MECHANISM_LABELS,
+    META_ELIGIBLE_MECHANISMS,
+    derive_consequence_family,
+    derive_failure_mechanism,
+)
 from recallzero.models import (
     AnalysisRun,
+    ClusterMember,
     Complaint,
+    ComplaintCluster,
     DefectSignal,
     EmbeddingMethod,
     EvidenceItem,
@@ -79,24 +88,18 @@ class RecallZeroPipeline:
         *,
         use_cache: bool = True,
     ) -> list[FailureSignature]:
-        # Persist successful extraction progress in small batches. A long hosted-NIM
-        # run can therefore resume after interruption or rate limiting without
-        # repeating already-completed ODI records.
         cache = self.repository.load_signatures(vehicle) if use_cache else {}
         merged = dict(cache)
         output: list[FailureSignature] = []
         batch_size = max(1, self.settings.signature_batch_size)
+
         def _checkpoint(signature: FailureSignature) -> None:
             merged[signature.complaint_id] = signature
-            # Successful NIM work is persisted immediately. If a later request
-            # exhausts its 429/5xx retry budget, the next run resumes from here.
             self.repository.save_signatures(vehicle, merged.values())
 
         for start in range(0, len(complaints), batch_size):
             batch = list(complaints[start : start + batch_size])
-            batch_signatures = await self.extractor.extract_many(
-                batch, cached=merged, on_result=_checkpoint
-            )
+            batch_signatures = await self.extractor.extract_many(batch, cached=merged, on_result=_checkpoint)
             output.extend(batch_signatures)
             merged.update({signature.complaint_id: signature for signature in batch_signatures})
             self.repository.save_signatures(vehicle, merged.values())
@@ -120,6 +123,174 @@ class RecallZeroPipeline:
                 visible.append(recall)
         return visible, unknown_date
 
+    def _make_signal(
+        self,
+        *,
+        vehicle: Vehicle,
+        cutoff_date: date,
+        cluster: ComplaintCluster,
+        complaints_by_id: dict[str, Complaint],
+        signatures_by_id: dict[str, FailureSignature],
+        visible_recalls: Sequence[Recall],
+        risk_engine: RiskEngine,
+        signal_scope: str,
+    ) -> DefectSignal:
+        member_complaints = [
+            complaints_by_id[item_id] for item_id in cluster.member_ids if item_id in complaints_by_id
+        ]
+        member_signatures = [
+            signatures_by_id[item_id] for item_id in cluster.member_ids if item_id in signatures_by_id
+        ]
+        trend = self.trend_engine.calculate(member_complaints, cutoff_date)
+        severity = self.severity_engine.calculate(member_complaints, member_signatures)
+        recall_match = self.recall_matcher.find_best_match(
+            cluster, member_signatures, visible_recalls, member_complaints
+        )
+        risk = risk_engine.calculate(
+            severity=severity,
+            trend=trend,
+            recall_match=recall_match,
+            evidence_count=cluster.evidence_count,
+        )
+        evidence = tuple(
+            EvidenceItem(
+                complaint_id=complaint.odi_number,
+                received_date=complaint.received_date,
+                components=complaint.components,
+                narrative_excerpt=excerpt(complaint.narrative),
+                crash=complaint.crash,
+                fire=complaint.fire,
+                injuries=complaint.injuries,
+                deaths=complaint.deaths,
+                signature=signatures_by_id[complaint.odi_number],
+                validated_severity_indicators=tuple(
+                    severity.evidence_by_complaint.get(complaint.odi_number, {}).keys()
+                ),
+                severity_evidence=severity.evidence_by_complaint.get(complaint.odi_number, {}),
+            )
+            for complaint in sorted(member_complaints, key=lambda item: item.received_date, reverse=True)
+        )
+        signal_id = stable_id("sig", vehicle.slug, cutoff_date, cluster.cluster_id)
+        if signal_scope == "meta":
+            lineage_id = stable_id("lin", vehicle.slug, "meta", cluster.failure_mechanism)
+        else:
+            lineage_id = stable_id(
+                "lin",
+                vehicle.slug,
+                "cluster",
+                cluster.system,
+                cluster.failure_mechanism,
+                cluster.consequence_family,
+            )
+        return DefectSignal(
+            signal_id=signal_id,
+            lineage_id=lineage_id,
+            signal_scope=signal_scope,
+            vehicle=vehicle,
+            cutoff_date=cutoff_date,
+            cluster=cluster,
+            trend=trend,
+            recall_match=recall_match,
+            risk=risk,
+            evidence=evidence,
+        )
+
+    def _build_meta_clusters(
+        self,
+        *,
+        complaints: Sequence[Complaint],
+        signatures_by_id: dict[str, FailureSignature],
+        child_clusters: Sequence[ComplaintCluster],
+        embedding_method: EmbeddingMethod,
+    ) -> tuple[list[ComplaintCluster], list[dict[str, object]]]:
+        complaint_by_id = {item.odi_number: item for item in complaints}
+        mechanism_groups: dict[str, list[str]] = defaultdict(list)
+        consequences_by_id: dict[str, str] = {}
+        systems_by_id: dict[str, str] = {}
+
+        for complaint in complaints:
+            signature = signatures_by_id.get(complaint.odi_number)
+            if signature is None:
+                continue
+            mechanism = derive_failure_mechanism(complaint, signature)
+            consequence = derive_consequence_family(complaint, signature)
+            consequences_by_id[complaint.odi_number] = consequence
+            systems_by_id[complaint.odi_number] = resolve_component_family(complaint, signature)
+            if mechanism in META_ELIGIBLE_MECHANISMS:
+                mechanism_groups[mechanism].append(complaint.odi_number)
+
+        meta_clusters: list[ComplaintCluster] = []
+        diagnostics: list[dict[str, object]] = []
+        for mechanism, member_ids in sorted(mechanism_groups.items()):
+            stable_member_ids = tuple(sorted(set(member_ids)))
+            if len(stable_member_ids) < 2:
+                continue
+            source_systems = tuple(sorted({systems_by_id[item_id] for item_id in stable_member_ids}))
+            consequence_counts = Counter(consequences_by_id[item_id] for item_id in stable_member_ids)
+            source_cluster_ids = tuple(
+                sorted(
+                    cluster.cluster_id
+                    for cluster in child_clusters
+                    if set(cluster.member_ids) & set(stable_member_ids)
+                )
+            )
+            # Meta-signals are useful only when they reconnect fragmentation across
+            # child clusters, component systems, or consequence presentations.
+            if len(source_cluster_ids) < 2 and len(source_systems) < 2 and len(consequence_counts) < 2:
+                continue
+
+            member_complaints = [complaint_by_id[item_id] for item_id in stable_member_ids]
+            dominant_consequence = consequence_counts.most_common(1)[0][0]
+            mechanism_label = FAILURE_MECHANISM_LABELS.get(mechanism, mechanism.replace("_", " ").title())
+            representative_ids: list[str] = []
+            for cluster in sorted(child_clusters, key=lambda item: -item.evidence_count):
+                if not (set(cluster.member_ids) & set(stable_member_ids)):
+                    continue
+                for item_id in cluster.representative_complaint_ids:
+                    if item_id in stable_member_ids and item_id not in representative_ids:
+                        representative_ids.append(item_id)
+                    if len(representative_ids) >= 3:
+                        break
+                if len(representative_ids) >= 3:
+                    break
+            if not representative_ids:
+                representative_ids = list(stable_member_ids[:3])
+
+            cluster_id = stable_id("meta", mechanism, *stable_member_ids)
+            meta_clusters.append(
+                ComplaintCluster(
+                    cluster_id=cluster_id,
+                    label=f"META — {mechanism_label}",
+                    system="CROSS-COMPONENT",
+                    failure_mode=mechanism_label.upper(),
+                    defect_family=mechanism,
+                    failure_mechanism=mechanism,
+                    consequence_family=dominant_consequence,
+                    member_ids=stable_member_ids,
+                    members=tuple(ClusterMember(complaint_id=item_id) for item_id in stable_member_ids),
+                    representative_complaint_ids=tuple(representative_ids),
+                    source_systems=source_systems,
+                    source_cluster_ids=source_cluster_ids,
+                    first_received_date=min(item.received_date for item in member_complaints),
+                    last_received_date=max(item.received_date for item in member_complaints),
+                    is_noise=False,
+                    is_meta=True,
+                    embedding_method=embedding_method,
+                )
+            )
+            diagnostics.append(
+                {
+                    "cluster_id": cluster_id,
+                    "failure_mechanism": mechanism,
+                    "label": mechanism_label,
+                    "evidence_count": len(stable_member_ids),
+                    "source_systems": list(source_systems),
+                    "source_cluster_count": len(source_cluster_ids),
+                    "consequence_families": dict(sorted(consequence_counts.items())),
+                }
+            )
+        return meta_clusters, diagnostics
+
     async def analyze_records(
         self,
         *,
@@ -138,7 +309,11 @@ class RecallZeroPipeline:
         if signatures is None:
             signatures = await self.extract_signatures(vehicle, visible_complaints)
         signatures_by_id = {signature.complaint_id: signature for signature in signatures}
-        visible_signatures = [signatures_by_id[item.odi_number] for item in visible_complaints if item.odi_number in signatures_by_id]
+        visible_signatures = [
+            signatures_by_id[item.odi_number]
+            for item in visible_complaints
+            if item.odi_number in signatures_by_id
+        ]
         complaints_by_id = {complaint.odi_number: complaint for complaint in visible_complaints}
 
         clusters, embedding, clustering_diagnostics = await self.clusterer.cluster_with_diagnostics(
@@ -147,57 +322,47 @@ class RecallZeroPipeline:
         visible_recalls, unknown_recall_dates = self._visible_recalls(recalls, cutoff_date)
         risk_engine = RiskEngine(risk_config or self.risk_config)
 
-        signals: list[DefectSignal] = []
-        for cluster in clusters:
-            member_complaints = [complaints_by_id[item_id] for item_id in cluster.member_ids if item_id in complaints_by_id]
-            member_signatures = [signatures_by_id[item_id] for item_id in cluster.member_ids if item_id in signatures_by_id]
-            trend = self.trend_engine.calculate(member_complaints, cutoff_date)
-            severity = self.severity_engine.calculate(member_complaints, member_signatures)
-            recall_match = self.recall_matcher.find_best_match(
-                cluster, member_signatures, visible_recalls, member_complaints
+        signals = [
+            self._make_signal(
+                vehicle=vehicle,
+                cutoff_date=cutoff_date,
+                cluster=cluster,
+                complaints_by_id=complaints_by_id,
+                signatures_by_id=signatures_by_id,
+                visible_recalls=visible_recalls,
+                risk_engine=risk_engine,
+                signal_scope="cluster",
             )
-            risk = risk_engine.calculate(
-                severity=severity,
-                trend=trend,
-                recall_match=recall_match,
-                evidence_count=cluster.evidence_count,
+            for cluster in clusters
+        ]
+
+        meta_clusters, meta_diagnostics = self._build_meta_clusters(
+            complaints=visible_complaints,
+            signatures_by_id=signatures_by_id,
+            child_clusters=clusters,
+            embedding_method=embedding.method if visible_complaints else EmbeddingMethod.TFIDF,
+        )
+        signals.extend(
+            self._make_signal(
+                vehicle=vehicle,
+                cutoff_date=cutoff_date,
+                cluster=cluster,
+                complaints_by_id=complaints_by_id,
+                signatures_by_id=signatures_by_id,
+                visible_recalls=visible_recalls,
+                risk_engine=risk_engine,
+                signal_scope="meta",
             )
-            evidence = tuple(
-                EvidenceItem(
-                    complaint_id=complaint.odi_number,
-                    received_date=complaint.received_date,
-                    components=complaint.components,
-                    narrative_excerpt=excerpt(complaint.narrative),
-                    crash=complaint.crash,
-                    fire=complaint.fire,
-                    injuries=complaint.injuries,
-                    deaths=complaint.deaths,
-                    signature=signatures_by_id[complaint.odi_number],
-                    validated_severity_indicators=tuple(
-                        severity.evidence_by_complaint.get(complaint.odi_number, {}).keys()
-                    ),
-                    severity_evidence=severity.evidence_by_complaint.get(complaint.odi_number, {}),
-                )
-                for complaint in sorted(member_complaints, key=lambda item: item.received_date, reverse=True)
-            )
-            signal_id = stable_id("sig", vehicle.slug, cutoff_date, cluster.cluster_id)
-            signals.append(
-                DefectSignal(
-                    signal_id=signal_id,
-                    vehicle=vehicle,
-                    cutoff_date=cutoff_date,
-                    cluster=cluster,
-                    trend=trend,
-                    recall_match=recall_match,
-                    risk=risk,
-                    evidence=evidence,
-                )
-            )
+            for cluster in meta_clusters
+        )
+        clustering_diagnostics["meta_signals"] = meta_diagnostics
+        clustering_diagnostics["meta_signal_count"] = len(meta_clusters)
 
         signals.sort(
             key=lambda item: (
                 not item.risk.alert,
                 -item.risk.final_score,
+                item.signal_scope != "meta",
                 -item.cluster.evidence_count,
                 item.cluster.label,
             )
@@ -206,7 +371,9 @@ class RecallZeroPipeline:
         if not visible_complaints:
             warnings.append("No complaint records were visible at the requested cutoff date.")
         if unknown_recall_dates:
-            warnings.append(f"Excluded {unknown_recall_dates} recall record(s) with no usable report date from cutoff logic.")
+            warnings.append(
+                f"Excluded {unknown_recall_dates} recall record(s) with no usable report date from cutoff logic."
+            )
         methods = extraction_method_counts(visible_signatures)
         heuristic_count = methods.get("heuristic", 0)
         fallback_ratio = heuristic_count / max(1, len(visible_signatures))
@@ -247,6 +414,7 @@ class RecallZeroPipeline:
             recall_count_visible=len(visible_recalls),
             signature_count=len(visible_signatures),
             cluster_count=len(clusters),
+            meta_signal_count=len(meta_clusters),
             signals=tuple(signals),
             extraction_method_counts=methods,
             embedding_method=embedding.method if clusters or visible_complaints else EmbeddingMethod.TFIDF,
@@ -311,9 +479,13 @@ def build_pipeline(
     chat_available = nim_enabled and chat_client.configured
     embedding_available = nim_enabled and embedding_client.configured
     if nim_enabled and not chat_available:
-        logger.warning("NIM extraction was requested but no credentialed hosted endpoint or local chat endpoint is configured; using heuristic extraction.")
+        logger.warning(
+            "NIM extraction was requested but no credentialed hosted endpoint or local chat endpoint is configured; using heuristic extraction."
+        )
     if nim_enabled and not embedding_available:
-        logger.warning("NIM embeddings were requested but no credentialed hosted endpoint or local embedding endpoint is configured; using TF-IDF.")
+        logger.warning(
+            "NIM embeddings were requested but no credentialed hosted endpoint or local embedding endpoint is configured; using TF-IDF."
+        )
 
     heuristic = HeuristicFailureExtractor()
     nim_extractor = NIMFailureExtractor(chat_client, settings.llm_model) if chat_available else None

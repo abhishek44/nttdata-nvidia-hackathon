@@ -11,7 +11,13 @@ from sklearn.cluster import AgglomerativeClustering, DBSCAN
 from sklearn.metrics.pairwise import cosine_similarity
 
 from recallzero.intelligence.embeddings import Embedder, EmbeddingResult
-from recallzero.intelligence.taxonomy import DEFECT_FAMILY_LABELS, derive_defect_family
+from recallzero.intelligence.taxonomy import (
+    CONSEQUENCE_FAMILY_LABELS,
+    FAILURE_MECHANISM_LABELS,
+    derive_consequence_family,
+    derive_defect_family,
+    derive_failure_mechanism,
+)
 from recallzero.models import ClusterMember, Complaint, ComplaintCluster, FailureSignature
 from recallzero.utils import stable_id
 
@@ -93,13 +99,19 @@ def build_cluster_document(
     signature: FailureSignature,
     family: str | None = None,
     defect_family: str | None = None,
+    failure_mechanism: str | None = None,
+    consequence_family: str | None = None,
 ) -> str:
     family = family or resolve_component_family(complaint, signature)
     defect_family = defect_family or derive_defect_family(complaint, signature)
+    failure_mechanism = failure_mechanism or derive_failure_mechanism(complaint, signature)
+    consequence_family = consequence_family or derive_consequence_family(complaint, signature)
     narrative = " ".join(complaint.narrative.split())[:350]
     return (
         f"component family: {family}\n"
-        f"canonical defect family: {defect_family}\n"
+        f"failure mechanism: {failure_mechanism}\n"
+        f"consequence family: {consequence_family}\n"
+        f"legacy defect family: {defect_family}\n"
         f"failure mode: {signature.failure_mode}\n"
         f"symptom: {signature.symptom or 'unknown'}\n"
         f"operating state: {signature.operating_state or 'unknown'}\n"
@@ -181,7 +193,7 @@ class ComplaintClusterer:
         if len(indices) < 3:
             return [indices]
         summary = self._distance_summary(matrix, indices)
-        if summary is None or summary["p90"] <= self.refine_max_distance:
+        if summary is None or summary["max"] <= self.refine_max_distance:
             return [indices]
         sub = matrix[indices]
         dense = sub.toarray() if sparse.issparse(sub) else np.asarray(sub)
@@ -206,7 +218,7 @@ class ComplaintClusterer:
         if not complaints:
             embedding = await self.embedder.embed([])
             return [], embedding, {
-                "algorithm": "hierarchical_taxonomy_dbscan_complete_link",
+                "algorithm": "hierarchical_dual_axis_dbscan_complete_link_max_guard",
                 "eps": self.eps,
                 "min_samples": self.min_samples,
                 "refine_max_distance": self.refine_max_distance,
@@ -223,12 +235,20 @@ class ComplaintClusterer:
         defect_families = [
             derive_defect_family(complaint_by_id[item_id], signatures_by_id[item_id]) for item_id in ordered_ids
         ]
+        failure_mechanisms = [
+            derive_failure_mechanism(complaint_by_id[item_id], signatures_by_id[item_id]) for item_id in ordered_ids
+        ]
+        consequence_families = [
+            derive_consequence_family(complaint_by_id[item_id], signatures_by_id[item_id]) for item_id in ordered_ids
+        ]
         documents = [
             build_cluster_document(
                 complaint_by_id[item_id],
                 signatures_by_id[item_id],
                 families[index],
                 defect_families[index],
+                failure_mechanisms[index],
+                consequence_families[index],
             )
             for index, item_id in enumerate(ordered_ids)
         ]
@@ -237,7 +257,9 @@ class ComplaintClusterer:
         hierarchy_groups: dict[tuple[str, str], list[int]] = {}
         if self.hierarchical:
             for index, family in enumerate(families):
-                taxonomy = defect_families[index] if self.taxonomy_grouping else "ALL"
+                # Child clusters are consequence-oriented. Root/mechanism identity is
+                # carried independently and is later used for cross-component meta-signals.
+                taxonomy = consequence_families[index] if self.taxonomy_grouping else "ALL"
                 hierarchy_groups.setdefault((family, taxonomy), []).append(index)
         else:
             hierarchy_groups[("ALL", "ALL")] = list(range(len(ordered_ids)))
@@ -249,9 +271,9 @@ class ComplaintClusterer:
         component_noise_count: Counter[str] = Counter()
         noise_count = 0
 
-        for (family, defect_family), indices in sorted(hierarchy_groups.items()):
+        for (family, consequence_family), indices in sorted(hierarchy_groups.items()):
             component_indices.setdefault(family, []).extend(indices)
-            component_taxonomy.setdefault(family, {})[defect_family] = list(indices)
+            component_taxonomy.setdefault(family, {})[consequence_family] = list(indices)
             if len(indices) < self.min_samples:
                 labels = np.full(len(indices), -1, dtype=int)
             else:
@@ -266,7 +288,7 @@ class ComplaintClusterer:
             for raw_label, raw_indices in raw_groups.items():
                 if raw_label == -1:
                     for global_index in raw_indices:
-                        key = f"{family}|{defect_family}|noise_{global_index}"
+                        key = f"{family}|{consequence_family}|noise_{global_index}"
                         groups[key] = [global_index]
                         noise_count += 1
                         component_noise_count[family] += 1
@@ -274,25 +296,25 @@ class ComplaintClusterer:
 
                 refined = self._refine_cluster(embedding.matrix, raw_indices)
                 for refinement_index, refined_indices in enumerate(refined):
-                    key = f"{family}|{defect_family}|cluster_{raw_label}_{refinement_index}"
+                    key = f"{family}|{consequence_family}|cluster_{raw_label}_{refinement_index}"
                     groups[key] = refined_indices
                     component_cluster_count[family] += 1
 
         component_diagnostics: dict[str, Any] = {}
         for family, indices in sorted(component_indices.items()):
             taxonomy_rows: dict[str, Any] = {}
-            for defect_family, family_indices in sorted(component_taxonomy[family].items()):
+            for consequence_family, family_indices in sorted(component_taxonomy[family].items()):
                 output_clusters = [
                     values
                     for key, values in groups.items()
-                    if key.startswith(f"{family}|{defect_family}|") and "|noise_" not in key
+                    if key.startswith(f"{family}|{consequence_family}|") and "|noise_" not in key
                 ]
                 output_noise = sum(
                     len(values)
                     for key, values in groups.items()
-                    if key.startswith(f"{family}|{defect_family}|noise_")
+                    if key.startswith(f"{family}|{consequence_family}|noise_")
                 )
-                taxonomy_rows[defect_family] = {
+                taxonomy_rows[consequence_family] = {
                     "count": len(family_indices),
                     "clusters": len(output_clusters),
                     "noise_points": output_noise,
@@ -303,6 +325,7 @@ class ComplaintClusterer:
                 "dbscan_clusters": component_cluster_count[family],
                 "noise_points": component_noise_count[family],
                 "cosine_distance": self._distance_summary(embedding.matrix, indices),
+                "consequence_family_groups": taxonomy_rows,
                 "defect_family_groups": taxonomy_rows,
             }
 
@@ -314,13 +337,21 @@ class ComplaintClusterer:
             member_complaints = [complaint_by_id[item_id] for item_id in member_ids]
             parts = key.split("|", 2)
             family = parts[0]
-            defect_family = parts[1]
+            consequence_family = parts[1]
             raw_failure_mode = self._mode([item.failure_mode for item in member_signatures], "UNSPECIFIED FAILURE")
+            member_mechanisms = [
+                derive_failure_mechanism(complaint_by_id[item_id], signatures_by_id[item_id]) for item_id in member_ids
+            ]
+            failure_mechanism = self._mode(member_mechanisms, "OTHER")
+            member_legacy_families = [
+                derive_defect_family(complaint_by_id[item_id], signatures_by_id[item_id]) for item_id in member_ids
+            ]
+            defect_family = self._mode(member_legacy_families, consequence_family)
             representatives, score_map = self._representatives(embedding.matrix, indices)
             representative_ids = tuple(ordered_ids[index] for index in representatives)
             stable_member_ids = tuple(sorted(member_ids))
-            cluster_id = stable_id("cl", family, defect_family, raw_failure_mode, *stable_member_ids)
-            stable_label = DEFECT_FAMILY_LABELS.get(defect_family, defect_family.replace("_", " ").title())
+            cluster_id = stable_id("cl", family, consequence_family, failure_mechanism, raw_failure_mode, *stable_member_ids)
+            stable_label = CONSEQUENCE_FAMILY_LABELS.get(consequence_family, consequence_family.replace("_", " ").title())
             label = f"{family} — {raw_failure_mode}"
             dates = [item.received_date for item in member_complaints]
             is_noise = "|noise_" in key
@@ -331,7 +362,10 @@ class ComplaintClusterer:
                     system=family,
                     failure_mode=raw_failure_mode,
                     defect_family=defect_family,
+                    failure_mechanism=failure_mechanism,
+                    consequence_family=consequence_family,
                     member_ids=stable_member_ids,
+                    source_systems=(family,),
                     members=tuple(
                         ClusterMember(
                             complaint_id=ordered_ids[index],
@@ -351,6 +385,11 @@ class ComplaintClusterer:
                 derive_defect_family(complaint_by_id[item_id], signatures_by_id[item_id]) for item_id in member_ids
             ]
             defect_mode_count = Counter(derived_families).most_common(1)[0][1]
+            mechanism_mode_count = Counter(member_mechanisms).most_common(1)[0][1]
+            derived_consequences = [
+                derive_consequence_family(complaint_by_id[item_id], signatures_by_id[item_id]) for item_id in member_ids
+            ]
+            consequence_mode_count = Counter(derived_consequences).most_common(1)[0][1]
             purity_rows.append(
                 {
                     "cluster_id": cluster_id,
@@ -358,9 +397,14 @@ class ComplaintClusterer:
                     "canonical_defect_label": stable_label,
                     "size": len(indices),
                     "defect_family": defect_family,
+                    "failure_mechanism": failure_mechanism,
+                    "failure_mechanism_label": FAILURE_MECHANISM_LABELS.get(failure_mechanism, failure_mechanism),
+                    "consequence_family": consequence_family,
                     "failure_mode_purity": round(raw_mode_count / max(1, len(indices)), 3),
                     "raw_failure_mode_purity": round(raw_mode_count / max(1, len(indices)), 3),
                     "defect_family_purity": round(defect_mode_count / max(1, len(indices)), 3),
+                    "failure_mechanism_purity": round(mechanism_mode_count / max(1, len(indices)), 3),
+                    "consequence_family_purity": round(consequence_mode_count / max(1, len(indices)), 3),
                     "cosine_distance": self._distance_summary(embedding.matrix, indices),
                     "noise": is_noise,
                 }
@@ -370,7 +414,7 @@ class ComplaintClusterer:
         cluster_sizes = [item.evidence_count for item in clusters]
         largest_share = max(cluster_sizes, default=0) / max(1, len(ordered_ids))
         diagnostics = {
-            "algorithm": "hierarchical_taxonomy_dbscan_complete_link" if self.hierarchical else "dbscan_complete_link",
+            "algorithm": "hierarchical_dual_axis_dbscan_complete_link_max_guard" if self.hierarchical else "dbscan_complete_link_max_guard",
             "eps": self.eps,
             "min_samples": self.min_samples,
             "taxonomy_grouping": self.taxonomy_grouping,

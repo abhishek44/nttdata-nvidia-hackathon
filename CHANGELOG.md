@@ -1,5 +1,18 @@
 # Changelog
 
+## 0.3.2
+
+- Added dual-axis defect representation: root `failure_mechanism` plus driver-visible `consequence_family`.
+- Added cross-component `meta` signals that reconnect fragmented child clusters while preserving ODI and child-cluster lineage.
+- Added stable `lineage_id` values across weekly replay snapshots.
+- Changed complete-link refinement guard to enforce maximum sampled pairwise dispersion rather than only p90 dispersion.
+- Added event-scoped severity validation to reject background, negated, and hypothetical motion/safety references.
+- Reworked persistence into active weeks over four weeks plus maximum consecutive active weeks over eight weeks.
+- Added component-compatibility gating and dual-axis scoring to recall matching.
+- Added Time Machine top-candidate diagnostics, post-hoc target scores, max risk, and distance-to-alert without exposing target recall text during detection.
+- Kept the 75/100 alert threshold, risk weights, minimum evidence defaults, and leakage boundary unchanged.
+
+
 ## 0.3.1
 
 - Add deterministic canonical defect families for cross-wording normalization while preserving raw NIM failure modes as evidence.

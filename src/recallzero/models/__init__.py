@@ -1,6 +1,7 @@
 from recallzero.models.api import AnalyzeRequest, BacktestRequest, IngestRequest, VehicleRequest
 from recallzero.models.domain import (
     AnalysisRun,
+    BacktestCandidate,
     BacktestResult,
     BacktestSnapshot,
     Complaint,
@@ -24,6 +25,7 @@ __all__ = [
     "AnalysisRun",
     "AnalyzeRequest",
     "BacktestRequest",
+    "BacktestCandidate",
     "BacktestResult",
     "BacktestSnapshot",
     "Complaint",

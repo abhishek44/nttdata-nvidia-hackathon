@@ -8,7 +8,11 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
 
 from recallzero.intelligence.clustering import canonical_family
-from recallzero.intelligence.taxonomy import derive_recall_defect_families, families_related
+from recallzero.intelligence.taxonomy import (
+    consequence_related,
+    derive_recall_axes,
+    mechanism_related,
+)
 from recallzero.models import Complaint, ComplaintCluster, FailureSignature, Recall, RecallMatch
 
 
@@ -26,6 +30,14 @@ SYNONYM_REPLACEMENTS = {
 STOPWORDS = {
     "the", "a", "an", "and", "or", "of", "to", "in", "on", "for", "with", "from", "is", "are", "was",
     "were", "be", "may", "can", "could", "vehicle", "vehicles", "driver", "drivers", "system", "systems",
+}
+
+RELATED_COMPONENTS = {
+    frozenset(("ELECTRICAL SYSTEM", "POWER TRAIN")),
+    frozenset(("ELECTRICAL SYSTEM", "FUEL/PROPULSION SYSTEM")),
+    frozenset(("POWER TRAIN", "FUEL/PROPULSION SYSTEM")),
+    frozenset(("DRIVER ASSISTANCE", "VEHICLE SPEED CONTROL")),
+    frozenset(("SERVICE BRAKES", "VEHICLE SPEED CONTROL")),
 }
 
 
@@ -56,7 +68,12 @@ def _campaign_aliases(campaign: str) -> set[str]:
 
 
 class RecallMatcher:
-    """Structured recall matcher with semantic text as supporting, not sole, evidence."""
+    """Dual-axis structured recall matcher.
+
+    Root mechanism and driver-visible consequence are scored independently. Component
+    compatibility acts as a gate so an unrelated visible recall cannot materially lower
+    the recall-gap score only because of generic words such as "failure" or "power".
+    """
 
     def __init__(self, match_threshold: float = 0.50):
         self.match_threshold = match_threshold
@@ -65,7 +82,8 @@ class RecallMatcher:
     def _cluster_text(cluster: ComplaintCluster, signatures: Sequence[FailureSignature]) -> str:
         signature_text = " ".join(signature.canonical_text() for signature in signatures)
         return normalize_match_text(
-            f"{cluster.label} {cluster.system} {cluster.defect_family} {cluster.failure_mode} {signature_text}"
+            f"{cluster.label} {cluster.system} {cluster.failure_mechanism} {cluster.consequence_family} "
+            f"{cluster.defect_family} {cluster.failure_mode} {' '.join(cluster.source_systems)} {signature_text}"
         )
 
     @staticmethod
@@ -91,21 +109,27 @@ class RecallMatcher:
 
     @staticmethod
     def _component_score(cluster: ComplaintCluster, recall: Recall) -> float:
-        recall_component = normalize_match_text(recall.component or "")
-        if not recall_component:
-            return 0.0
-        cluster_family = canonical_family(cluster.system)
         recall_family = canonical_family(recall.component)
-        if cluster_family != "UNKNOWN" and recall_family == cluster_family:
+        if recall_family == "UNKNOWN":
+            return 0.0
+        cluster_families = set(cluster.source_systems) or {cluster.system}
+        cluster_families = {canonical_family(item) for item in cluster_families}
+        cluster_families.discard("UNKNOWN")
+        if recall_family in cluster_families:
             return 1.0
+        if any(frozenset((recall_family, family)) in RELATED_COMPONENTS for family in cluster_families):
+            return 0.65
 
-        cluster_tokens = _token_set(cluster.system)
         recall_tokens = _token_set(recall.component or "")
+        best = 0.0
         safety_tokens = {
             "brake", "braking", "steering", "powertrain", "propulsion", "battery", "electrical", "airbag",
             "restraint", "engine", "fuel", "visibility", "windshield", "glass", "camera", "speed", "control",
         }
-        return _overlap(cluster_tokens & safety_tokens, recall_tokens & safety_tokens)
+        for family in cluster_families:
+            cluster_tokens = _token_set(family)
+            best = max(best, _overlap(cluster_tokens & safety_tokens, recall_tokens & safety_tokens))
+        return best
 
     @staticmethod
     def _subsystem_score(signatures: Sequence[FailureSignature], recall: Recall) -> float:
@@ -116,7 +140,7 @@ class RecallMatcher:
         return _overlap(left, right)
 
     @staticmethod
-    def _consequence_score(signatures: Sequence[FailureSignature], recall: Recall) -> float:
+    def _consequence_text_score(signatures: Sequence[FailureSignature], recall: Recall) -> float:
         left = set()
         for signature in signatures:
             left |= _token_set(" ".join(value for value in (signature.symptom, signature.consequence) if value))
@@ -134,8 +158,11 @@ class RecallMatcher:
         if explicit:
             return {
                 "explicit_campaign_reference": 1.0,
+                "failure_mechanism": 1.0,
+                "consequence_family": 1.0,
                 "defect_family": 1.0,
                 "component": 1.0,
+                "component_compatible": 1.0,
                 "subsystem": 1.0,
                 "consequence": 1.0,
                 "semantic_lexical": 1.0,
@@ -147,8 +174,11 @@ class RecallMatcher:
         if not recall_text:
             return {
                 "explicit_campaign_reference": 0.0,
+                "failure_mechanism": 0.0,
+                "consequence_family": 0.0,
                 "defect_family": 0.0,
                 "component": 0.0,
+                "component_compatible": 0.0,
                 "subsystem": 0.0,
                 "consequence": 0.0,
                 "semantic_lexical": 0.0,
@@ -159,28 +189,51 @@ class RecallMatcher:
         matrix = vectorizer.fit_transform([cluster_text, recall_text])
         semantic_lexical = float(cosine_similarity(matrix[0:1], matrix[1:2])[0, 0])
         component = self._component_score(cluster, recall)
-        recall_families = derive_recall_defect_families(recall)
-        defect_family = families_related(cluster.defect_family, recall_families)
+        recall_mechanisms, recall_consequences = derive_recall_axes(recall)
+        mechanism_value = cluster.failure_mechanism
+        consequence_value = cluster.consequence_family
+        # Older serialized/manual clusters may only have defect_family populated.
+        if mechanism_value == "OTHER" and cluster.defect_family in recall_mechanisms:
+            mechanism_value = cluster.defect_family
+        if consequence_value == "OTHER" and cluster.defect_family in recall_consequences:
+            consequence_value = cluster.defect_family
+        mechanism = mechanism_related(mechanism_value, recall_mechanisms)
+        consequence_family = consequence_related(consequence_value, recall_consequences)
+        defect_family = max(mechanism, consequence_family)
         subsystem = self._subsystem_score(signatures, recall)
-        consequence = self._consequence_score(signatures, recall)
+        consequence = self._consequence_text_score(signatures, recall)
+        component_compatible = 1.0 if component >= 0.35 else 0.0
 
-        # Structured failure compatibility carries the most weight. Lexical similarity
-        # supports the decision but cannot independently qualify a recall match.
         final = (
-            0.34 * defect_family
+            0.30 * mechanism
+            + 0.20 * consequence_family
             + 0.20 * component
-            + 0.12 * subsystem
-            + 0.14 * consequence
-            + 0.20 * semantic_lexical
+            + 0.10 * subsystem
+            + 0.10 * consequence
+            + 0.10 * semantic_lexical
         )
+
+        # Gating: a recall from an unrelated component domain should not reduce the
+        # detector's recall-gap score through generic semantic overlap. A strong exact
+        # mechanism match can retain a modest score for cross-domain wording, but it
+        # cannot qualify a match without some component/subsystem support.
+        if component_compatible == 0.0:
+            if mechanism < 1.0:
+                final *= 0.25
+            else:
+                final = min(final, 0.44)
+
         return {
             "explicit_campaign_reference": 0.0,
+            "failure_mechanism": round(mechanism, 4),
+            "consequence_family": round(consequence_family, 4),
             "defect_family": round(defect_family, 4),
             "component": round(component, 4),
+            "component_compatible": component_compatible,
             "subsystem": round(subsystem, 4),
             "consequence": round(consequence, 4),
             "semantic_lexical": round(semantic_lexical, 4),
-            "final": round(min(1.0, final), 4),
+            "final": round(min(1.0, max(0.0, final)), 4),
         }
 
     def score_target(

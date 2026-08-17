@@ -106,7 +106,7 @@ Persist for every reported experiment:
 - Model names/endpoints.
 - Extraction method counts.
 - Embedding method.
-- canonical defect-family rules, DBSCAN parameters, and complete-link refinement threshold.
+- failure-mechanism/consequence-family rules, meta-signal aggregation rules, DBSCAN parameters, and complete-link refinement threshold.
 - Risk configuration.
 - Official recall date source.
 - Replay start date.
@@ -115,3 +115,7 @@ Persist for every reported experiment:
 ## Current candidate
 
 `config/candidates.yml` includes Ford Mustang Mach-E campaign `22V412000` with a `2022-06-10` boundary because it appeared in the recovered project notes. It remains an unvalidated candidate until real pre-recall data are run and reviewed. A negative outcome is acceptable and must be preserved.
+
+## 0.3.2 evaluation-only candidate diagnostics
+
+After each detector snapshot is frozen, the Time Machine records up to five highest-risk candidates with `max_risk_score`, `distance_to_alert_threshold`, stable lineage, and an evaluation-only `posthoc_target_score`. Target recall text is introduced only after the detector output is frozen and never changes clustering, trend, severity, recall-gap scoring, or the alert decision. This allows a negative backtest to distinguish "the detector looked at the right mechanism but stayed below threshold" from "the detector never surfaced a target-like pattern."

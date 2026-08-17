@@ -45,7 +45,7 @@ The original complaint is not mutated by GenAI output.
 1. NVIDIA NIM LLM structured extraction when configured.
 2. A deterministic heuristic extractor when NIM is not configured or when a non-transient structured-output failure is explicitly allowed to fall back.
 
-Hosted 429/5xx and transport failures are retried with Retry-After awareness, exponential backoff, and jitter. After the retry budget is exhausted, 0.3.1 fails the run by default rather than silently mixing heuristic signatures into a NIM validation set. Successful ODI signatures are checkpointed incrementally so the next run resumes from completed work.
+Hosted 429/5xx and transport failures are retried with Retry-After awareness, exponential backoff, and jitter. After the retry budget is exhausted, 0.3.2 fails the run by default rather than silently mixing heuristic signatures into a NIM validation set. Successful ODI signatures are checkpointed incrementally so the next run resumes from completed work.
 
 The extraction prompt explicitly forbids the model from inventing trend, risk, recall status, causation, or complaint counts.
 
@@ -60,7 +60,7 @@ The extraction prompt explicitly forbids the model from inventing trend, risk, r
 
 This prevents a generic LLM label from merging unrelated brake, propulsion, and electrical complaints into one fleet-wide cluster. Cluster documents emphasize failure mode, symptom, operating state, consequence, safety indicators, and a bounded narrative excerpt.
 
-Each analysis records component-group sizes, canonical defect-family groups, DBSCAN/noise counts, sampled cosine-distance summaries, complete-link refinement parameters, largest-cluster share, raw failure-mode purity, and canonical defect-family purity. One-cluster and dominant-cluster outcomes emit quality warnings. Noise points are retained as singleton/noise clusters for transparency.
+Each analysis records component-group sizes, consequence-family groups, DBSCAN/noise counts, sampled cosine-distance summaries, complete-link refinement parameters, largest-cluster share, raw failure-mode purity, mechanism purity, consequence purity, and meta-signal provenance. One-cluster and dominant-cluster outcomes emit quality warnings. Noise points are retained as singleton/noise clusters for transparency.
 
 ### 5. Deterministic analytics
 
@@ -83,7 +83,7 @@ Final risk = 0.30 severity
            + 0.20 evidence
            + 0.10 recall gap
 
-Severity provenance is deterministic in 0.3.1: NHTSA structured crash/injury/fatality/fire fields are source truth, while semantic indicators such as loss of motive power or unintended braking require explicit narrative support. Unsupported LLM indicators are retained in the raw signature but rejected from numerical risk scoring.
+Severity provenance is deterministic in 0.3.2: NHTSA structured crash/injury/fatality/fire fields are source truth, while semantic indicators such as loss of motive power or unintended braking require event-scoped narrative support; background, negated, and hypothetical references are rejected. Unsupported LLM indicators are retained in the raw signature but rejected from numerical risk scoring.
 ```
 
 The default alert gate is `risk >= 75` with at least four supporting complaints. All values are configurable and should be calibrated.
@@ -151,3 +151,11 @@ Future additions can implement existing protocols/contracts:
 - Manufacturer communication and investigation matching.
 - Calibrated probabilistic risk models.
 - Batch scheduler and model-line surveillance.
+
+## Signal lineage and meta-detection (0.3.2)
+
+RecallZero now represents each complaint on two orthogonal axes: a root-oriented `failure_mechanism` and a driver-visible `consequence_family`. Child clusters remain component/consequence oriented for evidence drill-down. A second deterministic aggregation layer creates `meta` signals only when the same eligible mechanism is fragmented across multiple child clusters, component families, or consequence families. Meta signals preserve every ODI number and the contributing child-cluster IDs.
+
+Each signal also has a stable `lineage_id`. The weekly Time Machine can therefore track the same mechanism across changing membership without pretending that cluster IDs are stable as new complaints arrive. The detector still scores only information visible at each cutoff.
+
+Persistence no longer means only "a streak ending on the cutoff date." It combines active weeks in the most recent four-week horizon with the maximum consecutive active-week run in the recent eight-week horizon. Risk weights and the 75-point default alert gate remain unchanged.

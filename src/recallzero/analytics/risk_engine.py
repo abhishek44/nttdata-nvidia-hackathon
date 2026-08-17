@@ -42,7 +42,8 @@ class RiskEngine:
             "persistence": (
                 trend.persistence_score,
                 self.config.weights.persistence,
-                f"The signal appears in {trend.persistence_weeks} consecutive recent week(s).",
+                f"Persistence combines {trend.active_weeks_recent_4}/4 active recent weeks with a "
+                f"maximum {trend.max_consecutive_weeks_recent_8}-week active run in the last eight weeks.",
             ),
             "evidence": (
                 trend.evidence_score,

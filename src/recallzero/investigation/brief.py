@@ -26,7 +26,8 @@ class EvidenceCritic:
             families.discard("UNKNOWN")
             if families:
                 component_checkable += 1
-                if signal.cluster.system in families:
+                expected_families = set(signal.cluster.source_systems) or {signal.cluster.system}
+                if families & expected_families:
                     component_aligned += 1
         component_alignment_ratio = component_aligned / max(1, component_checkable)
 
@@ -53,7 +54,8 @@ class EvidenceCritic:
         if component_checkable and component_alignment_ratio < 0.75:
             notes.append(
                 f"Only {component_alignment_ratio:.0%} of evidence records with NHTSA component labels align with "
-                f"the cluster family {signal.cluster.system}; review semantic grouping before escalation."
+                f"the signal source systems {', '.join(signal.cluster.source_systems) or signal.cluster.system}; "
+                "review semantic grouping before escalation."
             )
         if "MALFUNCTION" in signal.cluster.failure_mode.upper() and signal.cluster.evidence_count >= 10:
             notes.append(
@@ -100,6 +102,9 @@ class EngineeringBriefRenderer:
 **Vehicle:** {signal.vehicle.display_name}  
 **Cutoff date:** {signal.cutoff_date.isoformat()}  
 **Emerging issue:** {signal.cluster.label}  
+**Signal scope:** {signal.signal_scope}  
+**Failure mechanism:** {signal.cluster.failure_mechanism}  
+**Consequence family:** {signal.cluster.consequence_family}  
 **Priority:** {signal.risk.level.value} — {signal.risk.final_score:.1f}/100  
 **Alert gate:** {'PASSED' if signal.risk.alert else 'NOT PASSED'}
 
@@ -109,7 +114,8 @@ class EngineeringBriefRenderer:
 - Complaints in recent window: {signal.trend.recent_count}
 - Baseline complaints: {signal.trend.baseline_count}
 - Smoothed recent/baseline ratio: {signal.trend.trend_ratio:.2f}x
-- Consecutive recent weeks with evidence: {signal.trend.persistence_weeks}
+- Active weeks in the recent 4-week horizon: {signal.trend.active_weeks_recent_4}
+- Maximum consecutive active weeks in the recent 8-week horizon: {signal.trend.max_consecutive_weeks_recent_8}
 - Complaint IDs: {ids or 'None'}
 
 ## Semantic extraction quality

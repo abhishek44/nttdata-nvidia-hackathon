@@ -81,7 +81,7 @@ RecallZero 0.2.2 fixes the plugin registration by supplying explicit Pydantic in
 
 ## Hosted NIM returns many HTTP 429 responses
 
-RecallZero 0.3.1 treats 429 as a transient capacity/rate-limit condition rather than a semantic extraction failure. The default hosted-NIM behavior is:
+RecallZero 0.3.2 treats 429 as a transient capacity/rate-limit condition rather than a semantic extraction failure. The default hosted-NIM behavior is:
 
 ```text
 LLM concurrency: 2
@@ -103,7 +103,7 @@ Do not use that mode for a headline historical validation result unless the mixe
 
 ## Analysis still produces one giant cluster
 
-0.3.1 performs component-family → canonical defect-family → DBSCAN clustering with complete-link refinement and records `clustering_diagnostics`. Inspect:
+0.3.2 performs component-family → canonical defect-family → DBSCAN clustering with complete-link refinement and records `clustering_diagnostics`. Inspect:
 
 - component-group counts;
 - canonical defect-family groups and DBSCAN clusters/noise by component;
@@ -115,7 +115,7 @@ A suspicious all-in-one result is marked `semantic_quality=DEGRADED` and emits a
 
 ## NAT 1.8 rejects `thinking` or loops in ReAct parsing
 
-The modern `configs/aiq/recallzero_agent.yml` in 0.3.1 uses NAT's documented `tool_calling_agent` fields and deliberately has **no `thinking` YAML key**. Thinking is disabled only inside RecallZero's direct structured-extraction HTTP request when needed; that request option is separate from NAT's LLM configuration schema.
+The modern `configs/aiq/recallzero_agent.yml` in 0.3.2 uses NAT's documented `tool_calling_agent` fields and deliberately has **no `thinking` YAML key**. Thinking is disabled only inside RecallZero's direct structured-extraction HTTP request when needed; that request option is separate from NAT's LLM configuration schema.
 
 Verify:
 

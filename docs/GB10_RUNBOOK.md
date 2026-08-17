@@ -49,7 +49,7 @@ recallzero analyze \
   --max-complaints 25
 ```
 
-Review `extraction_method_counts`, `semantic_quality`, and the clustering summary. With 0.3.1, configured hosted-NIM 429/5xx failures are retried and do not silently become heuristic signatures by default.
+Review `extraction_method_counts`, `semantic_quality`, and the clustering summary. With 0.3.2, configured hosted-NIM 429/5xx failures are retried and do not silently become heuristic signatures by default.
 
 ## 4. Run the full experiment
 
@@ -89,7 +89,7 @@ recallzero serve --port 8080
 
 ## 8. Upgrade an existing 0.2.x / 0.3.0 checkout
 
-Replace the source files with the 0.3.1 archive, retain your existing `.env` and `data/` directory, then reinstall the editable package:
+Replace the source files with the 0.3.2 archive, retain your existing `.env` and `data/` directory, then reinstall the editable package:
 
 ```bash
 cd recallzero_v2
@@ -102,7 +102,7 @@ recallzero --version
 Expected output:
 
 ```text
-RecallZero 0.3.1
+RecallZero 0.3.2
 ```
 
-Retaining `data/cache/*_signatures.json` is useful: successful NIM signatures from 0.2.2/0.3.0 can be reused, while heuristic fallback entries are automatically retried when NIM is enabled. In 0.3.1, severity validation, canonical defect taxonomy, clustering refinement, recall matching, and backtest status semantics are recomputed at analysis time, so rerun analysis/backtests rather than reusing prior run JSON as evidence.
+Retaining `data/cache/*_signatures.json` is useful: successful NIM signatures from 0.2.2/0.3.0 can be reused, while heuristic fallback entries are automatically retried when NIM is enabled. In 0.3.2, severity validation, canonical defect taxonomy, clustering refinement, recall matching, and backtest status semantics are recomputed at analysis time, so rerun analysis/backtests rather than reusing prior run JSON as evidence.
