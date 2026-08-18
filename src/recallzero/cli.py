@@ -19,7 +19,21 @@ from rich.table import Table
 
 from recallzero import __version__
 from recallzero.backtest import RecallTimeMachine
-from recallzero.benchmark import compare_benchmark_runs, run_benchmark, write_benchmark_csv
+from recallzero.benchmark import (
+    BenchmarkSplit,
+    compare_benchmark_runs,
+    create_benchmark_lock,
+    preflight_benchmark,
+    run_benchmark,
+    verify_benchmark_lock,
+    write_benchmark_csv,
+)
+from recallzero.benchmark_adjudication import (
+    AdjudicatedBenchmarkRun,
+    adjudicate_benchmark,
+    build_validation_report,
+    write_validation_report_csv,
+)
 from recallzero.config import get_settings
 from recallzero.demo import build_demo_records
 from recallzero.freeze import verify_freeze
@@ -372,36 +386,163 @@ def freeze_verify(
     console.print("[green]Freeze verified against live Settings/risk.yml and source hashes.[/green]")
 
 
+@app.command("benchmark-preflight")
+def benchmark_preflight(
+    manifest: Path = typer.Option(
+        Path("config/candidates.yml"),
+        "--manifest",
+        help="Preregistered benchmark case manifest.",
+    ),
+    freeze_manifest: Path = typer.Option(
+        Path("benchmarks/detector_freeze_v1.yaml"),
+        "--freeze",
+        help="Detector freeze manifest to verify before checking case metadata.",
+    ),
+    split: BenchmarkSplit = typer.Option("validation", "--split"),
+    refresh: bool = typer.Option(False, help="Refresh NHTSA case metadata; detector scoring is never run."),
+    json_output: Path | None = typer.Option(None, "--json"),
+) -> None:
+    """Validate benchmark identity/data prerequisites without running the detector."""
+    settings = get_settings()
+    configure_logging(settings.log_level)
+
+    async def _run() -> None:
+        result = await preflight_benchmark(
+            settings=settings,
+            candidates_path=manifest,
+            freeze_manifest_path=freeze_manifest,
+            split=split,
+            refresh=refresh,
+        )
+        table = Table(title=f"Benchmark preflight: {result.benchmark_id} [{split}]")
+        table.add_column("Case")
+        table.add_column("Role")
+        table.add_column("Eligible complaints", justify="right")
+        table.add_column("Complaint queries", justify="right")
+        table.add_column("Recalls", justify="right")
+        table.add_column("Status")
+        for item in result.cases:
+            table.add_row(
+                item.name,
+                item.expected_role,
+                str(item.complaint_count_eligible),
+                str(len(item.complaint_models_queried)),
+                str(item.recall_count_raw),
+                "[green]PASS[/green]" if item.valid else "[red]FAIL[/red]",
+            )
+            if len(item.complaint_models_queried) > 1:
+                details = ", ".join(
+                    f"{key}={count}"
+                    for key, count in sorted(item.complaint_count_by_model_variant.items())
+                )
+                console.print(
+                    f"[dim]{item.name} complaint variants:[/dim] "
+                    f"{', '.join(item.complaint_models_queried)}"
+                    + (f" ({details})" if details else "")
+                )
+            for warning in item.warnings:
+                console.print(f"[yellow]{item.name} warning:[/yellow] {warning}")
+            for error in item.errors:
+                console.print(f"[red]{item.name} error:[/red] {error}")
+        console.print(table)
+        console.print(
+            f"Freeze={'PASS' if result.freeze_verified else 'FAIL'}; cases={result.case_count}; "
+            f"positives={result.positive_count}; controls={result.control_count}; "
+            f"manufacturers={result.distinct_manufacturers}; strata={result.distinct_selection_strata}"
+        )
+        if json_output is not None:
+            json_output.parent.mkdir(parents=True, exist_ok=True)
+            json_output.write_text(dumps_json(result.model_dump(mode="json")), encoding="utf-8")
+            console.print(f"Saved preflight JSON: {json_output}")
+        if not result.ready:
+            console.print("[red]Benchmark preflight is not ready. Do not lock or score this cohort.[/red]")
+            raise typer.Exit(code=1)
+        console.print("[green]READY FOR VALIDATION[/green]")
+
+    _run_cli_async(_run(), "Benchmark preflight")
+
+
+@app.command("benchmark-lock")
+def benchmark_lock(
+    manifest: Path = typer.Option(Path("config/candidates.yml"), "--manifest"),
+    freeze_manifest: Path = typer.Option(
+        Path("benchmarks/detector_freeze_v1.yaml"), "--freeze"
+    ),
+    split: BenchmarkSplit = typer.Option("validation", "--split"),
+    output: Path = typer.Option(..., "--output"),
+) -> None:
+    """Lock the exact candidate manifest and selected split before detector scoring."""
+    lock = create_benchmark_lock(
+        candidates_path=manifest,
+        freeze_manifest_path=freeze_manifest,
+        split=split,
+    )
+    output.parent.mkdir(parents=True, exist_ok=True)
+    output.write_text(dumps_json(lock.model_dump(mode="json")), encoding="utf-8")
+    verification = verify_benchmark_lock(
+        lock_path=output,
+        candidates_path=manifest,
+        freeze_manifest_path=freeze_manifest,
+        split=split,
+    )
+    if not verification.ok:
+        console.print("[red]Lock verification failed immediately after creation.[/red]")
+        raise typer.Exit(code=1)
+    console.print(
+        f"Locked [bold]{lock.case_count}[/bold] {split} cases "
+        f"({lock.positive_count} positive, {lock.control_count} control)."
+    )
+    console.print(f"Manifest SHA-256: {lock.candidate_manifest_sha256}")
+    console.print(f"Saved lock: {output}")
+
+
 @app.command()
 def benchmark(
     manifest: Path = typer.Option(
         Path("config/candidates.yml"),
         "--manifest",
-        help="Manifest of positive/negative benchmark cases.",
+        help="Manifest of positive/control benchmark cases.",
     ),
     freeze_manifest: Path = typer.Option(
         Path("benchmarks/detector_freeze_v1.yaml"),
         "--freeze",
         help="Detector freeze manifest that must match before the benchmark runs.",
     ),
+    lock: Path | None = typer.Option(
+        None,
+        "--lock",
+        help="Preregistered benchmark lock. Required for validation and holdout splits.",
+    ),
+    split: BenchmarkSplit = typer.Option("development", "--split"),
+    confirm_holdout: bool = typer.Option(
+        False,
+        "--confirm-holdout",
+        help="Required acknowledgement before scoring holdout cases.",
+    ),
     json_output: Path = typer.Option(
         Path("data/runs/benchmark_v1.json"),
         "--json",
-        help="Machine-readable benchmark result including snapshot factor breakdowns.",
+        help="Raw detector benchmark result. Control alerts are not adjudicated here.",
     ),
     csv_output: Path | None = typer.Option(
         Path("data/runs/benchmark_v1.csv"),
         "--csv",
-        help="Optional per-case CSV summary.",
+        help="Optional per-case raw CSV summary.",
     ),
-    refresh: bool = typer.Option(False, help="Refresh NHTSA data and signature cache instead of reusing local evidence."),
+    refresh: bool = typer.Option(False, help="Refresh NHTSA data/signatures instead of reusing local evidence."),
     allow_freeze_mismatch: bool = typer.Option(
         False,
         "--allow-freeze-mismatch",
-        help="Run despite a freeze mismatch. Results are marked non-comparable; not recommended.",
+        help="Run despite a freeze mismatch. Results are invalid/non-comparable; not recommended.",
     ),
 ) -> None:
-    """Run a manifest-driven historical benchmark without changing detector logic."""
+    """Run a split-aware frozen-detector benchmark and persist raw detector output."""
+    if split == "holdout" and not confirm_holdout:
+        console.print(
+            "[red]Holdout execution requires --confirm-holdout. "
+            "Holdout cases should not be inspected during detector development.[/red]"
+        )
+        raise typer.Exit(code=2)
     settings = get_settings()
     configure_logging(settings.log_level)
 
@@ -410,8 +551,11 @@ def benchmark(
             settings=settings,
             candidates_path=manifest,
             freeze_manifest_path=freeze_manifest,
+            split=split,
+            lock_path=lock,
             refresh=refresh,
             allow_freeze_mismatch=allow_freeze_mismatch,
+            confirm_holdout=confirm_holdout,
         )
         json_output.parent.mkdir(parents=True, exist_ok=True)
         json_output.write_text(dumps_json(result.model_dump(mode="json")), encoding="utf-8")
@@ -419,14 +563,72 @@ def benchmark(
             write_benchmark_csv(result, csv_output)
 
         console.print(f"[bold]Benchmark:[/bold] {result.benchmark_run_id}")
+        console.print(f"[bold]Split:[/bold] {result.benchmark_split}")
         console.print(f"[bold]Freeze:[/bold] {result.freeze_id} ({'verified' if verification.ok else 'MISMATCH'})")
+        console.print(f"[bold]Manifest lock:[/bold] {'verified' if result.lock_verified else 'not used'}")
         console.print(f"[bold]Cases:[/bold] {result.case_count}")
-        console.print(f"[bold]Aggregate:[/bold] {json.dumps(result.aggregate, sort_keys=True)}")
-        console.print(f"Saved JSON: {json_output}")
+        console.print(f"[bold]Raw aggregate:[/bold] {json.dumps(result.aggregate, sort_keys=True)}")
+        console.print("[yellow]Control alerts remain unadjudicated in this raw artifact.[/yellow]")
+        console.print(f"Saved raw JSON: {json_output}")
         if csv_output is not None:
-            console.print(f"Saved CSV: {csv_output}")
+            console.print(f"Saved raw CSV: {csv_output}")
 
     _run_cli_async(_run(), "Benchmark")
+
+
+@app.command("benchmark-adjudicate")
+def benchmark_adjudicate(
+    raw_result: Path = typer.Argument(..., exists=True, readable=True),
+    manifest: Path = typer.Option(Path("config/candidates.yml"), "--manifest"),
+    freeze_manifest: Path | None = typer.Option(None, "--freeze"),
+    json_output: Path = typer.Option(..., "--json"),
+    refresh: bool = typer.Option(False, help="Refresh recall data used only for post-hoc adjudication."),
+) -> None:
+    """Classify frozen alert lineages against visible/future recalls after scoring."""
+    settings = get_settings()
+    configure_logging(settings.log_level)
+
+    async def _run() -> None:
+        result = await adjudicate_benchmark(
+            settings=settings,
+            raw_result_path=raw_result,
+            candidates_path=manifest,
+            freeze_manifest_path=freeze_manifest,
+            refresh=refresh,
+        )
+        json_output.parent.mkdir(parents=True, exist_ok=True)
+        json_output.write_text(dumps_json(result.model_dump(mode="json")), encoding="utf-8")
+        console.print(f"[bold]Adjudicated benchmark:[/bold] {result.benchmark_run_id}")
+        console.print(f"[bold]Aggregate:[/bold] {json.dumps(result.aggregate, sort_keys=True)}")
+        console.print(f"Saved adjudicated JSON: {json_output}")
+
+    _run_cli_async(_run(), "Benchmark adjudication")
+
+
+@app.command("benchmark-report")
+def benchmark_report(
+    adjudicated_result: Path = typer.Argument(..., exists=True, readable=True),
+    json_output: Path | None = typer.Option(None, "--json"),
+    csv_output: Path | None = typer.Option(None, "--csv"),
+) -> None:
+    """Render final detector-validation summary from an adjudicated benchmark."""
+    result = AdjudicatedBenchmarkRun.model_validate_json(
+        adjudicated_result.read_text(encoding="utf-8")
+    )
+    report = build_validation_report(result)
+    if json_output is not None:
+        json_output.parent.mkdir(parents=True, exist_ok=True)
+        json_output.write_text(dumps_json(report), encoding="utf-8")
+        console.print(f"Saved validation summary JSON: {json_output}")
+    if csv_output is not None:
+        write_validation_report_csv(result, csv_output)
+        console.print(f"Saved validation summary CSV: {csv_output}")
+    if json_output is None:
+        console.print(dumps_json(report))
+    console.print(
+        f"[bold]Prototype acceptance:[/bold] "
+        f"{'PASS' if result.aggregate.get('prototype_acceptance_pass') else 'FAIL'}"
+    )
 
 
 @app.command("benchmark-compare")

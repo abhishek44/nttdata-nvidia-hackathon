@@ -43,6 +43,29 @@ def test_register_module_avoids_deferred_annotations() -> None:
     assert "input_schema=BriefToolInput" in source
 
 
+def _make_eager_vehicle_tool():
+    # Compile without inheriting this test module's ``from __future__ import annotations``.
+    # recallzero.aiq.register deliberately does not enable deferred annotations, so NAT
+    # receives concrete runtime types. Plain exec() would inherit the caller's future
+    # flags and accidentally turn VehicleToolInput into a string, reproducing an old
+    # NAT wrapper bug that the production registration module does not trigger.
+    namespace = {"VehicleToolInput": VehicleToolInput}
+    code = compile(
+        "async def tool(input_data: VehicleToolInput) -> str:\n    return input_data.model\n",
+        "<recallzero-nat-compat-test>",
+        "exec",
+        dont_inherit=True,
+    )
+    exec(code, namespace)
+    return namespace["tool"]
+
+
+def test_nat_compat_fixture_really_uses_eager_runtime_annotations() -> None:
+    tool = _make_eager_vehicle_tool()
+    assert tool.__annotations__["input_data"] is VehicleToolInput
+    assert typing.get_type_hints(tool)["input_data"] is VehicleToolInput
+
+
 def test_nat_function_info_accepts_explicit_schema_when_nat_is_installed() -> None:
     nat = pytest.importorskip("nat")
     del nat
@@ -51,13 +74,6 @@ def test_nat_function_info_accepts_explicit_schema_when_nat_is_installed() -> No
     except ImportError:
         from nat.builder.function_info import FunctionInfo
 
-    # Use eager runtime annotations, matching recallzero.aiq.register after 0.2.2.
-    namespace = {"VehicleToolInput": VehicleToolInput}
-    exec(
-        "async def tool(input_data: VehicleToolInput) -> str:\n    return input_data.model\n",
-        namespace,
-    )
-    tool = namespace["tool"]
-    assert typing.get_type_hints(tool)["input_data"] is VehicleToolInput
+    tool = _make_eager_vehicle_tool()
     info = FunctionInfo.from_fn(tool, input_schema=VehicleToolInput, description="test")
     assert info.input_schema is VehicleToolInput

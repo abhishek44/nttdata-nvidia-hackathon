@@ -1,9 +1,12 @@
 freeze_id: recallzero-detector-v1
 detector_source_release: 0.3.3a2
-benchmark_release: 0.3.4
+benchmark_release: 0.3.5.post1
+input_adapter_revision: nhtsa-complaint-catalog-v2
 provenance:
   git_commit: null
-  note: Recovered/build archive contains no .git metadata; module SHA-256 values are the authoritative source freeze.
+  note: Recovered/build archive contains no .git metadata; module SHA-256 values are
+    the authoritative source freeze.
+  benchmark_note: 0.3.5.post1 changes the NHTSA complaint input adapter and evaluation provenance before validation locking; Detector v1 scoring/representation remains the 0.3.3a2 state.
 runtime:
   models:
     llm_model: nvidia/nemotron-3.5-lightning-30b-a3b
@@ -41,7 +44,8 @@ runtime:
 evaluation:
   target_match_threshold: 0.45
   top_candidate_count: 5
-  note: Evaluation-only values. Target recall remains hidden until each detector snapshot is frozen.
+  note: Evaluation-only values. Target recall remains hidden until each detector snapshot
+    is frozen.
 runtime_config_files:
   risk_file:
     path: config/risk.yml
@@ -52,7 +56,7 @@ detector_modules:
     sha256: 0c8f8e85c5ccda3f09efe442fc522b3e7556d507eb0a3b3473dd35981938c5c6
   nhtsa_client:
     path: src/recallzero/data/nhtsa_client.py
-    sha256: 8260c9961648a36bd98a55bf994b0d3a26a98338c0220ec311e135b1ec594e98
+    sha256: 9624ecb9a63177ef2e91bf9a05e0031cac071b6a4d1d09611edd48f4a6c544bd
   normalizer:
     path: src/recallzero/data/normalizer.py
     sha256: 7a3ce7ff91ba448f2a4611174026e68f51d81e3a7ec441a01eaa4241d3b2c669
@@ -95,20 +99,28 @@ detector_modules:
 evaluation_modules:
   domain_schema:
     path: src/recallzero/models/domain.py
-    sha256: e21f5da9a631c6502dc440846fef0890ef411075219909011246286e6c7c5929
+    sha256: e07e886062b2c4e74ee7bc2f0112ffd1775e93132341118231800e39835c1990
   time_machine:
     path: src/recallzero/backtest/time_machine.py
-    sha256: 23763d657aca7f761d37074c3b593be812fd13a36d22793a94bf5566c7d4fe3a
+    sha256: 5394ef155f4f57ad323d664c8002be7b6ec3877f5d34a2e65d4d9755e2216dcb
   benchmark_harness:
     path: src/recallzero/benchmark.py
-    sha256: 76e2f458844b81bc925667354807d4c4d83368579dbecb71936715255f227dac
+    sha256: e7fba8cd806bc6fa0f35f4f3fde429c5b76dafa87fe05c823427a4578ab55f8f
+  benchmark_adjudication:
+    path: src/recallzero/benchmark_adjudication.py
+    sha256: 3c8d4362ff120c404bbcd907d56a67759490228d3e67163bdc9fdff4e088b0e4
+  benchmark_cli:
+    path: src/recallzero/cli.py
+    sha256: 384334a86ac8bd1cbd853cd8dcf506c1f56e453ea26b08837d98d37bb559b418
   freeze_verifier:
     path: src/recallzero/freeze.py
     sha256: 7b10409c3187399dc5d3a42f40216ff6a8ddefbee71d7012b76ac69d3f25fc8c
 known_gaps:
 - id: TAX-001
   status: deferred_until_benchmark
-  summary: consequence_family OTHER can bypass mechanism consistency checks and fragment lineage IDs
+  summary: consequence_family OTHER can bypass mechanism consistency checks and fragment
+    lineage IDs
 - id: META-001
   status: deferred_until_benchmark
-  summary: mechanism meta-signals may over-aggregate evidence in mature current-state populations
+  summary: mechanism meta-signals may over-aggregate evidence in mature current-state
+    populations

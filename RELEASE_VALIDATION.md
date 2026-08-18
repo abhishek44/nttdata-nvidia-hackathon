@@ -1,46 +1,126 @@
 # RecallZero v2 Release Validation
 
-Release version: **0.3.4** — Detector Freeze v1 benchmark/evaluation infrastructure.
+Release version: **0.3.5.post1** — pre-validation complaint-input maintenance patch.
 
-## Detector freeze guarantee
+## Scope and freeze guarantee
 
-The detector-critical modules listed in `benchmarks/detector_freeze_v1.yaml` were compared byte-for-byte (SHA-256) with the 0.3.3a2 source tree. The following remained unchanged: runtime config model, NHTSA client/normalizer/repository, NIM client/extractor/embeddings, taxonomy, clustering, severity, trend engine, risk engine, pipeline/meta construction, recall matcher, and utility/lineage helpers. `config/risk.yml` is also unchanged.
+Detector Freeze v1 remains the **0.3.3a2 detector algorithm state**. This maintenance patch was made before the validation cohort was locked or scored after live preflight exposed NHTSA complaint-addressing failures for Tesla Model Y and Ford F-150 cases.
 
-0.3.4 intentionally changes only evaluation/reporting surfaces: benchmark/freeze tooling, additive `BacktestCandidate.risk_factors` persistence, CLI commands, manifest metadata, documentation, and tests.
+Compared with 0.3.5, `config/risk.yml` is byte-identical. Of the 15 files historically grouped under `detector_modules`, 14 are byte-identical and one intentionally changes: `src/recallzero/data/nhtsa_client.py`, the NHTSA input adapter. The scoring/representation modules remain byte-identical: extractor/embeddings/NIM, taxonomy, clustering, severity, trend, risk, `pipeline.py` meta construction, recall matcher, config, normalizer, repository, and utilities. Production NAT registration (`src/recallzero/aiq/register.py`) is also unchanged.
+
+The freeze manifest records:
+
+- `detector_source_release: 0.3.3a2`
+- `benchmark_release: 0.3.5.post1`
+- `input_adapter_revision: nhtsa-complaint-catalog-v2`
+
+Preflight requires raw complaint-cache provenance to match the frozen input-adapter revision. A stale 0.3.5 cache therefore fails preflight and instructs the operator to rerun with `--refresh`.
+
+## NHTSA complaint input-adapter correction
+
+The complaint endpoint can partition one marketed vehicle family across product-catalog model variants. 0.3.5.post1 resolves the NHTSA complaint product catalog (`issueType=c`) before complaint retrieval, then:
+
+1. accepts exact punctuation-insensitive model identity;
+2. accepts a broader catalog variant only when requested model tokens are a complete prefix of catalog model tokens;
+3. never uses arbitrary substring or fuzzy matching;
+4. queries every accepted catalog variant;
+5. de-duplicates the union by ODI number;
+6. records requested/resolved/queried/successful/rejected variants and per-variant counts in `recallzeroQuery` raw provenance;
+7. tolerates HTTP 400 only as a rejected model address while other resolved variants remain available;
+8. fails hard if every resolved variant is rejected or on non-400 HTTP failures;
+9. retains HTTP 200 empty partitions as legitimate empty results.
+
+Benchmark preflight now surfaces this query provenance and refuses to become ready when cached complaint input lacks the frozen adapter revision.
+
+## NAT compatibility regression-test correction
+
+The reported NAT test failure was reproduced conceptually as a test-fixture annotation problem. The test module enables postponed annotations; its plain `exec()` inherited that compiler state, so the dynamically-created tool carried the string annotation `"VehicleToolInput"`. NAT 1.8's generated wrapper then attempted to resolve that name outside the fixture's namespace and raised `NameError`.
+
+Production `src/recallzero/aiq/register.py` does not enable postponed annotations and uses concrete Pydantic schema classes at runtime. 0.3.5.post1 therefore changes the regression fixture, not production registration: it compiles the dynamic function with `dont_inherit=True` and asserts that the resulting annotation is the concrete `VehicleToolInput` class before calling `FunctionInfo.from_fn`.
 
 ## Validated in the build environment
 
-- `PYTHONPATH=src pytest -q -ra`: **66 tests passed, 1 optional NAT-runtime test skipped** because `nat` is not installed in the build container.
-- `python -m compileall -q src tests`: passed.
-- `python -m recallzero.cli --version`: reported `RecallZero 0.3.4`.
-- `python -m recallzero.cli demo`: synthetic end-to-end analysis and Time Machine replay completed.
-- `recallzero freeze-verify --manifest benchmarks/detector_freeze_v1.yaml`: all detector module hashes, evaluation module hashes, live risk/clustering/trend/model/execution settings, and active `risk.yml` hash passed.
-- Positive and targetless-negative benchmark orchestration smoke tests completed against the offline synthetic records; top-candidate outputs contained all five risk-factor breakdowns.
-- Python wheel built successfully without network build isolation and installed into an isolated target path; the installed package reported `0.3.4` and exposed `BacktestCandidate.risk_factors`.
-- Wheel SHA-256: `2a4456a906a3988a515eb36e860bf5f373b1b26efd9422cd828cf68d60d5ec02`.
+- `PYTHONPATH=src pytest -q -ra`: **90 collected, 89 passed, 1 skipped**.
+- The skipped test is the optional NAT-runtime `FunctionInfo.from_fn` integration test because `nat` is not installed in the build container.
+- The non-NAT eager-annotation regression assertion passes.
+- `python -m compileall -q src tests`: **PASS**.
+- `PYTHONPATH=src python -m recallzero.cli --version`: **RecallZero 0.3.5.post1**.
+- `freeze-verify --manifest benchmarks/detector_freeze_v1.yaml`: **PASS** for frozen source/evaluation hashes, active `risk.yml`, and live Settings-loaded risk/clustering/trend/model/execution values.
+- Targeted complaint-adapter/benchmark/NAT fixture tests pass.
+- Ruff is not installed in the build container; no Ruff result is claimed.
+- Wheel build completed offline using the installed build toolchain.
+- Isolated-target wheel installation reports **0.3.5.post1**.
+- Wheel SHA-256: `05b59a7f6df37f3213f710618be361dbb4b7b47e9bd6824bab7d740eaa816b0a`.
 
-## New 0.3.4 evaluation coverage
+## New regression coverage
 
-- `benchmarks/detector_freeze_v1.yaml` explicitly pins `analytics/severity.py`, `analytics/risk_engine.py`, `analytics/trend_engine.py`, `intelligence/taxonomy.py`, `intelligence/clustering.py`, `pipeline.py`, `recall/matcher.py`, and the rest of the data-to-alert path.
-- Freeze verification reads the active `Settings().risk_config()` and active risk file rather than trusting copied YAML numbers.
-- Every Time Machine `BacktestCandidate` persists `severity`, `trend`, `persistence`, `evidence`, and `recall_gap` score/weight/contribution/explanation fields.
-- `config/candidates.yml` is now directly consumable by `recallzero benchmark` and supports development/holdout plus positive/targetless-negative roles.
-- Negative controls replay the same frozen detector to an exclusive evaluation boundary without a target recall.
-- Aggregate outputs include positive sensitivity/lead-time and negative false-alert snapshot/lineage burden.
-- `benchmarks/KNOWN_GAPS.md` records TAX-001 and META-001 as benchmark-driven deferred issues.
+Complaint data adapter tests cover:
 
-## Requires validation on the target GB10 environment
+- Model Y generic/family lookup where one model address returns HTTP 400 and valid catalog variants return complaints;
+- F-150 family aggregation across base/SUPERCAB/SUPERCREW catalog entries while excluding F-250;
+- ODI de-duplication across complaint partitions;
+- token-prefix family protection (`500` does not absorb `500X`, Model Y does not absorb Model S, F-150 does not absorb F-250);
+- hard failure when all resolved variants return HTTP 400;
+- valid HTTP 200 empty population behavior;
+- Mach-E punctuation alias resolution without drifting into unrelated Mustang catalog models.
 
-1. Install 0.3.4 while preserving `.env`, normalized evidence, and signature cache.
-2. Run `recallzero freeze-verify --manifest benchmarks/detector_freeze_v1.yaml` before any benchmark.
-3. Extend `config/candidates.yml` with unrelated historical positive cases and targetless controls; keep Mach-E 22V412000 in the **development** split.
-4. Run `recallzero benchmark --manifest config/candidates.yml --freeze benchmarks/detector_freeze_v1.yaml`.
-5. Do not modify detector modules, `risk.yml`, thresholds, weights, taxonomy, meta eligibility, or severity logic while collecting Detector v1 benchmark data.
-6. Inspect unique false-lineage spikes for TAX-001 lineage fragmentation before interpreting them as distinct false alarms.
+Benchmark regression tests additionally cover:
+
+- surfacing complaint model-resolution provenance in preflight;
+- rejecting stale raw complaint input that lacks `nhtsa-complaint-catalog-v2` provenance and requiring `--refresh`.
+
+## Source comparison against 0.3.5
+
+Intentional source changes that can affect runtime behavior are limited to:
+
+- `src/recallzero/data/nhtsa_client.py` — input-addressing/aggregation revision;
+- `src/recallzero/benchmark.py` — preflight provenance and frozen adapter-revision enforcement;
+- `src/recallzero/cli.py` — preflight query diagnostics.
+
+Tests, documentation, version metadata, and the freeze manifest also change. Production NAT registration remains unchanged; only its compatibility test fixture changes.
+
+## Requires live validation on the target GB10 environment
+
+The build container does not have live NHTSA/NVIDIA benchmark connectivity and does not contain NAT, so it cannot claim that the two originally failing live cases are resolved end to end. The adapter behavior is regression-tested with deterministic HTTP mocks; the target GB10 preflight is the authoritative live confirmation.
+
+After upgrading, run:
+
+```bash
+pytest -q
+
+recallzero freeze-verify \
+  --manifest benchmarks/detector_freeze_v1.yaml
+
+recallzero benchmark-preflight \
+  --manifest config/candidates.yml \
+  --freeze benchmarks/detector_freeze_v1.yaml \
+  --split validation \
+  --refresh \
+  --json data/runs/detector_v1_validation_preflight.json
+```
+
+Do **not** create the validation lock unless the refreshed preflight ends with `READY FOR VALIDATION`.
+
+For the Tesla Model Y and Ford F-150 cases, inspect the new fields:
+
+- `complaint_adapter_revision`
+- `complaint_models_requested`
+- `complaint_models_resolved`
+- `complaint_models_queried`
+- `complaint_count_by_model_variant`
+
+If a live case still fails, treat that as an input/metadata problem and resolve it before locking; do not modify Detector v1 scoring based on preflight.
+
+## Deferred known gaps
+
+- **TAX-001:** `consequence_family == OTHER` can bypass taxonomy consistency checks and may fragment one real phenomenon across multiple lineage IDs.
+- **META-001:** mechanism meta-signals may over-aggregate evidence in mature populations.
+
+Both remain intentionally unfixed through 0.3.5.post1.
 
 ## Non-claims
 
-- The build environment did not execute live NHTSA/NVIDIA/NAT calls.
-- Synthetic benchmark smoke results are not vehicle-safety findings.
-- Mach-E 22V412000 is a development case, not an untouched holdout.
-- 0.3.4 is not a detector-improvement release; it is a freeze and evaluation release.
+- 0.3.5.post1 does not claim Detector v1 has passed generalization validation.
+- The live 20-case validation cohort has not been scored by the build environment.
+- Mock complaint retrieval tests are adapter correctness tests, not evidence about actual complaint counts.
+- `UNCONFIRMED_ALERT` remains an operational burden category, not proof that a safety concern is false.

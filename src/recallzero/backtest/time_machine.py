@@ -111,8 +111,15 @@ class RecallTimeMachine:
                 alerts = tuple(signal for signal in run.signals if signal.risk.alert)
 
             ranked = list(run.signals[: self.top_candidate_count])
+            # Persist every alert even when there are more alerts than the ordinary
+            # top-N diagnostic budget. This is evaluation-only provenance needed for
+            # later benchmark adjudication; it does not change detector scoring or
+            # the top-N target-like diagnostic semantics.
+            persisted = list(ranked)
+            ranked_ids = {signal.signal_id for signal in ranked}
+            persisted.extend(signal for signal in alerts if signal.signal_id not in ranked_ids)
             candidate_rows: list[BacktestCandidate] = []
-            for signal in ranked:
+            for signal in persisted:
                 member_signatures = [
                     signature_by_id[item_id]
                     for item_id in signal.cluster.member_ids
@@ -129,15 +136,23 @@ class RecallTimeMachine:
                     signal.cluster, member_signatures, target_recall, member_complaints
                 )
                 target_score = details["final"]
-                all_posthoc_candidates.append((cutoff, target_score, signal))
+                if signal.signal_id in ranked_ids:
+                    all_posthoc_candidates.append((cutoff, target_score, signal))
                 candidate_rows.append(
                     BacktestCandidate(
                         signal_id=signal.signal_id,
                         lineage_id=signal.lineage_id,
                         signal_scope=signal.signal_scope,
                         issue=signal.cluster.label,
+                        cluster_id=signal.cluster.cluster_id,
+                        system=signal.cluster.system,
+                        failure_mode=signal.cluster.failure_mode,
+                        defect_family=signal.cluster.defect_family,
                         failure_mechanism=signal.cluster.failure_mechanism,
                         consequence_family=signal.cluster.consequence_family,
+                        source_systems=signal.cluster.source_systems,
+                        member_ids=signal.cluster.member_ids,
+                        embedding_method=signal.cluster.embedding_method,
                         evidence_count=signal.cluster.evidence_count,
                         risk_score=signal.risk.final_score,
                         risk_factors={
@@ -151,6 +166,10 @@ class RecallTimeMachine:
                         },
                         alert=signal.risk.alert and not degraded,
                         distance_to_alert_threshold=round(max(0.0, risk_config.alert_threshold - signal.risk.final_score), 2),
+                        visible_recall_matched=signal.recall_match.matched,
+                        visible_recall_campaign_number=signal.recall_match.campaign_number,
+                        visible_recall_score=signal.recall_match.score,
+                        visible_recall_breakdown=signal.recall_match.score_breakdown,
                         posthoc_target_score=target_score,
                         posthoc_target_breakdown={key: float(value) for key, value in details.items()},
                     )
@@ -289,6 +308,7 @@ class RecallTimeMachine:
             snapshots=tuple(frozen_snapshots),
             complaints_considered=len(pre_recall),
             latest_complaint_date_used=latest_used,
+            degraded_snapshot_count=degraded_snapshot_count,
             anti_leakage_checks=checks,
             warnings=tuple(warnings),
         )

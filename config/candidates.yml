@@ -1,7 +1,32 @@
-# Manifest consumed directly by `recallzero benchmark`.
-# `expected_role` and target campaign metadata are evaluation-only; they must never
-# be exposed to the detector before a snapshot is frozen.
+# RecallZero Detector v1 benchmark registry.
+#
+# Scientific contract:
+# - `expected_role`, campaign metadata, and adjudication boundaries are evaluation-only.
+# - The detector never receives future target recall text before a snapshot is frozen.
+# - `development` cases have already influenced architecture and cannot support a clean
+#   generalization claim.
+# - `validation` cases are preregistered here before Detector v1 scoring.
+# - `holdout` is reserved for a future Detector v2 and requires explicit CLI confirmation.
+# - Controls are targetless replay windows. An alert is not called a false positive merely
+#   because no target campaign was specified; later recalls are exposed only during post-hoc
+#   adjudication and unmatched alerts are reported as UNCONFIRMED_ALERT.
+benchmark:
+  id: detector-v1-validation-01
+  detector_freeze: recallzero-detector-v1
+  selection_policy: complaint_addressable_safety_recalls_v1
+  preregistered: true
+  acceptance_criteria:
+    positive_sensitivity_min: 0.60
+    median_qualified_lead_time_days_min: 1.0
+    unconfirmed_alert_lineages_per_vehicle_replay_year_max: 1.0
+    control_cases_with_unconfirmed_alerts_rate_max: 0.30
+    anti_leakage_required: true
+    minimum_nim_fraction: 1.0
+
 candidates:
+  # ---------------------------------------------------------------------------
+  # DEVELOPMENT — already inspected while building Detector v1.
+  # ---------------------------------------------------------------------------
   - name: Mustang Mach-E high-voltage contactor recall
     make: FORD
     model: MUSTANG MACH-E
@@ -11,21 +36,261 @@ candidates:
     expected_role: positive
     benchmark_split: development
     defect_family: HIGH_VOLTAGE_POWER_DISTRIBUTION
+    selection_stratum: high_voltage_electrical
     status: detector_v1_development_positive
     note: >-
-      Known-answer development case used during architecture iteration. Detector Freeze v1
-      reproduces a qualified 2022-05-26 alert in leakage-safe replay; do not treat this case
-      as an untouched holdout. Add unrelated positive recalls and targetless negative controls
-      before changing Detector v1.
+      Known-answer development case used during architecture iteration. It must not be
+      included in Detector v1 validation sensitivity.
 
-# Negative controls use the same shape but omit campaign_number/official_recall_date
-# and provide an exclusive evaluation_end_date, for example:
-#  - name: Example targetless control
-#    make: EXAMPLE
-#    model: MODEL
-#    model_years: [2022]
-#    campaign_number: null
-#    evaluation_end_date: 2023-01-01
-#    expected_role: negative
-#    benchmark_split: development
-#    status: planned_control
+  # ---------------------------------------------------------------------------
+  # VALIDATION POSITIVES — selected by observable safety-defect strata, not by
+  # RecallZero score or known pre-recall complaint volume. Campaign dates are NHTSA
+  # report-received dates and are verified again by `benchmark-preflight` before scoring.
+  # ---------------------------------------------------------------------------
+  - name: Chevrolet Bolt EV high-voltage battery fire recall
+    make: CHEVROLET
+    model: BOLT EV
+    model_years: [2019]
+    campaign_number: 21V560000
+    official_recall_date: 2021-07-23
+    expected_role: positive
+    benchmark_split: validation
+    defect_family: HIGH_VOLTAGE_POWER_DISTRIBUTION
+    selection_stratum: high_voltage_battery_fire
+    status: preregistered_validation_positive
+
+  - name: Tesla Model Y windshield defrost heat-pump recall
+    make: TESLA
+    model: MODEL Y
+    model_years: [2021]
+    campaign_number: 22V050000
+    official_recall_date: 2022-02-02
+    expected_role: positive
+    benchmark_split: validation
+    defect_family: THERMAL_SYSTEM
+    selection_stratum: visibility_thermal
+    status: preregistered_validation_positive
+
+  - name: Volkswagen ID.4 exterior door handle recall
+    make: VOLKSWAGEN
+    model: ID.4
+    model_years: [2021, 2022]
+    campaign_number: 23V312000
+    official_recall_date: 2023-05-03
+    expected_role: positive
+    benchmark_split: validation
+    defect_family: ACCESS_CONTROL
+    selection_stratum: structure_closure
+    status: preregistered_validation_positive
+
+  - name: Ford Escape cracked fuel injector fire recall
+    make: FORD
+    model: ESCAPE
+    model_years: [2020, 2021, 2022]
+    campaign_number: 22V859000
+    official_recall_date: 2022-11-18
+    expected_role: positive
+    benchmark_split: validation
+    defect_family: THERMAL_SYSTEM
+    selection_stratum: fuel_fire
+    status: preregistered_validation_positive
+
+  - name: Ford Fusion steering wheel fastening recall
+    make: FORD
+    model: FUSION
+    model_years: [2017, 2018]
+    campaign_number: 18V167000
+    official_recall_date: 2018-03-12
+    expected_role: positive
+    benchmark_split: validation
+    defect_family: STEERING_SYSTEM
+    selection_stratum: steering
+    status: preregistered_validation_positive
+
+  - name: Toyota Camry low-pressure fuel pump stall recall
+    make: TOYOTA
+    model: CAMRY
+    model_years: [2019]
+    campaign_number: 20V012000
+    official_recall_date: 2020-01-13
+    expected_role: positive
+    benchmark_split: validation
+    defect_family: PROPULSION_CONTROL
+    selection_stratum: propulsion_stall
+    status: preregistered_validation_positive
+
+  - name: Hyundai Sonata engine bearing wear stall recall
+    make: HYUNDAI
+    model: SONATA
+    model_years: [2013, 2014]
+    campaign_number: 17V226000
+    official_recall_date: 2017-03-31
+    expected_role: positive
+    benchmark_split: validation
+    defect_family: PROPULSION_CONTROL
+    selection_stratum: engine_stall
+    status: preregistered_validation_positive
+
+  - name: Jeep Grand Cherokee crank position sensor tone-wheel recall
+    make: JEEP
+    model: GRAND CHEROKEE
+    model_years: [2015, 2016]
+    campaign_number: 20V475000
+    official_recall_date: 2020-08-13
+    expected_role: positive
+    benchmark_split: validation
+    defect_family: PROPULSION_CONTROL
+    selection_stratum: engine_sensor_stall
+    status: preregistered_validation_positive
+
+  - name: Ford F-150 brake master cylinder recall
+    make: FORD
+    model: F-150
+    model_years: [2016, 2017]
+    campaign_number: 20V332000
+    official_recall_date: 2020-06-08
+    expected_role: positive
+    benchmark_split: validation
+    defect_family: BRAKE_SYSTEM
+    selection_stratum: braking
+    status: preregistered_validation_positive
+
+  - name: Honda Odyssey power sliding door latch recall
+    make: HONDA
+    model: ODYSSEY
+    model_years: [2018, 2019]
+    campaign_number: 18V795000
+    official_recall_date: 2018-11-09
+    expected_role: positive
+    benchmark_split: validation
+    defect_family: STRUCTURE_CLOSURE
+    selection_stratum: structure_closure
+    status: preregistered_validation_positive
+
+  # ---------------------------------------------------------------------------
+  # VALIDATION CONTROLS — targetless replay windows with later adjudication.
+  # These are intentionally nontrivial production vehicles rather than zero-complaint
+  # controls. Preflight records complaint volume but does not run or expose detector scores.
+  # ---------------------------------------------------------------------------
+  - name: Honda CR-V 2019 targetless control
+    make: HONDA
+    model: CR-V
+    model_years: [2019]
+    campaign_number: null
+    evaluation_end_date: 2020-01-01
+    adjudication_end_date: 2022-01-01
+    expected_role: negative
+    benchmark_split: validation
+    selection_stratum: complaint_volume_control
+    status: preregistered_validation_control
+
+  - name: Toyota RAV4 2019 targetless control
+    make: TOYOTA
+    model: RAV4
+    model_years: [2019]
+    campaign_number: null
+    evaluation_end_date: 2020-01-01
+    adjudication_end_date: 2022-01-01
+    expected_role: negative
+    benchmark_split: validation
+    selection_stratum: complaint_volume_control
+    status: preregistered_validation_control
+
+  - name: Ford Explorer 2020 targetless control
+    make: FORD
+    model: EXPLORER
+    model_years: [2020]
+    campaign_number: null
+    evaluation_end_date: 2021-01-01
+    adjudication_end_date: 2023-01-01
+    expected_role: negative
+    benchmark_split: validation
+    selection_stratum: complaint_volume_control
+    status: preregistered_validation_control
+
+  - name: Jeep Wrangler 2018 targetless control
+    make: JEEP
+    model: WRANGLER
+    model_years: [2018]
+    campaign_number: null
+    evaluation_end_date: 2019-01-01
+    adjudication_end_date: 2021-01-01
+    expected_role: negative
+    benchmark_split: validation
+    selection_stratum: complaint_volume_control
+    status: preregistered_validation_control
+
+  - name: Nissan Rogue 2018 targetless control
+    make: NISSAN
+    model: ROGUE
+    model_years: [2018]
+    campaign_number: null
+    evaluation_end_date: 2019-01-01
+    adjudication_end_date: 2021-01-01
+    expected_role: negative
+    benchmark_split: validation
+    selection_stratum: complaint_volume_control
+    status: preregistered_validation_control
+
+  - name: Subaru Forester 2019 targetless control
+    make: SUBARU
+    model: FORESTER
+    model_years: [2019]
+    campaign_number: null
+    evaluation_end_date: 2020-01-01
+    adjudication_end_date: 2022-01-01
+    expected_role: negative
+    benchmark_split: validation
+    selection_stratum: complaint_volume_control
+    status: preregistered_validation_control
+
+  - name: Hyundai Palisade 2020 targetless control
+    make: HYUNDAI
+    model: PALISADE
+    model_years: [2020]
+    campaign_number: null
+    evaluation_end_date: 2021-01-01
+    adjudication_end_date: 2023-01-01
+    expected_role: negative
+    benchmark_split: validation
+    selection_stratum: complaint_volume_control
+    status: preregistered_validation_control
+
+  - name: Kia Telluride 2020 targetless control
+    make: KIA
+    model: TELLURIDE
+    model_years: [2020]
+    campaign_number: null
+    evaluation_end_date: 2021-01-01
+    adjudication_end_date: 2023-01-01
+    expected_role: negative
+    benchmark_split: validation
+    selection_stratum: complaint_volume_control
+    status: preregistered_validation_control
+
+  - name: Chevrolet Equinox 2019 targetless control
+    make: CHEVROLET
+    model: EQUINOX
+    model_years: [2019]
+    campaign_number: null
+    evaluation_end_date: 2020-01-01
+    adjudication_end_date: 2022-01-01
+    expected_role: negative
+    benchmark_split: validation
+    selection_stratum: complaint_volume_control
+    status: preregistered_validation_control
+
+  - name: Tesla Model 3 2020 targetless control
+    make: TESLA
+    model: MODEL 3
+    model_years: [2020]
+    campaign_number: null
+    evaluation_end_date: 2021-01-01
+    adjudication_end_date: 2023-01-01
+    expected_role: negative
+    benchmark_split: validation
+    selection_stratum: complaint_volume_control
+    status: preregistered_validation_control
+
+# No Detector v2 holdout cases are identified in this file yet. Selecting them only after
+# Detector v1 validation avoids accidentally scoring or inspecting them during the v1 cycle.

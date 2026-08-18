@@ -1,5 +1,28 @@
 # Changelog
 
+## 0.3.5.post1 — Complaint catalog adapter correction + NAT compatibility test fix
+
+- Detector v1 scoring/representation logic remains frozen; no changes to severity, taxonomy, clustering, meta-signal construction, trend, risk, recall matching, thresholds, weights, or Time Machine leakage rules.
+- Complaint ingestion now resolves NHTSA's complaint product catalog (`issueType=c`) and aggregates conservative model-family variants before ODI de-duplication. This addresses marketed-family lookups such as Tesla Model Y and Ford F-150 where ODI records may be partitioned across catalog variants or a generic endpoint query may be rejected.
+- HTTP 400 is tolerated only as a rejected complaint-model variant while other catalog-resolved variants are tried; non-400 HTTP failures remain fatal to avoid silently accepting partial benchmark input.
+- Raw complaint payloads now preserve adapter/query provenance, including requested model, catalog-resolved models, queried/successful variants, per-variant counts, rejected HTTP-400 variants, and de-duplicated ODI count.
+- Benchmark preflight surfaces complaint adapter/model-variant provenance and rejects stale complaint caches that lack the `nhtsa-complaint-catalog-v2` marker, directing operators to rerun with `--refresh` before locking the cohort.
+- Fixed the NAT registration compatibility regression test: its dynamic `exec()` unintentionally inherited this test module's `from __future__ import annotations`, producing string annotations unlike the production `recallzero.aiq.register` module. The fixture now compiles with `dont_inherit=True`, accurately exercising eager runtime annotations on NAT 1.8.
+
+
+## 0.3.5 — Detector v1 validation harness
+
+- Keep Detector Freeze v1 byte-for-byte unchanged while extending only evaluation/schema/CLI code.
+- Add preregistered `development`, `validation`, and guarded `holdout` benchmark splits.
+- Add `benchmark-preflight` for NHTSA identity/date/data checks without detector scoring.
+- Add manifest locking and validation/holdout lock enforcement; holdout also requires explicit confirmation.
+- Preregister a 10-positive / 10-targetless-control Detector v1 validation cohort in `config/candidates.yml`; Mach-E remains development-only.
+- Persist signed threshold margins, full risk-factor breakdowns, alert persistence, input-data fingerprints, semantic/NIM provenance, and explicit case validity.
+- Add post-hoc control adjudication with `VISIBLE_RECALL_ASSOCIATED`, `FUTURE_RECALL_ASSOCIATED`, and `UNCONFIRMED_ALERT`; future recall data is exposed only after raw detector output is frozen and persisted.
+- Add Wilson 95% confidence intervals and richer validation aggregate/report metrics.
+- Make benchmark comparison lineage-aware by matching `(cutoff_date, lineage_id)` and add best-effort split/merge diagnostics.
+- Add `docs/BENCHMARK_PROTOCOL.md` and keep TAX-001 / META-001 explicitly deferred.
+
 ## 0.3.4 — Detector Freeze v1 benchmark infrastructure
 
 - Freeze detector behavior at the 0.3.3a2 state; no intentional changes to severity math, taxonomy, clustering, meta-signal construction, trend/risk scoring, recall matching, thresholds, weights, or leakage rules.

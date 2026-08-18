@@ -310,13 +310,26 @@ class BacktestCandidate(StrictModel):
     lineage_id: str = ""
     signal_scope: str = "cluster"
     issue: str
+    # Evaluation-only cluster context persisted so benchmark adjudication can
+    # reproduce recall matching without rerunning the detector.
+    cluster_id: str = ""
+    system: str = "UNKNOWN"
+    failure_mode: str = "UNSPECIFIED FAILURE"
+    defect_family: str = "OTHER"
     failure_mechanism: str = "OTHER"
     consequence_family: str = "OTHER"
+    source_systems: tuple[str, ...] = Field(default_factory=tuple)
+    member_ids: tuple[str, ...] = Field(default_factory=tuple)
+    embedding_method: EmbeddingMethod = EmbeddingMethod.TFIDF
     evidence_count: int = 0
     risk_score: float = Field(ge=0, le=100)
     risk_factors: dict[str, BacktestRiskFactor] = Field(default_factory=dict)
     alert: bool = False
     distance_to_alert_threshold: float = Field(ge=0)
+    visible_recall_matched: bool = False
+    visible_recall_campaign_number: str | None = None
+    visible_recall_score: float | None = Field(default=None, ge=0.0, le=1.0)
+    visible_recall_breakdown: dict[str, float] = Field(default_factory=dict)
     posthoc_target_score: float = Field(ge=0.0, le=1.0)
     posthoc_target_breakdown: dict[str, float] = Field(default_factory=dict)
 
@@ -358,6 +371,7 @@ class BacktestResult(StrictModel):
     snapshots: tuple[BacktestSnapshot, ...]
     complaints_considered: int
     latest_complaint_date_used: date | None
+    degraded_snapshot_count: int = Field(default=0, ge=0)
     anti_leakage_checks: dict[str, bool]
     warnings: tuple[str, ...] = Field(default_factory=tuple)
     created_at: datetime = Field(default_factory=lambda: datetime.now(UTC))

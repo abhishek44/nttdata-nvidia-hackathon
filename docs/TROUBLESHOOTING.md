@@ -124,3 +124,36 @@ nat --version
 nat run --config_file configs/aiq/recallzero_agent.yml \
   --input "Investigate emerging safety concerns for the 2021 and 2022 Ford Mustang Mach-E."
 ```
+
+## Complaint preflight returns HTTP 400 or zero eligible complaints for a known active model
+
+RecallZero 0.3.5.post1 treats NHTSA complaint vehicle addressing as an input-integrity problem rather than evidence that the vehicle has no complaints. The complaint adapter now queries the NHTSA complaint product catalog with `issueType=c`, resolves conservative marketed-model family variants, fetches each accepted variant, and de-duplicates the union by ODI number.
+
+Examples that motivated the adapter revision include generic marketed names whose ODI complaint records can be partitioned into configuration variants. Preflight JSON now records:
+
+```text
+complaint_adapter_revision
+complaint_models_requested
+complaint_models_resolved
+complaint_models_queried
+complaint_count_by_model_variant
+```
+
+After upgrading from 0.3.5, force one fresh preflight so stale normalized complaint caches cannot hide the new resolver:
+
+```bash
+recallzero benchmark-preflight \
+  --manifest config/candidates.yml \
+  --freeze benchmarks/detector_freeze_v1.yaml \
+  --split validation \
+  --refresh \
+  --json data/runs/detector_v1_validation_preflight.json
+```
+
+Do not create the validation lock until preflight reports `READY FOR VALIDATION`.
+
+## `pytest` fails in NAT with `NameError: VehicleToolInput is not defined`
+
+In 0.3.5, the NAT compatibility test dynamically created a function with plain `exec()` inside a test module that has `from __future__ import annotations`. Python inherited that future flag, so the test function carried the string annotation `"VehicleToolInput"`. NAT 1.8 then synthesized a streaming wrapper in its own module and attempted to resolve that string in the wrong globals, producing the reported `NameError`.
+
+The production `src/recallzero/aiq/register.py` deliberately does **not** enable deferred annotations, so its nested tool functions carry concrete runtime Pydantic classes. 0.3.5.post1 fixes the regression fixture by compiling it with `dont_inherit=True`, matching the production registration semantics. No detector logic or NAT YAML behavior changes are involved.

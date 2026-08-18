@@ -33,6 +33,7 @@ def test_candidates_manifest_reuses_existing_shape_with_benchmark_extensions(tmp
             model_years: [2022]
             campaign_number: null
             evaluation_end_date: 2023-01-01
+            adjudication_end_date: 2024-01-01
             expected_role: negative
             benchmark_split: holdout
         """,
@@ -121,5 +122,5 @@ def test_aggregate_benchmark_reports_lineage_and_snapshot_false_alert_burden() -
         replay_years=1.0,
     )
     aggregate = aggregate_benchmark([negative])
-    assert aggregate["false_alert_snapshots_per_vehicle_replay_year"] == 3.0
-    assert aggregate["unique_false_lineages_per_vehicle_replay_year"] == 2.0
+    assert aggregate["raw_control_alert_snapshots_per_vehicle_replay_year"] == 3.0
+    assert aggregate["raw_control_alert_lineages_per_vehicle_replay_year"] == 2.0

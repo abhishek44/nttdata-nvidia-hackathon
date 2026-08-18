@@ -125,9 +125,64 @@ class NHTSAClient:
             values.append(" ".join(model.replace("-", " ").split()))
         dedup: list[str] = []
         for value in values:
-            if value and value not in dedup:
-                dedup.append(value)
+            cleaned = " ".join(str(value).strip().upper().split())
+            if cleaned and cleaned not in dedup:
+                dedup.append(cleaned)
         return tuple(dedup)
+
+    @staticmethod
+    def _model_words(value: str) -> tuple[str, ...]:
+        """Return punctuation-insensitive model tokens while preserving token boundaries."""
+
+        return tuple(re.findall(r"[A-Z0-9]+", value.upper()))
+
+    @classmethod
+    def _is_catalog_family_match(cls, requested_model: str, catalog_model: str) -> bool:
+        """Conservatively recognize catalog variants that belong to a requested model family.
+
+        NHTSA's complaint product catalog sometimes splits one marketed model into
+        body/configuration variants (for example F-150 SUPERCAB/SUPERCREW or Model Y
+        seating variants). Exact punctuation-insensitive identity remains preferred. A
+        broader family match is accepted only when the requested model tokens are a
+        complete prefix of the catalog model tokens; substring/fuzzy matching is never
+        used. This keeps ``500`` from absorbing ``500X`` while allowing ``F-150`` to
+        include ``F-150 SUPERCAB``.
+        """
+
+        if cls._model_identity(requested_model) == cls._model_identity(catalog_model):
+            return True
+        requested_words = cls._model_words(requested_model)
+        catalog_words = cls._model_words(catalog_model)
+        if not requested_words or len(catalog_words) <= len(requested_words):
+            return False
+        return catalog_words[: len(requested_words)] == requested_words
+
+    async def resolve_complaint_catalog_models(self, *, make: str, model: str, year: int) -> tuple[str, ...]:
+        """Resolve every complaint-catalog model belonging to the requested family.
+
+        Unlike recalls, complaint records can be partitioned across NHTSA catalog
+        variants. Returning all conservative family matches allows the caller to query
+        and de-duplicate those partitions without changing the configured benchmark
+        vehicle identity.
+        """
+
+        candidates = await self.fetch_available_models(make=make, year=year, issue_type="c")
+        matches = [candidate for candidate in candidates if self._is_catalog_family_match(model, candidate)]
+        if not matches:
+            return ()
+
+        identity = self._model_identity(model)
+        return tuple(
+            sorted(
+                matches,
+                key=lambda value: (
+                    0 if self._model_identity(value) == identity else 1,
+                    len(self._model_words(value)),
+                    len(value),
+                    value,
+                ),
+            )
+        )
 
     async def fetch_available_models(self, *, make: str, year: int, issue_type: str) -> tuple[str, ...]:
         issue_type = issue_type.lower().strip()
@@ -194,20 +249,122 @@ class NHTSAClient:
             )
         return resolved
 
+    async def _fetch_complaints_payload(
+        self,
+        *,
+        make: str,
+        model: str,
+        year: int,
+    ) -> tuple[dict[str, Any], tuple[str, ...]]:
+        """Fetch and aggregate complaint partitions for one requested model-year.
+
+        The ODI complaint API can reject a marketed family name even when the product
+        catalog contains valid body/configuration variants. It can also return a valid
+        but incomplete family-level response while complaints live under variants. This
+        method therefore resolves the complaint catalog first, queries every conservative
+        family match, and de-duplicates raw rows by ODI number. HTTP 400 is tolerated only
+        as an exact-model rejection while other resolved variants are tried. Any other
+        HTTP failure remains fatal so a partial benchmark input cannot masquerade as a
+        complete complaint population.
+        """
+
+        catalog_error: str | None = None
+        try:
+            catalog_models = await self.resolve_complaint_catalog_models(make=make, model=model, year=year)
+        except (NHTSAError, httpx.HTTPError) as exc:
+            catalog_models = ()
+            catalog_error = str(exc)
+            logger.warning("Could not resolve NHTSA complaint catalog for %s %s %s: %s", year, make, model, exc)
+
+        query_models: list[str] = []
+        model_candidates = catalog_models or self._safe_model_variants(model)
+        for candidate in model_candidates:
+            cleaned = " ".join(candidate.strip().upper().split())
+            if cleaned and cleaned not in query_models:
+                query_models.append(cleaned)
+
+        if not query_models:
+            raise NHTSAError(f"No usable NHTSA complaint model variant was generated for {year} {make} {model}")
+
+        results_by_odi: dict[str, dict[str, Any]] = {}
+        successful_models: list[str] = []
+        rejected_models: list[str] = []
+        count_by_model: dict[str, int] = {}
+        messages_by_model: dict[str, str] = {}
+        last_400: NHTSAHTTPError | None = None
+
+        for candidate in query_models:
+            try:
+                variant_payload = await self._get_json(
+                    "/complaints/complaintsByVehicle",
+                    params={"make": make, "model": candidate, "modelYear": year},
+                )
+            except NHTSAHTTPError as exc:
+                if exc.status_code != 400:
+                    raise
+                last_400 = exc
+                rejected_models.append(candidate)
+                continue
+
+            variant_results = self._results(variant_payload)
+            successful_models.append(candidate)
+            count_by_model[candidate] = len(variant_results)
+            messages_by_model[candidate] = str(
+                variant_payload.get("message") or variant_payload.get("Message") or ""
+            )
+            for index, item in enumerate(variant_results):
+                odi = item.get("odiNumber") or item.get("odi_number") or item.get("cmplid")
+                key = str(odi) if odi not in (None, "") else f"{candidate}#row{index}"
+                results_by_odi.setdefault(key, item)
+
+        if not successful_models:
+            tried = ", ".join(query_models)
+            detail = f"NHTSA complaint lookup rejected all resolved model variants for {year} {make} {model}. Tried: {tried}."
+            if catalog_error:
+                detail += f" Catalog resolution error: {catalog_error}."
+            if last_400 is not None:
+                detail += f" Last error: {last_400}"
+                raise NHTSAError(detail) from last_400
+            raise NHTSAError(detail)
+
+        combined_results = list(results_by_odi.values())
+        payload: dict[str, Any] = {
+            "count": len(combined_results),
+            "message": "Results returned successfully (RecallZero complaint catalog aggregation)",
+            "results": combined_results,
+            "recallzeroQuery": {
+                "adapterRevision": "nhtsa-complaint-catalog-v2",
+                "requestedModel": model,
+                "catalogModelsResolved": list(catalog_models),
+                "queriedModels": query_models,
+                "successfulModels": successful_models,
+                "rejectedModelsHttp400": rejected_models,
+                "countByModelVariant": count_by_model,
+                "messageByModelVariant": messages_by_model,
+                "deduplicatedComplaintCount": len(combined_results),
+                "modelYear": year,
+                "make": make,
+            },
+        }
+        if catalog_error:
+            payload["recallzeroQuery"]["catalogResolutionWarning"] = catalog_error
+        return payload, tuple(successful_models)
+
     async def fetch_complaints_for_year(self, vehicle: Vehicle, year: int) -> tuple[list[Complaint], dict[str, Any]]:
-        params = {"make": vehicle.make, "model": vehicle.model, "modelYear": year}
-        payload = await self._get_json("/complaints/complaintsByVehicle", params=params)
-        complaints: list[Complaint] = []
+        payload, _query_models = await self._fetch_complaints_payload(
+            make=vehicle.make,
+            model=vehicle.model,
+            year=year,
+        )
+        dedup: dict[str, Complaint] = {}
+        requested_vehicle = Vehicle(make=vehicle.make, model=vehicle.model, model_years=(year,))
         for item in self._results(payload):
             try:
-                complaints.append(
-                    normalize_complaint(
-                        item,
-                        Vehicle(make=vehicle.make, model=vehicle.model, model_years=(year,)),
-                    )
-                )
+                complaint = normalize_complaint(item, requested_vehicle)
+                dedup[complaint.odi_number] = complaint
             except (ValueError, TypeError) as exc:
                 logger.warning("Skipping invalid complaint: %s", exc)
+        complaints = sorted(dedup.values(), key=lambda item: (item.received_date, item.odi_number))
         return complaints, payload
 
     async def fetch_complaints(self, vehicle: Vehicle) -> tuple[list[Complaint], dict[str, Any]]:

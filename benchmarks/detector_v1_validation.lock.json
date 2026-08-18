@@ -1,0 +1,33 @@
+{
+  "benchmark_id": "detector-v1-validation-01",
+  "candidate_manifest_sha256": "c691ad8ec02fd1f8431da8b958d837183773556059ec0873d7357c52b3e2c47a",
+  "case_count": 20,
+  "case_ids": [
+    "case_2fc0e691db1fa2b1",
+    "case_d8e964268da5faf4",
+    "case_26d977ae1ccb623a",
+    "case_01fe68acba645eaf",
+    "case_5424e1117a13f0e6",
+    "case_febda2afdc119daa",
+    "case_6bce6fe3365050e7",
+    "case_3f34c3b212bd59b0",
+    "case_46c0f16060cb563b",
+    "case_a792beada8ba5cc3",
+    "case_131e28dedfe2ad22",
+    "case_b727da6da94fa034",
+    "case_3c2598ceba4d9aed",
+    "case_516f4bc694b2497e",
+    "case_71b8aa472d20bd7e",
+    "case_2c53b3da44187646",
+    "case_88fad2965d4eb427",
+    "case_343cb71ef01aa475",
+    "case_bc6ffc6d07a218f9",
+    "case_b5c4fe65311704d5"
+  ],
+  "control_count": 10,
+  "created_at": "2026-08-18T12:34:25.132529Z",
+  "freeze_id": "recallzero-detector-v1",
+  "freeze_manifest_sha256": "e40979f1f0c2786f34c64aaf8ad1bd90e29467d540803b2d79a35c89b0fc3773",
+  "positive_count": 10,
+  "split": "validation"
+}

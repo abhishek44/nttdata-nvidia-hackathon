@@ -23,11 +23,13 @@ This repository is a clean rebuild based on the supplied RecallZero design docum
 ## Architecture
 
 
-### Detector Freeze v1 and 0.3.4 benchmark phase
+### Detector Freeze v1 and 0.3.5.post1 validation phase
 
-Detector Freeze v1 is the 0.3.3a2 detection state. RecallZero 0.3.4 intentionally adds benchmark/freeze-verification infrastructure without changing detector math or eligibility rules. The 75-point alert threshold, 30/25/15/20/10 risk weights, 28/84-day windows, DBSCAN parameters, severity validator, taxonomy, meta construction, recall matcher, and anti-leakage rules are frozen.
+Detector Freeze v1 is the 0.3.3a2 detection state. RecallZero 0.3.5 adds validation infrastructure without changing detector math or eligibility rules. The 0.3.5.post1 maintenance patch changes only the NHTSA complaint input adapter and benchmark provenance/tests; detector scoring and representation logic remain frozen. The 75-point alert threshold, 30/25/15/20/10 risk weights, 28/84-day windows, DBSCAN parameters, severity validator, taxonomy, meta construction, recall matcher, and anti-leakage rules remain frozen.
 
-The freeze manifest hashes detector-critical modules (including `analytics/severity.py`, `analytics/risk_engine.py`, `pipeline.py`, and `recall/matcher.py`) and verifies the *live loaded* risk/clustering/trend/model settings. Snapshot top candidates now persist complete factor score/weight/contribution/explanation data for forensic benchmark comparison. Deferred TAX-001 and META-001 issues are documented under `benchmarks/KNOWN_GAPS.md`; they are not silently fixed against the Mach-E development case.
+The freeze manifest hashes detector-critical modules (including `analytics/severity.py`, `analytics/risk_engine.py`, `pipeline.py`, and `recall/matcher.py`) and verifies the *live loaded* risk/clustering/trend/model settings. The validation harness adds preregistered `development` / `validation` / `holdout` splits, preflight, manifest locking, signed threshold margins, input fingerprints, semantic provenance, alert persistence, Wilson confidence intervals, and post-hoc control adjudication. Deferred TAX-001 and META-001 issues remain documented under `benchmarks/KNOWN_GAPS.md`; they are not silently fixed against validation cases.
+
+Before the validation cohort is locked, 0.3.5.post1 resolves the NHTSA complaint product catalog (`issueType=c`) and aggregates conservative marketed-model variants by ODI number. This prevents a generic model lookup failure or body/configuration split from being misread as zero complaint evidence. Preflight records requested/resolved/query model names and per-variant counts and requires refreshed `nhtsa-complaint-catalog-v2` provenance before validation locking.
 
 ### 0.3.3a scientific slice
 
@@ -218,32 +220,73 @@ recallzero backtest \
 
 Valid outcomes include `EARLY_SIGNAL_DETECTED`, `EARLY_ALERT_TARGET_UNMATCHED`, `NO_EARLY_SIGNAL`, and `INVALID_BACKTEST`. `EARLY_ALERT_TARGET_UNMATCHED` means a pre-recall risk-qualified alert existed, but the post-hoc target-recall matcher did not qualify it; this is distinct from no alert existing at all. Do not tune thresholds after seeing a target outcome and then report the same case as an unbiased validation.
 
-## Detector freeze and benchmark
+## Detector freeze and benchmark validation
 
-Verify that the current checkout and *live runtime configuration* still match Detector Freeze v1:
+0.3.5 separates benchmark **preflight**, **raw detector scoring**, and **post-hoc adjudication**. See `docs/BENCHMARK_PROTOCOL.md` for the full scientific protocol.
+
+First verify the frozen detector and live configuration:
 
 ```bash
 recallzero freeze-verify \
   --manifest benchmarks/detector_freeze_v1.yaml
 ```
 
-The verifier hashes detector/evaluation modules, hashes the active `risk.yml`, and compares values loaded through `Settings().risk_config()`, `ClusteringConfig`, `TrendConfig`, and the configured model identifiers. A config-only edit therefore fails the freeze even if the static manifest numbers were not edited.
+Preflight the preregistered validation cohort without running extraction, clustering, risk scoring, or alerting:
 
-Run the candidate manifest:
+```bash
+recallzero benchmark-preflight \
+  --manifest config/candidates.yml \
+  --freeze benchmarks/detector_freeze_v1.yaml \
+  --split validation \
+  --refresh \
+  --json data/runs/detector_v1_validation_preflight.json
+```
+
+The shipped manifest contains the already-inspected Mach-E case under `development` and a preregistered 10-positive / 10-control `validation` cohort. Controls are targetless replay windows and include a later `adjudication_end_date`; they are not assumed to be defect-free.
+
+After reviewing only case identity, dates, vehicle resolution, and data counts, lock the exact manifest:
+
+```bash
+recallzero benchmark-lock \
+  --manifest config/candidates.yml \
+  --freeze benchmarks/detector_freeze_v1.yaml \
+  --split validation \
+  --output benchmarks/detector_v1_validation.lock.json
+```
+
+Run Detector Freeze v1 once against the locked validation split:
 
 ```bash
 recallzero benchmark \
   --manifest config/candidates.yml \
   --freeze benchmarks/detector_freeze_v1.yaml \
-  --json data/runs/benchmark_v1.json \
-  --csv data/runs/benchmark_v1.csv
+  --lock benchmarks/detector_v1_validation.lock.json \
+  --split validation \
+  --json data/runs/detector_v1_validation_raw.json \
+  --csv data/runs/detector_v1_validation_raw.csv
 ```
 
-`config/candidates.yml` preserves the existing `name/make/model/model_years/campaign_number/official_recall_date/status/note` shape and adds `expected_role` (`positive` or `negative`) plus `benchmark_split` (`development` or `holdout`). Targetless negative controls use an exclusive `evaluation_end_date` instead of a campaign. Positive target metadata is used only after detector snapshots are frozen.
+The raw result persists full risk-factor score/weight/contribution/explanation data, signed threshold margin (`risk_score - 75`), alert-lineage persistence, input fingerprints, NIM/signature provenance, and case validity. It is the audit artifact for what the detector knew.
 
-Every persisted top candidate contains the complete deterministic risk-factor breakdown (`severity`, `trend`, `persistence`, `evidence`, and `recall_gap`) including score, weight, contribution, and explanation. The aggregate output reports positive sensitivity/lead-time plus negative false-alert snapshot and unique-lineage burden. `unique false lineages` must be interpreted with the TAX-001 caveat in `benchmarks/KNOWN_GAPS.md`, because taxonomy-driven lineage fragmentation can inflate that metric.
+Only after raw output is persisted should controls be adjudicated against later recalls:
 
-Compare two benchmark runs without modifying the detector:
+```bash
+recallzero benchmark-adjudicate \
+  data/runs/detector_v1_validation_raw.json \
+  --manifest config/candidates.yml \
+  --json data/runs/detector_v1_validation_adjudicated.json
+
+recallzero benchmark-report \
+  data/runs/detector_v1_validation_adjudicated.json \
+  --json data/runs/detector_v1_validation_summary.json \
+  --csv data/runs/detector_v1_validation_summary.csv
+```
+
+Control alert classifications are `VISIBLE_RECALL_ASSOCIATED`, `FUTURE_RECALL_ASSOCIATED`, or `UNCONFIRMED_ALERT`. Unconfirmed is an operational alert-burden label, not proof that a safety concern was false. Future recall information is evaluation-only and cannot change the frozen historical risk score or alert decision.
+
+Holdout scoring requires both a lock and explicit `--confirm-holdout`. No Detector v2 holdout cases are identified in the shipped v1 validation manifest yet.
+
+Compare raw benchmark versions by cutoff date + stable lineage rather than top-rank position:
 
 ```bash
 recallzero benchmark-compare \
@@ -251,6 +294,8 @@ recallzero benchmark-compare \
   data/runs/benchmark_v2.json \
   --json data/runs/benchmark_compare.json
 ```
+
+`unique_alert_lineages` and unconfirmed-lineage burden must be interpreted with TAX-001 in `benchmarks/KNOWN_GAPS.md`, because taxonomy-driven lineage fragmentation can inflate unique-lineage counts.
 
 ## API and Safety Radar dashboard
 
