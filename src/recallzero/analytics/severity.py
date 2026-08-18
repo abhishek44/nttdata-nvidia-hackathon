@@ -37,6 +37,7 @@ class SeverityResult:
     indicator_counts: dict[str, int]
     rejected_indicator_counts: dict[str, int] = field(default_factory=dict)
     evidence_by_complaint: dict[str, dict[str, str]] = field(default_factory=dict)
+    context_by_complaint: dict[str, dict[str, str]] = field(default_factory=dict)
 
 
 def _norm(text: str | None) -> str:
@@ -313,7 +314,38 @@ class SeverityEngine:
         return sentences[:2]
 
     @classmethod
+    def _parked_event_evidence(cls, complaint: Complaint, signature: FailureSignature) -> str | None:
+        """Return evidence that the *failure event* is parked, not merely that parking is mentioned.
+
+        0.3.3a2 already carried parked-event cues but did not use them.  The a2 guard
+        intentionally requires the extracted operating state to agree with a parked cue.
+        This makes the veto narrow: a later sentence saying the driver parked after an
+        in-motion failure does not erase valid motion evidence from that failure.
+        """
+
+        state = _norm(signature.operating_state)
+        if "parked" not in state:
+            return None
+        for sentence in cls._incident_sentences(complaint, signature):
+            normalized = _norm(sentence)
+            for phrase in cls.PARKED_EVENT_CUES:
+                if phrase in normalized:
+                    return f"Failure event is parked: {phrase!r}; operating_state={signature.operating_state!r}"
+        return None
+
+    @classmethod
+    def _parked_event(cls, complaint: Complaint, signature: FailureSignature) -> bool:
+        return cls._parked_event_evidence(complaint, signature) is not None
+
+    @classmethod
     def _motion_evidence(cls, complaint: Complaint, signature: FailureSignature) -> str | None:
+        # A parked failure can contain background/history text such as "while driving".
+        # Do not let that unrelated sentence promote a parked no-start into an
+        # in-motion event.  The guard is intentionally state+cues scoped rather than
+        # a document-wide ban on the word "parked".
+        if cls._parked_event(complaint, signature):
+            return None
+
         for sentence in cls._incident_sentences(complaint, signature):
             normalized = _norm(sentence)
             if any(
@@ -336,16 +368,15 @@ class SeverityEngine:
                 return f"Incident sentence indicates motion: {matched!r}"
         return None
 
-    @classmethod
-    def _parked_event(cls, complaint: Complaint, signature: FailureSignature) -> bool:
-        for sentence in cls._incident_sentences(complaint, signature):
-            normalized = _norm(sentence)
-            if any(phrase in normalized for phrase in cls.PARKED_EVENT_CUES):
-                return True
-        return False
-
-    def validate_indicators(self, complaint: Complaint, signature: FailureSignature) -> dict[str, str]:
+    def _validate_indicators_with_context(
+        self, complaint: Complaint, signature: FailureSignature
+    ) -> tuple[dict[str, str], dict[str, str]]:
         evidence: dict[str, str] = {}
+        context: dict[str, str] = {}
+        parked = self._parked_event_evidence(complaint, signature)
+        if parked:
+            context["event_state_source"] = "suppressed_by_parked_event"
+            context["parked_event_evidence"] = parked
 
         if complaint.crash:
             evidence["crash_reported"] = "NHTSA structured crash flag=true"
@@ -359,6 +390,13 @@ class SeverityEngine:
         motion = self._motion_evidence(complaint, signature)
         if motion:
             evidence["vehicle_in_motion"] = motion
+            context["event_state_source"] = "incident_motion_context"
+        elif "event_state_source" not in context and any(
+            key in evidence for key in ("crash_reported", "injury_reported", "fatality_reported", "fire_or_thermal_event")
+        ):
+            context["event_state_source"] = "structured_nhtsa"
+        elif "event_state_source" not in context:
+            context["event_state_source"] = "no_validated_motion_context"
 
         incident_sentences = self._incident_sentences(complaint, signature)
         for indicator, patterns in self.SEMANTIC_PATTERNS.items():
@@ -383,20 +421,30 @@ class SeverityEngine:
                     )
                     break
 
-        return dict(sorted(evidence.items()))
+        return dict(sorted(evidence.items())), dict(sorted(context.items()))
+
+    def validate_indicators(self, complaint: Complaint, signature: FailureSignature) -> dict[str, str]:
+        evidence, _context = self._validate_indicators_with_context(complaint, signature)
+        return evidence
+
+    def validate_context(self, complaint: Complaint, signature: FailureSignature) -> dict[str, str]:
+        _evidence, context = self._validate_indicators_with_context(complaint, signature)
+        return context
 
     def calculate(self, complaints: Sequence[Complaint], signatures: Sequence[FailureSignature]) -> SeverityResult:
         signatures_by_id = {item.complaint_id: item for item in signatures}
         counts: Counter[str] = Counter()
         rejected: Counter[str] = Counter()
         evidence_by_complaint: dict[str, dict[str, str]] = {}
+        context_by_complaint: dict[str, dict[str, str]] = {}
 
         for complaint in complaints:
             signature = signatures_by_id.get(complaint.odi_number)
             if signature is None:
                 continue
-            evidence = self.validate_indicators(complaint, signature)
+            evidence, context = self._validate_indicators_with_context(complaint, signature)
             evidence_by_complaint[complaint.odi_number] = evidence
+            context_by_complaint[complaint.odi_number] = context
             counts.update(evidence.keys())
             for candidate in signature.severity_indicators:
                 if candidate not in evidence:
@@ -409,6 +457,7 @@ class SeverityEngine:
                 indicator_counts={},
                 rejected_indicator_counts=dict(rejected),
                 evidence_by_complaint=evidence_by_complaint,
+                context_by_complaint=context_by_complaint,
             )
 
         scored = sorted(
@@ -433,4 +482,5 @@ class SeverityEngine:
             indicator_counts=dict(counts),
             rejected_indicator_counts=dict(rejected),
             evidence_by_complaint=evidence_by_complaint,
+            context_by_complaint=context_by_complaint,
         )

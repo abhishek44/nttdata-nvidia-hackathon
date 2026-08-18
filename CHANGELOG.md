@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.3.3a2 — Parked-event severity guard
+
+- Wire the existing parked-event cue scaffold into severity validation so a parked no-start/no-drive event cannot inherit unrelated background `while driving` text.
+- Keep the veto narrow by requiring the extracted operating state to be `PARKED` and a parked-event cue to occur in incident context; moving failures are not suppressed merely because a later sentence mentions parking.
+- Add production-shaped Mach-E regressions for the named moving/parked ODI cases, including the 11459506 background-motion bug shape.
+- Add a split-sentence moving regression so valid narratives such as `I was driving... The car lost all power` remain accepted even if a later sentence says the vehicle was parked.
+- Add non-scoring severity provenance (`severity_context`) showing whether motion context was accepted or suppressed by the parked-event guard.
+- Lock the verified severity arithmetic: two `loss_of_motive_power` and two `vehicle_in_motion` complaints still score 83.5.
+- Keep taxonomy, recall matching, Time Machine semantics, clustering, risk weights, threshold 75, and 28/84-day windows unchanged from 0.3.3a1.
+
 ## 0.3.3a1 — Scientific slice A
 
 - Keep detector calibration frozen: alert threshold 75, risk weights, 28/84-day windows, DBSCAN eps/min_samples, and anti-leakage rules are unchanged.

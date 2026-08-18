@@ -263,6 +263,7 @@ class EvidenceItem(StrictModel):
     signature: FailureSignature
     validated_severity_indicators: tuple[str, ...] = Field(default_factory=tuple)
     severity_evidence: dict[str, str] = Field(default_factory=dict)
+    severity_context: dict[str, str] = Field(default_factory=dict)
 
 
 class DefectSignal(StrictModel):

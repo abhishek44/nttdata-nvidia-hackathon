@@ -1,40 +1,36 @@
 # RecallZero v2 Release Validation
 
-Release version: **0.3.3a1** (the requested 0.3.3a scientific slice; `a1` is the PEP 440 package version).
+Release version: **0.3.3a2**.
 
 ## Validated in the build environment
 
-- `PYTHONPATH=src pytest -q -ra`: **60 tests passed, 1 optional NAT-runtime test skipped** because `nat` is not installed in the build container.
+- `PYTHONPATH=src pytest -q -ra`: **63 tests passed, 1 optional NAT-runtime test skipped** because `nat` is not installed in the build container.
 - `python -m compileall -q src tests`: passed.
-- `python -m recallzero.cli --version`: reported `RecallZero 0.3.3a1`.
+- `python -m recallzero.cli --version`: reported `RecallZero 0.3.3a2`.
 - `python -m recallzero.cli demo`: synthetic end-to-end analysis and Time Machine replay completed.
-- Python wheel built successfully without network build isolation and installed into an isolated target path; `RecallZero 0.3.3a1` loaded from the wheel.
-- Wheel SHA-256: `69712149bea2bad7566fbdab6845e71ae512cd99eeb9ee0dbbe26339d3d71c9b`.
+- Python wheel built without network build isolation and installed into an isolated target path; `RecallZero 0.3.3a2` imported successfully.
+- Wheel SHA-256: `792bd3a33f2a6dd0e6df3701f14b73a3804dbe76578cd5e34d1e85efb80e2c0b`.
 
-## New 0.3.3a slice coverage
+## 0.3.3a2 coverage
 
-- Moving-event positive regressions for ODI examples `11415152`, `11460408`, `11462003`, `11465461`, `11465548`, and `11466150`.
-- Parked/no-start negative regressions for ODI examples `11459506`, `11463755`, `11464507`, and `11464559`.
-- Loss-of-motive-power now requires event-scoped motion support, while shutdown/stall/dead-throttle and contextual unable-to-move phrases have broader deterministic coverage.
-- Contradictory specific mechanism/consequence assignments are downgraded to component-level `GENERAL_*`/`OTHER` categories.
-- Meta recall matching uses the member consequence-family distribution while retaining the same mechanism/component/subsystem/text structure.
-- Time Machine exports `earliest_target_like_candidate_date` separately from `first_qualified_alert_date`.
+- Wires the existing `PARKED_EVENT_CUES` / `_parked_event` scaffold into motion validation.
+- The parked veto requires both an extracted `PARKED` operating state and an incident-context parked cue, avoiding a document-wide ban on parking language.
+- Production-shaped parked regressions cover `11459506`, `11463755`, `11464507`, and `11464559`; the 11459506 case contains the later/background `while driving` phrase that caused the observed false positive.
+- Moving regressions cover `11415152`, `11460408`, `11462003`, `11465461`, `11465548`, and `11466150`.
+- A split-sentence moving regression protects `I was driving... The car lost all power` style narratives even when later text says the vehicle was parked.
+- An arithmetic regression locks the expected severity result at **83.5** after the parked false-positive `vehicle_in_motion` occurrence is removed.
+- Evidence output now includes non-scoring `severity_context`, including `suppressed_by_parked_event` and `incident_motion_context`.
 
 ## Frozen by design
 
-The following were **not changed** in this slice: alert threshold, risk weights, recent/baseline windows, minimum evidence defaults, DBSCAN `eps`, DBSCAN `min_samples`, complete-link threshold, meta-signal aggregation architecture, and anti-leakage rules. The proposed investigation-signal fusion graph and meta-membership confidence heuristic are deferred.
+0.3.3a2 does **not** modify taxonomy logic, recall-matching weights/thresholds, meta-signal membership, clustering, alert threshold 75, risk weights, 28/84-day trend windows, minimum-evidence defaults, or anti-leakage rules.
 
-## Requires validation on the target GB10 environment
+## Target GB10 validation
 
-1. Preserve `.env` and `data/cache`; install 0.3.3a1.
-2. Re-run the same current-state Mach-E analysis used for 0.3.2.
-3. Re-run the same `--cutoff 2022-06-09` analysis.
-4. Re-run campaign `22V412000` with recall date `2022-06-10`.
-5. Compare the 0.3.2 and 0.3.3a1 outputs, especially severity factor counts, meta-signal risk, `earliest_target_like_candidate_date`, `first_qualified_alert_date`, `first_matching_alert_date`, and anti-leakage checks.
-6. Do not tune the 75-point threshold based on this single candidate.
+Re-run the same three Mach-E experiments used for 0.3.3a1. The primary acceptance check is that ODI `11459506` no longer receives `vehicle_in_motion`, while the May 26 qualified alert remains independently determined by the unchanged risk engine. Do not tune the detector between the a1 and a2 comparisons.
 
 ## Non-claims
 
-- The build environment did not execute live NHTSA/NVIDIA/NAT calls.
-- A target-like candidate is not an alert and is not a lead-time result.
-- Any Mach-E outcome change must be attributed to this narrow slice before deciding whether the deferred fusion/meta-confidence work is needed.
+- The build environment does not execute live NHTSA/NVIDIA/NAT calls.
+- Synthetic demo output is not a vehicle-safety finding.
+- A historical lead-time claim still requires a qualified alert, post-hoc target match, and passing anti-leakage checks in the target replay.

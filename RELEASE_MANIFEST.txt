@@ -1,49 +1,33 @@
 RecallZero v2 release manifest
 ==============================
 
-Version: 0.3.3a1
+Version: 0.3.3a2
 Release date: 2026-08-18
 Target: NVIDIA GB10 compute system / Python 3.11-3.13 environment
 
-Release focus: Scientific Slice A — isolated severity/taxonomy/evaluation correction
-- Repair event-scoped severity false negatives for moving shutdown/stall/power-loss narratives.
-- Preserve parked no-start/no-drive negatives through deterministic event-context checks.
-- Add a narrow mechanism/consequence consistency guard that downgrades contradictory specific assignments to GENERAL/OTHER.
-- Score recall consequence compatibility from the observed consequence-family distribution, not only the dominant meta label.
-- Separate evaluation-only target-pattern recognition (`earliest_target_like_candidate_date`) from a qualified alert (`first_qualified_alert_date`).
-- Keep alert threshold 75, all risk weights, 28/84-day windows, DBSCAN eps/min_samples, and anti-leakage rules unchanged.
-- Explicitly defer the signal-fusion graph and meta-membership confidence rules to a later isolated experiment.
-
-Included capabilities:
-- NHTSA complaint and recall ingestion with evidence-preserving normalization
-- NVIDIA NIM structured complaint extraction and embedding integrations
-- Deterministic heuristic and TF-IDF fallbacks for explicitly allowed/offline modes
-- Component/consequence child clustering + root-mechanism meta-signals + DBSCAN + complete-link refinement
-- Deterministic trend, persistence, severity, evidence and recall-gap risk scoring
-- Structured visible-recall matching and leakage-safe Recall Time Machine historical replay
-- Evidence critic and engineering brief
-- FastAPI service and Safety Radar dashboard
-- NeMo Agent Toolkit plugin tools and standalone native tool-calling workflow
-- Optional legacy AIQ registration and current stock AI-Q data-source-registry patching
+Release focus: parked-event severity correctness patch
+- Finish wiring the existing PARKED_EVENT_CUES / _parked_event scaffold into severity validation.
+- Suppress background motion text only when the extracted failure state is PARKED and incident context contains a parked cue.
+- Preserve valid split-sentence in-motion failures even when a later sentence mentions parking.
+- Add severity_context provenance without changing risk scoring.
+- Freeze taxonomy, recall matching, clustering, threshold 75, risk weights, trend windows, and anti-leakage behavior.
 
 Offline validation:
-- 60 automated tests passed; 1 optional NAT-runtime integration test skipped because `nat` is not installed in the build container
-- 13 new 0.3.3a slice tests cover the six named moving Mach-E positives, four named parked negatives, taxonomy guard, consequence-distribution matching, and dual Time Machine metrics
+- 63 automated tests passed; 1 optional NAT-runtime integration test skipped because `nat` is not installed in the build container
 - Python compilation passed
 - Synthetic end-to-end analysis and historical replay passed
 - Wheel build and isolated-target installation passed
 
 Wheel:
-- dist/recallzero-0.3.3a1-py3-none-any.whl
-- SHA-256: 69712149bea2bad7566fbdab6845e71ae512cd99eeb9ee0dbbe26339d3d71c9b
+- dist/recallzero-0.3.3a2-py3-none-any.whl
+- SHA-256: 792bd3a33f2a6dd0e6df3701f14b73a3804dbe76578cd5e34d1e85efb80e2c0b
 
 Target-environment validation still required:
-- Re-run the exact 0.3.2 Mach-E current, 2022-06-09 cutoff, and 22V412000 Time Machine commands under 0.3.3a1
-- Compare severity factors and the new target-like-vs-qualified metrics without changing threshold/weights/windows/clustering parameters
-- Native NAT tool-calling smoke test with the installed runtime
+- Re-run the exact 0.3.3a1 Mach-E current, 2022-06-09 cutoff, and 22V412000 Time Machine commands under 0.3.3a2
+- Confirm 11459506 is suppressed as a parked event and does not receive vehicle_in_motion
+- Confirm moving positive ODIs retain loss_of_motive_power / vehicle_in_motion where supported
+- Confirm whether first_qualified_alert_date remains 2022-05-26 without changing detector calibration
 
 Non-claims:
 - Synthetic demo results are not real vehicle safety findings.
-- `earliest_target_like_candidate_date` is evaluation-only and is not lead time.
-- A lead-time claim requires `first_qualified_alert_date`, a target match, and passing anti-leakage checks.
-- 0.3.3a1 is intentionally not a calibration release; detector thresholds remain frozen.
+- 0.3.3a2 is a correctness patch, not a calibration release.

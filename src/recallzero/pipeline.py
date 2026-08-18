@@ -167,6 +167,7 @@ class RecallZeroPipeline:
                     severity.evidence_by_complaint.get(complaint.odi_number, {}).keys()
                 ),
                 severity_evidence=severity.evidence_by_complaint.get(complaint.odi_number, {}),
+                severity_context=severity.context_by_complaint.get(complaint.odi_number, {}),
             )
             for complaint in sorted(member_complaints, key=lambda item: item.received_date, reverse=True)
         )

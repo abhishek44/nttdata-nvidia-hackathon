@@ -126,5 +126,5 @@ The Time Machine now emits two explicit evaluation fields in addition to the exi
 - `earliest_target_like_candidate_date`: earliest frozen top candidate whose post-hoc target score crosses the configured target-match threshold. This is **not** an alert and must not be reported as lead time.
 - `first_qualified_alert_date`: earliest frozen detector alert that also passes the post-hoc target-recall match threshold. This is the alert date eligible for a lead-time claim when all anti-leakage checks pass.
 
-The target recall is still introduced only after each detector snapshot is frozen. 0.3.3a1 keeps the detector threshold, risk weights, trend windows, minimum evidence defaults, DBSCAN parameters, and anti-leakage rules unchanged.
+The target recall is still introduced only after each detector snapshot is frozen. 0.3.3a2 keeps the detector threshold, risk weights, trend windows, minimum evidence defaults, DBSCAN parameters, and anti-leakage rules unchanged.
 
