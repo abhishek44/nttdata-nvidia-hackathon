@@ -1,8 +1,13 @@
 # RecallZero MVP
 
-**AI that sees the recall before the recall.**
-
 This repository is the first implementation slice of the hackathon design: real NHTSA ingestion, complaint normalization, semantic clustering, deterministic trend/risk scoring, and a leakage-safe historical "Recall Time Machine" backtest.
+
+## Project layout
+
+```text
+BE/  Backend API, pipeline, tests, scripts, and candidate data
+FE/  Streamlit dashboard connected to the backend API
+```
 
 ## What is implemented now
 
@@ -26,15 +31,27 @@ NHTSA documentation says Ford issued recall 22V-412 on June 10, 2022 for 2021-20
 
 ## Run locally
 
+### Backend
+
 ```bash
 python -m venv .venv
 source .venv/bin/activate
-pip install -r requirements.txt
-cp .env.example .env
+pip install -r BE/requirements.txt
+pip install -e .
+cp BE/.env.example BE/.env
 pytest -q
 python -m recallzero.cli demo-backtest
 uvicorn recallzero.api:app --reload
 ```
+
+### Frontend
+
+```bash
+pip install -r FE/requirements.txt
+python -m streamlit run FE/app.py
+```
+
+The frontend expects the backend at `http://localhost:8000` by default. You can change it with `RECALLZERO_API_URL`.
 
 ## Fetch real NHTSA complaints
 
@@ -43,7 +60,7 @@ python -m recallzero.cli fetch \
   --make Ford \
   --model "Mustang Mach-E" \
   --year 2021 \
-  --out data/mach_e_2021_complaints.json
+  --out BE/data/mach_e_2021_complaints.json
 ```
 
 Repeat for 2022. This requires internet access to `api.nhtsa.gov`.
@@ -85,8 +102,8 @@ NVIDIA_API_KEY=<only if your endpoint requires it>
 After configuring NVIDIA NIM (recommended) and from a machine with NHTSA internet access:
 
 ```bash
-python scripts/backtest_candidate.py data/candidates/22V412000.json \
-  --out data/22V412000_backtest.json
+python BE/scripts/backtest_candidate.py BE/data/candidates/22V412000.json \
+  --out BE/data/22V412000_backtest.json
 ```
 
 The runner deliberately performs **detection before it looks at the historical recall description**:
