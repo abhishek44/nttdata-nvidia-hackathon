@@ -1,14 +1,15 @@
 # Changelog
 
-## 0.3.3a2 — Parked-event severity guard
+## 0.3.4 — Detector Freeze v1 benchmark infrastructure
 
-- Wire the existing parked-event cue scaffold into severity validation so a parked no-start/no-drive event cannot inherit unrelated background `while driving` text.
-- Keep the veto narrow by requiring the extracted operating state to be `PARKED` and a parked-event cue to occur in incident context; moving failures are not suppressed merely because a later sentence mentions parking.
-- Add production-shaped Mach-E regressions for the named moving/parked ODI cases, including the 11459506 background-motion bug shape.
-- Add a split-sentence moving regression so valid narratives such as `I was driving... The car lost all power` remain accepted even if a later sentence says the vehicle was parked.
-- Add non-scoring severity provenance (`severity_context`) showing whether motion context was accepted or suppressed by the parked-event guard.
-- Lock the verified severity arithmetic: two `loss_of_motive_power` and two `vehicle_in_motion` complaints still score 83.5.
-- Keep taxonomy, recall matching, Time Machine semantics, clustering, risk weights, threshold 75, and 28/84-day windows unchanged from 0.3.3a1.
+- Freeze detector behavior at the 0.3.3a2 state; no intentional changes to severity math, taxonomy, clustering, meta-signal construction, trend/risk scoring, recall matching, thresholds, weights, or leakage rules.
+- Add `benchmarks/detector_freeze_v1.yaml` with explicit hashes for detector-critical modules including severity, risk, trend, taxonomy, clustering, `pipeline.py`, and `recall/matcher.py`, plus evaluation-layer hashes.
+- Verify the freeze against live loaded `Settings().risk_config()`, clustering/trend settings, model identifiers, and the actual active `risk.yml` hash rather than trusting duplicated manifest values.
+- Persist full severity/trend/persistence/evidence/recall-gap score, weight, contribution, and explanation fields on every `BacktestCandidate` top-candidate snapshot.
+- Extend `config/candidates.yml` with benchmark role/split metadata while preserving the existing vehicle/campaign schema.
+- Add `recallzero benchmark --manifest ...`, positive historical replays, targetless negative-control replays, JSON/CSV outputs, aggregate sensitivity/lead-time/false-alert metrics, and lineage-fragmentation caveats.
+- Add `recallzero freeze-verify` and `recallzero benchmark-compare` commands.
+- Track TAX-001 (OTHER consequence consistency bypass) and META-001 (over-broad mechanism meta-signal membership) as benchmark-driven backlog items instead of changing detector logic.
 
 ## 0.3.3a1 — Scientific slice A
 

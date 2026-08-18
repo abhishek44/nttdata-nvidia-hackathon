@@ -140,6 +140,15 @@ class RecallTimeMachine:
                         consequence_family=signal.cluster.consequence_family,
                         evidence_count=signal.cluster.evidence_count,
                         risk_score=signal.risk.final_score,
+                        risk_factors={
+                            factor.name: {
+                                "score": factor.score,
+                                "weight": factor.weight,
+                                "contribution": factor.contribution,
+                                "explanation": factor.explanation,
+                            }
+                            for factor in signal.risk.factors
+                        },
                         alert=signal.risk.alert and not degraded,
                         distance_to_alert_threshold=round(max(0.0, risk_config.alert_threshold - signal.risk.final_score), 2),
                         posthoc_target_score=target_score,

@@ -1,33 +1,42 @@
 RecallZero v2 release manifest
 ==============================
 
-Version: 0.3.3a2
+Version: 0.3.4
 Release date: 2026-08-18
 Target: NVIDIA GB10 compute system / Python 3.11-3.13 environment
 
-Release focus: parked-event severity correctness patch
-- Finish wiring the existing PARKED_EVENT_CUES / _parked_event scaffold into severity validation.
-- Suppress background motion text only when the extracted failure state is PARKED and incident context contains a parked cue.
-- Preserve valid split-sentence in-motion failures even when a later sentence mentions parking.
-- Add severity_context provenance without changing risk scoring.
-- Freeze taxonomy, recall matching, clustering, threshold 75, risk weights, trend windows, and anti-leakage behavior.
+Release focus: Detector Freeze v1 + manifest-driven benchmark infrastructure
+- Freeze detector behavior at the 0.3.3a2 state.
+- Hash detector-critical modules explicitly, including severity.py, risk_engine.py, pipeline.py, and recall/matcher.py.
+- Verify active risk.yml and live Settings-loaded risk/clustering/trend/model/execution values.
+- Persist complete risk-factor breakdowns on BacktestCandidate snapshots.
+- Reuse/extend config/candidates.yml for positive, negative, development, and holdout benchmark cases.
+- Add benchmark JSON/CSV aggregation, targetless negative-control replay, freeze verification, and benchmark comparison.
+- Defer TAX-001 and META-001 until multi-case benchmark evidence justifies Detector v2 changes.
+
+Detector-change check:
+- 15 detector-critical source modules compared with 0.3.3a2: 15 SAME / 0 CHANGED
+- config/risk.yml: SAME
+- time_machine.py/domain.py: evaluation-schema-only additive changes for risk-factor persistence
 
 Offline validation:
-- 63 automated tests passed; 1 optional NAT-runtime integration test skipped because `nat` is not installed in the build container
+- 66 automated tests passed; 1 optional NAT-runtime integration test skipped because nat is not installed in the build container
 - Python compilation passed
-- Synthetic end-to-end analysis and historical replay passed
+- Synthetic end-to-end analysis and Time Machine replay passed
+- Detector freeze verification passed
+- Positive and targetless-negative benchmark orchestration smoke tests passed
 - Wheel build and isolated-target installation passed
 
 Wheel:
-- dist/recallzero-0.3.3a2-py3-none-any.whl
-- SHA-256: 792bd3a33f2a6dd0e6df3701f14b73a3804dbe76578cd5e34d1e85efb80e2c0b
+- dist/recallzero-0.3.4-py3-none-any.whl
+- SHA-256: 2a4456a906a3988a515eb36e860bf5f373b1b26efd9422cd828cf68d60d5ec02
 
-Target-environment validation still required:
-- Re-run the exact 0.3.3a1 Mach-E current, 2022-06-09 cutoff, and 22V412000 Time Machine commands under 0.3.3a2
-- Confirm 11459506 is suppressed as a parked event and does not receive vehicle_in_motion
-- Confirm moving positive ODIs retain loss_of_motive_power / vehicle_in_motion where supported
-- Confirm whether first_qualified_alert_date remains 2022-05-26 without changing detector calibration
+Target-environment next step:
+- Run freeze verification first.
+- Add unrelated positive recalls and targetless controls to config/candidates.yml.
+- Keep Mach-E in development split; reserve untouched cases for holdout.
+- Run the frozen benchmark before making any Detector v2 changes.
 
 Non-claims:
-- Synthetic demo results are not real vehicle safety findings.
-- 0.3.3a2 is a correctness patch, not a calibration release.
+- Synthetic demo/benchmark results are not real vehicle safety findings.
+- 0.3.4 intentionally does not tune the detector against Mach-E.

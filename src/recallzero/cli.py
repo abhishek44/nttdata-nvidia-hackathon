@@ -19,8 +19,10 @@ from rich.table import Table
 
 from recallzero import __version__
 from recallzero.backtest import RecallTimeMachine
+from recallzero.benchmark import compare_benchmark_runs, run_benchmark, write_benchmark_csv
 from recallzero.config import get_settings
 from recallzero.demo import build_demo_records
+from recallzero.freeze import verify_freeze
 from recallzero.investigation import EngineeringBriefRenderer
 from recallzero.models import Vehicle
 from recallzero.pipeline import build_pipeline
@@ -338,6 +340,112 @@ def demo(backtest_mode: bool = typer.Option(True, "--backtest/--analysis-only"))
                 )
 
     _run_cli_async(_run(), "Synthetic demo")
+
+
+@app.command("freeze-verify")
+def freeze_verify(
+    manifest: Path = typer.Option(
+        Path("benchmarks/detector_freeze_v1.yaml"),
+        "--manifest",
+        help="Detector freeze manifest to verify against live source and runtime configuration.",
+    ),
+) -> None:
+    """Verify Detector Freeze v1 source hashes and live loaded configuration."""
+    settings = get_settings()
+    verification = verify_freeze(manifest, settings)
+    table = Table(title=f"Detector freeze: {verification.freeze_id}")
+    table.add_column("Check")
+    table.add_column("Status")
+    table.add_column("Expected")
+    table.add_column("Actual")
+    for item in verification.checks:
+        table.add_row(
+            item.name,
+            "[green]PASS[/green]" if item.ok else "[red]FAIL[/red]",
+            item.expected,
+            item.actual,
+        )
+    console.print(table)
+    if not verification.ok:
+        console.print("[red]Freeze verification failed. Benchmark comparability is invalid.[/red]")
+        raise typer.Exit(code=1)
+    console.print("[green]Freeze verified against live Settings/risk.yml and source hashes.[/green]")
+
+
+@app.command()
+def benchmark(
+    manifest: Path = typer.Option(
+        Path("config/candidates.yml"),
+        "--manifest",
+        help="Manifest of positive/negative benchmark cases.",
+    ),
+    freeze_manifest: Path = typer.Option(
+        Path("benchmarks/detector_freeze_v1.yaml"),
+        "--freeze",
+        help="Detector freeze manifest that must match before the benchmark runs.",
+    ),
+    json_output: Path = typer.Option(
+        Path("data/runs/benchmark_v1.json"),
+        "--json",
+        help="Machine-readable benchmark result including snapshot factor breakdowns.",
+    ),
+    csv_output: Path | None = typer.Option(
+        Path("data/runs/benchmark_v1.csv"),
+        "--csv",
+        help="Optional per-case CSV summary.",
+    ),
+    refresh: bool = typer.Option(False, help="Refresh NHTSA data and signature cache instead of reusing local evidence."),
+    allow_freeze_mismatch: bool = typer.Option(
+        False,
+        "--allow-freeze-mismatch",
+        help="Run despite a freeze mismatch. Results are marked non-comparable; not recommended.",
+    ),
+) -> None:
+    """Run a manifest-driven historical benchmark without changing detector logic."""
+    settings = get_settings()
+    configure_logging(settings.log_level)
+
+    async def _run() -> None:
+        result, verification = await run_benchmark(
+            settings=settings,
+            candidates_path=manifest,
+            freeze_manifest_path=freeze_manifest,
+            refresh=refresh,
+            allow_freeze_mismatch=allow_freeze_mismatch,
+        )
+        json_output.parent.mkdir(parents=True, exist_ok=True)
+        json_output.write_text(dumps_json(result.model_dump(mode="json")), encoding="utf-8")
+        if csv_output is not None:
+            write_benchmark_csv(result, csv_output)
+
+        console.print(f"[bold]Benchmark:[/bold] {result.benchmark_run_id}")
+        console.print(f"[bold]Freeze:[/bold] {result.freeze_id} ({'verified' if verification.ok else 'MISMATCH'})")
+        console.print(f"[bold]Cases:[/bold] {result.case_count}")
+        console.print(f"[bold]Aggregate:[/bold] {json.dumps(result.aggregate, sort_keys=True)}")
+        console.print(f"Saved JSON: {json_output}")
+        if csv_output is not None:
+            console.print(f"Saved CSV: {csv_output}")
+
+    _run_cli_async(_run(), "Benchmark")
+
+
+@app.command("benchmark-compare")
+def benchmark_compare(
+    left: Path = typer.Argument(..., exists=True, readable=True),
+    right: Path = typer.Argument(..., exists=True, readable=True),
+    json_output: Path | None = typer.Option(None, "--json", help="Optional path for the comparison JSON."),
+) -> None:
+    """Compare two benchmark outputs, including snapshot risk-factor score deltas."""
+    left_data = json.loads(left.read_text(encoding="utf-8"))
+    right_data = json.loads(right.read_text(encoding="utf-8"))
+    comparison = compare_benchmark_runs(left_data, right_data)
+    rendered = dumps_json(comparison)
+    if json_output:
+        json_output.parent.mkdir(parents=True, exist_ok=True)
+        json_output.write_text(rendered, encoding="utf-8")
+        console.print(f"Saved comparison JSON: {json_output}")
+    else:
+        console.print(rendered)
 
 
 @app.command()

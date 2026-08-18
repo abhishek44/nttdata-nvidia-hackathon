@@ -1,3 +1,6 @@
+# Manifest consumed directly by `recallzero benchmark`.
+# `expected_role` and target campaign metadata are evaluation-only; they must never
+# be exposed to the detector before a snapshot is frozen.
 candidates:
   - name: Mustang Mach-E high-voltage contactor recall
     make: FORD
@@ -5,7 +8,24 @@ candidates:
     model_years: [2021, 2022]
     campaign_number: 22V412000
     official_recall_date: 2022-06-10
-    status: unvalidated_candidate
+    expected_role: positive
+    benchmark_split: development
+    defect_family: HIGH_VOLTAGE_POWER_DISTRIBUTION
+    status: detector_v1_development_positive
     note: >-
-      This candidate comes from the recovered RecallZero design documents. The project must not claim
-      early-warning lead time until a real leakage-safe backtest is executed and reviewed.
+      Known-answer development case used during architecture iteration. Detector Freeze v1
+      reproduces a qualified 2022-05-26 alert in leakage-safe replay; do not treat this case
+      as an untouched holdout. Add unrelated positive recalls and targetless negative controls
+      before changing Detector v1.
+
+# Negative controls use the same shape but omit campaign_number/official_recall_date
+# and provide an exclusive evaluation_end_date, for example:
+#  - name: Example targetless control
+#    make: EXAMPLE
+#    model: MODEL
+#    model_years: [2022]
+#    campaign_number: null
+#    evaluation_end_date: 2023-01-01
+#    expected_role: negative
+#    benchmark_split: development
+#    status: planned_control

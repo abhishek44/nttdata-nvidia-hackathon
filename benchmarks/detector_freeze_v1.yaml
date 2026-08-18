@@ -1,0 +1,114 @@
+freeze_id: recallzero-detector-v1
+detector_source_release: 0.3.3a2
+benchmark_release: 0.3.4
+provenance:
+  git_commit: null
+  note: Recovered/build archive contains no .git metadata; module SHA-256 values are the authoritative source freeze.
+runtime:
+  models:
+    llm_model: nvidia/nemotron-3.5-lightning-30b-a3b
+    embedding_model: nvidia/nv-embedqa-e5-v5
+    use_nim: true
+  risk:
+    weights:
+      severity: 0.3
+      trend: 0.25
+      persistence: 0.15
+      evidence: 0.2
+      recall_gap: 0.1
+    alert_threshold: 75.0
+    minimum_evidence: 4
+    medium_threshold: 45.0
+    high_threshold: 70.0
+    critical_threshold: 88.0
+  clustering:
+    eps: 0.27
+    min_samples: 2
+    max_representatives: 3
+    hierarchical: true
+    taxonomy_grouping: true
+    refine_max_distance: 0.34
+    diagnostics_sample_size: 160
+    suspicious_cluster_share: 0.7
+  trend:
+    recent_window_days: 28
+    baseline_window_days: 84
+    persistence_weeks_to_full_score: 4
+  execution:
+    llm_concurrency: 2
+    signature_batch_size: 20
+    transient_nim_fallback: false
+evaluation:
+  target_match_threshold: 0.45
+  top_candidate_count: 5
+  note: Evaluation-only values. Target recall remains hidden until each detector snapshot is frozen.
+runtime_config_files:
+  risk_file:
+    path: config/risk.yml
+    sha256: 7392bf7f447928dce443a65753d064f4544b2a8fed9b71faa1bdaab23ade0bea
+detector_modules:
+  config:
+    path: src/recallzero/config.py
+    sha256: 0c8f8e85c5ccda3f09efe442fc522b3e7556d507eb0a3b3473dd35981938c5c6
+  nhtsa_client:
+    path: src/recallzero/data/nhtsa_client.py
+    sha256: 8260c9961648a36bd98a55bf994b0d3a26a98338c0220ec311e135b1ec594e98
+  normalizer:
+    path: src/recallzero/data/normalizer.py
+    sha256: 7a3ce7ff91ba448f2a4611174026e68f51d81e3a7ec441a01eaa4241d3b2c669
+  repository:
+    path: src/recallzero/data/repository.py
+    sha256: 2eedd35f1428806abbcc83dfe1a255b3418bb30d2ace041d65a50ec83f9baacf
+  nim_client:
+    path: src/recallzero/intelligence/nim_client.py
+    sha256: 954997bcea4c01f57b6b88e19f5ec3f5642f1efabb7e96805fb81979d5faba8a
+  extractor:
+    path: src/recallzero/intelligence/extractor.py
+    sha256: 4bee9d8d5eaf90fc1afac7d021be8e053af31767af4d7855e49f113d750e0464
+  embeddings:
+    path: src/recallzero/intelligence/embeddings.py
+    sha256: 413c297e97cd70b3182c14ee125f61ed7fbee87bc3ca694e5a5e5b7e39bcef93
+  taxonomy:
+    path: src/recallzero/intelligence/taxonomy.py
+    sha256: c75259014422ab0bb498f311658111ee1ce039c7925bde5771e4bd65fe000134
+  clustering:
+    path: src/recallzero/intelligence/clustering.py
+    sha256: d974c33fcd60ead2bd742f7854c195c5c2d1c8df3bbc843ce5c5474a4bf80c8d
+  severity:
+    path: src/recallzero/analytics/severity.py
+    sha256: 93ba614ddb1930322484b14d34408adf303f8bf0631f278b5748744a5be46d54
+  trend_engine:
+    path: src/recallzero/analytics/trend_engine.py
+    sha256: 5de2e5d251b26662d41d4fa3aced28f7481decd018a38c7b7aeb14e6d2717dc8
+  risk_engine:
+    path: src/recallzero/analytics/risk_engine.py
+    sha256: 31954041c366ae17061a816caf7e31707f9e38a276cbe513d7c38ee116335437
+  pipeline:
+    path: src/recallzero/pipeline.py
+    sha256: 6f419384aaee89b9bcc494796c20da799ff832a30d595da50a0514aed8b5bed0
+  recall_matcher:
+    path: src/recallzero/recall/matcher.py
+    sha256: a31473513ef9699038ba60bba9b29a52da65c9cd3005db11431a6b123a376445
+  utils:
+    path: src/recallzero/utils.py
+    sha256: b49170dfaef5d0b8fac5701264e61e660b757e5f6ea2f003ea864dc7963e50e4
+evaluation_modules:
+  domain_schema:
+    path: src/recallzero/models/domain.py
+    sha256: e21f5da9a631c6502dc440846fef0890ef411075219909011246286e6c7c5929
+  time_machine:
+    path: src/recallzero/backtest/time_machine.py
+    sha256: 23763d657aca7f761d37074c3b593be812fd13a36d22793a94bf5566c7d4fe3a
+  benchmark_harness:
+    path: src/recallzero/benchmark.py
+    sha256: 76e2f458844b81bc925667354807d4c4d83368579dbecb71936715255f227dac
+  freeze_verifier:
+    path: src/recallzero/freeze.py
+    sha256: 7b10409c3187399dc5d3a42f40216ff6a8ddefbee71d7012b76ac69d3f25fc8c
+known_gaps:
+- id: TAX-001
+  status: deferred_until_benchmark
+  summary: consequence_family OTHER can bypass mechanism consistency checks and fragment lineage IDs
+- id: META-001
+  status: deferred_until_benchmark
+  summary: mechanism meta-signals may over-aggregate evidence in mature current-state populations

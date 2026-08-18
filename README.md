@@ -23,9 +23,15 @@ This repository is a clean rebuild based on the supplied RecallZero design docum
 ## Architecture
 
 
+### Detector Freeze v1 and 0.3.4 benchmark phase
+
+Detector Freeze v1 is the 0.3.3a2 detection state. RecallZero 0.3.4 intentionally adds benchmark/freeze-verification infrastructure without changing detector math or eligibility rules. The 75-point alert threshold, 30/25/15/20/10 risk weights, 28/84-day windows, DBSCAN parameters, severity validator, taxonomy, meta construction, recall matcher, and anti-leakage rules are frozen.
+
+The freeze manifest hashes detector-critical modules (including `analytics/severity.py`, `analytics/risk_engine.py`, `pipeline.py`, and `recall/matcher.py`) and verifies the *live loaded* risk/clustering/trend/model settings. Snapshot top candidates now persist complete factor score/weight/contribution/explanation data for forensic benchmark comparison. Deferred TAX-001 and META-001 issues are documented under `benchmarks/KNOWN_GAPS.md`; they are not silently fixed against the Mach-E development case.
+
 ### 0.3.3a scientific slice
 
-0.3.3a1 introduced the small severity/taxonomy/recall-evaluation slice. 0.3.3a2 is narrower still: it only finishes the parked-event severity guard, adds production-shaped regression coverage and non-scoring `severity_context` provenance. Taxonomy logic, consequence-distribution recall matching, Time Machine semantics, alert threshold, risk weights, trend windows, DBSCAN parameters, and leakage rules are unchanged from 0.3.3a1. The signal-fusion graph and meta-membership confidence heuristics remain deferred.
+0.3.3a1 repaired moving-event severity false negatives and added the first small scientific slice. 0.3.3a2 then wired the parked-event veto so parked/no-start narratives no longer inherit unrelated motion text while genuine moving shutdowns remain valid. The Mach-E outcome was rerun with threshold/weights/windows/clustering frozen before declaring Detector Freeze v1.
 
 ### 0.3.2 signal model
 
@@ -79,7 +85,7 @@ The trust boundary is deliberate:
 - **GenAI:** interprets and normalizes complaint language and can explain an already-calculated result.
 - **Deterministic code:** counts evidence, computes dates/windows, trend, persistence, severity factors, risk, recall lead time, and anti-leakage checks.
 
-See [Architecture](docs/ARCHITECTURE.md), [Backtest Protocol](docs/BACKTEST_PROTOCOL.md), and [Source Traceability](docs/SOURCE_TRACEABILITY.md).
+See [Architecture](docs/ARCHITECTURE.md), [Backtest Protocol](docs/BACKTEST_PROTOCOL.md), [Benchmark Protocol](docs/BENCHMARK_PROTOCOL.md), and [Source Traceability](docs/SOURCE_TRACEABILITY.md).
 
 ## Requirements
 
@@ -212,6 +218,40 @@ recallzero backtest \
 
 Valid outcomes include `EARLY_SIGNAL_DETECTED`, `EARLY_ALERT_TARGET_UNMATCHED`, `NO_EARLY_SIGNAL`, and `INVALID_BACKTEST`. `EARLY_ALERT_TARGET_UNMATCHED` means a pre-recall risk-qualified alert existed, but the post-hoc target-recall matcher did not qualify it; this is distinct from no alert existing at all. Do not tune thresholds after seeing a target outcome and then report the same case as an unbiased validation.
 
+## Detector freeze and benchmark
+
+Verify that the current checkout and *live runtime configuration* still match Detector Freeze v1:
+
+```bash
+recallzero freeze-verify \
+  --manifest benchmarks/detector_freeze_v1.yaml
+```
+
+The verifier hashes detector/evaluation modules, hashes the active `risk.yml`, and compares values loaded through `Settings().risk_config()`, `ClusteringConfig`, `TrendConfig`, and the configured model identifiers. A config-only edit therefore fails the freeze even if the static manifest numbers were not edited.
+
+Run the candidate manifest:
+
+```bash
+recallzero benchmark \
+  --manifest config/candidates.yml \
+  --freeze benchmarks/detector_freeze_v1.yaml \
+  --json data/runs/benchmark_v1.json \
+  --csv data/runs/benchmark_v1.csv
+```
+
+`config/candidates.yml` preserves the existing `name/make/model/model_years/campaign_number/official_recall_date/status/note` shape and adds `expected_role` (`positive` or `negative`) plus `benchmark_split` (`development` or `holdout`). Targetless negative controls use an exclusive `evaluation_end_date` instead of a campaign. Positive target metadata is used only after detector snapshots are frozen.
+
+Every persisted top candidate contains the complete deterministic risk-factor breakdown (`severity`, `trend`, `persistence`, `evidence`, and `recall_gap`) including score, weight, contribution, and explanation. The aggregate output reports positive sensitivity/lead-time plus negative false-alert snapshot and unique-lineage burden. `unique false lineages` must be interpreted with the TAX-001 caveat in `benchmarks/KNOWN_GAPS.md`, because taxonomy-driven lineage fragmentation can inflate that metric.
+
+Compare two benchmark runs without modifying the detector:
+
+```bash
+recallzero benchmark-compare \
+  data/runs/benchmark_v1.json \
+  data/runs/benchmark_v2.json \
+  --json data/runs/benchmark_compare.json
+```
+
 ## API and Safety Radar dashboard
 
 ```bash
@@ -300,7 +340,7 @@ python -m compileall -q src tests
 
 The suite covers normalization, structured/heuristic extraction, transient NIM retry behavior, dual-axis taxonomy, meta-signal lineage, complete-link max-distance refinement, event-scoped severity provenance, structured recall matching, active-week persistence, NHTSA response parsing, campaign lookup, API health/demo, NAT/AI-Q config integration, and Time Machine anti-leakage/outcome semantics.
 
-The 0.3.3a2 archive is validated offline before release; live NHTSA/NIM execution and the exact installed NAT runtime must still be smoke-tested on the GB10. See [Release Validation](RELEASE_VALIDATION.md).
+The 0.3.3a1 archive is validated offline before release; live NHTSA/NIM execution and the exact installed NAT runtime must still be smoke-tested on the GB10. See [Release Validation](RELEASE_VALIDATION.md).
 
 ## Risk configuration
 

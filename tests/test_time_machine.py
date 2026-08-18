@@ -82,4 +82,8 @@ async def test_time_machine_records_frozen_top_candidate_diagnostics(tmp_path) -
     assert populated.max_risk_score >= 0
     assert populated.distance_to_alert_threshold is not None
     assert all(0.0 <= item.posthoc_target_score <= 1.0 for item in populated.top_candidates)
+    assert all(item.risk_factors for item in populated.top_candidates)
+    factor_names = set(populated.top_candidates[0].risk_factors)
+    assert {"severity", "trend", "persistence", "evidence", "recall_gap"} <= factor_names
+    assert populated.top_candidates[0].risk_factors["severity"].weight == 0.30
     assert result.max_pre_alert_target_score is not None

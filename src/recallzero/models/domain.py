@@ -298,6 +298,13 @@ class AnalysisRun(StrictModel):
     created_at: datetime = Field(default_factory=lambda: datetime.now(UTC))
 
 
+class BacktestRiskFactor(StrictModel):
+    score: float = Field(ge=0, le=100)
+    weight: float = Field(ge=0, le=1)
+    contribution: float = Field(ge=0, le=100)
+    explanation: str = ""
+
+
 class BacktestCandidate(StrictModel):
     signal_id: str
     lineage_id: str = ""
@@ -307,6 +314,7 @@ class BacktestCandidate(StrictModel):
     consequence_family: str = "OTHER"
     evidence_count: int = 0
     risk_score: float = Field(ge=0, le=100)
+    risk_factors: dict[str, BacktestRiskFactor] = Field(default_factory=dict)
     alert: bool = False
     distance_to_alert_threshold: float = Field(ge=0)
     posthoc_target_score: float = Field(ge=0.0, le=1.0)
