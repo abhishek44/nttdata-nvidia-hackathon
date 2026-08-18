@@ -27,4 +27,8 @@ dev = ["pytest>=8.0"]
 recallzero = "recallzero.cli:app"
 
 [tool.setuptools.packages.find]
+where = ["BE/src"]
 include = ["recallzero*"]
+
+[tool.setuptools.package-dir]
+"" = "BE/src"

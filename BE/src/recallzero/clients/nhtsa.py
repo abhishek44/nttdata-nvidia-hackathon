@@ -9,6 +9,10 @@ from recallzero.config import settings
 from recallzero.models import Complaint, Recall, VehicleKey
 
 
+def _query_value(value: str) -> str:
+    return quote(value, safe="-")
+
+
 def _parse_date(value: str | None):
     if not value:
         return None
@@ -36,7 +40,7 @@ class NHTSAClient:
     def complaints_by_vehicle(self, vehicle: VehicleKey) -> list[Complaint]:
         path = (
             "/complaints/complaintsByVehicle"
-            f"?make={quote(vehicle.make)}&model={quote(vehicle.model)}&modelYear={vehicle.model_year}"
+            f"?make={_query_value(vehicle.make)}&model={_query_value(vehicle.model)}&modelYear={vehicle.model_year}"
         )
         payload = self._get(path)
         results = payload.get("results", [])
@@ -68,7 +72,7 @@ class NHTSAClient:
     def recalls_by_vehicle(self, vehicle: VehicleKey) -> list[Recall]:
         path = (
             "/recalls/recallsByVehicle"
-            f"?make={quote(vehicle.make)}&model={quote(vehicle.model)}&modelYear={vehicle.model_year}"
+            f"?make={_query_value(vehicle.make)}&model={_query_value(vehicle.model)}&modelYear={vehicle.model_year}"
         )
         payload = self._get(path)
         results = payload.get("results", [])

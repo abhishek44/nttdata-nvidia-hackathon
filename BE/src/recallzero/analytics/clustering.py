@@ -1,12 +1,34 @@
 from __future__ import annotations
 
-import numpy as np
-from sklearn.cluster import DBSCAN
-from sklearn.feature_extraction.text import TfidfVectorizer
-from sklearn.preprocessing import normalize
+try:
+    import numpy as np
+    from sklearn.cluster import DBSCAN
+    from sklearn.feature_extraction.text import TfidfVectorizer
+    from sklearn.preprocessing import normalize
+except ModuleNotFoundError:
+    np = None
+    DBSCAN = None
+    TfidfVectorizer = None
+    normalize = None
 
 from recallzero.clients.nvidia_nim import NvidiaNIMClient
 from recallzero.models import EnrichedComplaint
+
+
+def _simple_cluster(items: list[EnrichedComplaint]) -> list[EnrichedComplaint]:
+    groups: dict[str, str] = {}
+    for item in items:
+        key = " | ".join(
+            [
+                item.signature.system or "UNKNOWN",
+                item.signature.subsystem or "GENERAL",
+                item.signature.failure_mode or "OTHER_FAILURE",
+            ]
+        )
+        if key not in groups:
+            groups[key] = f"cluster-{len(groups):03d}"
+        item.cluster_id = groups[key]
+    return items
 
 
 def cluster_complaints(items: list[EnrichedComplaint], eps: float = 0.34, min_samples: int = 3, nim: NvidiaNIMClient | None = None) -> list[EnrichedComplaint]:
@@ -16,9 +38,13 @@ def cluster_complaints(items: list[EnrichedComplaint], eps: float = 0.34, min_sa
     texts = [f"{x.signature.canonical_text()} | {x.complaint.summary}" for x in items]
     nim = nim or NvidiaNIMClient()
     if nim.embeddings_enabled:
+        if np is None or normalize is None:
+            return _simple_cluster(items)
         matrix = np.asarray(nim.embeddings(texts), dtype=float)
         matrix = normalize(matrix)
     else:
+        if TfidfVectorizer is None or DBSCAN is None:
+            return _simple_cluster(items)
         matrix = TfidfVectorizer(stop_words="english", ngram_range=(1, 2), min_df=1).fit_transform(texts)
     labels = DBSCAN(eps=eps, min_samples=min_samples, metric="cosine").fit_predict(matrix)
     for item, label in zip(items, labels):

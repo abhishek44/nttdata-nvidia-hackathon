@@ -11,7 +11,7 @@ class Settings(BaseSettings):
     recallzero_alert_threshold: float = 75.0
     recallzero_min_cluster_size: int = 4
 
-    model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8", extra="ignore")
+    model_config = SettingsConfigDict(env_file=(".env", "BE/.env"), env_file_encoding="utf-8", extra="ignore")
 
 
 settings = Settings()
