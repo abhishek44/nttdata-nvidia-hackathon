@@ -10,8 +10,9 @@ from recallzero import __version__
 from recallzero.backtest import RecallTimeMachine
 from recallzero.config import Settings
 from recallzero.demo import build_demo_records
+from recallzero.demo_runtime import DemoRuntimeError, demo_readiness, run_fresh_nvidia_trace
 from recallzero.investigation import EngineeringBriefRenderer
-from recallzero.models import AnalyzeRequest, BacktestRequest, IngestRequest
+from recallzero.models import AnalyzeRequest, BacktestRequest, IngestRequest, NvidiaTraceRequest
 from recallzero.pipeline import build_pipeline
 
 router = APIRouter()
@@ -61,6 +62,29 @@ async def offline_demo() -> dict[str, object]:
         "analysis": run.model_dump(mode="json"),
         "backtest": backtest_result.model_dump(mode="json"),
     }
+
+
+@router.get("/api/v1/demo/readiness")
+async def live_demo_readiness(request: Request) -> dict[str, object]:
+    settings = request.app.state.settings
+    repository = request.app.state.pipeline.repository
+    return demo_readiness(settings, repository)
+
+
+@router.post("/api/v1/demo/nvidia-trace")
+async def live_nvidia_trace(payload: NvidiaTraceRequest, request: Request) -> dict[str, object]:
+    settings = request.app.state.settings
+    repository = request.app.state.pipeline.repository
+    try:
+        return await run_fresh_nvidia_trace(
+            settings=settings,
+            repository=repository,
+            odi_number=payload.odi_number.strip(),
+        )
+    except DemoRuntimeError as exc:
+        raise HTTPException(status_code=503, detail=str(exc)) from exc
+    except Exception as exc:
+        raise HTTPException(status_code=502, detail=f"Fresh NVIDIA demo trace failed: {exc}") from exc
 
 
 @router.post("/api/v1/ingest")

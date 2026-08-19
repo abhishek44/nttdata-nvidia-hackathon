@@ -11,7 +11,7 @@ def test_health_and_dashboard(tmp_path) -> None:
     assert health.json()["status"] == "ok"
     dashboard = client.get("/")
     assert dashboard.status_code == 200
-    assert "RecallZero Safety Radar" in dashboard.text
+    assert "API is online" in dashboard.text
 
 
 def test_offline_demo_endpoint(tmp_path) -> None:

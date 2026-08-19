@@ -1,4 +1,4 @@
-from recallzero.models.api import AnalyzeRequest, BacktestRequest, IngestRequest, VehicleRequest
+from recallzero.models.api import AnalyzeRequest, BacktestRequest, IngestRequest, NvidiaTraceRequest, VehicleRequest
 from recallzero.models.domain import (
     AnalysisRun,
     BacktestCandidate,
@@ -39,6 +39,7 @@ __all__ = [
     "ExtractionMethod",
     "FailureSignature",
     "IngestRequest",
+    "NvidiaTraceRequest",
     "Recall",
     "RecallMatch",
     "RiskAssessment",

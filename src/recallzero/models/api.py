@@ -35,3 +35,7 @@ class BacktestRequest(VehicleRequest):
     use_nim: bool | None = None
     alert_threshold: float | None = Field(default=None, ge=0, le=100)
     minimum_evidence: int | None = Field(default=None, ge=1)
+
+
+class NvidiaTraceRequest(BaseModel):
+    odi_number: str = Field(min_length=1)

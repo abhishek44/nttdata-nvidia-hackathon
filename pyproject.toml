@@ -48,6 +48,9 @@ nat = [
 aiq-legacy = [
   "aiqtoolkit[langchain]>=1.1,<1.2",
 ]
+demo = [
+  "streamlit>=1.40,<2",
+]
 dev = [
   "pytest>=8.3,<9",
   "pytest-asyncio>=0.24,<1",
