@@ -1,0 +1,3116 @@
+[
+  {
+    "case_id": "case_d8e964268da5faf4",
+    "name": "Tesla Model Y windshield defrost heat-pump recall",
+    "campaign_number": "22V050000",
+    "boundary_date": "2022-02-02",
+    "first_alert_date": "2021-11-16",
+    "max_risk_score": 92.41,
+    "alert_candidates": [
+      {
+        "cutoff_date": "2021-11-16",
+        "signal_id": "sig_bef7428eef9d7469",
+        "lineage_id": "lin_5e45f68c3e7f26ff",
+        "issue": "DRIVER ASSISTANCE — UNINTENDED BRAKING",
+        "signal_scope": "cluster",
+        "risk_score": 80.5,
+        "evidence_count": 8,
+        "failure_mechanism": "OTHER",
+        "consequence_family": "UNINTENDED_BRAKING",
+        "source_systems": [
+          "DRIVER ASSISTANCE"
+        ],
+        "posthoc_target_score": 0.0019,
+        "posthoc_target_breakdown": {
+          "component": 0.0,
+          "component_compatible": 0.0,
+          "consequence": 0.0238,
+          "consequence_family": 0.0,
+          "consequence_family_best": 0.0,
+          "consequence_family_weighted": 0.0,
+          "defect_family": 0.0,
+          "explicit_campaign_reference": 0.0,
+          "failure_mechanism": 0.0,
+          "final": 0.0019,
+          "semantic_lexical": 0.0508,
+          "subsystem": 0.0
+        }
+      },
+      {
+        "cutoff_date": "2021-11-23",
+        "signal_id": "sig_6a0e705d879ce4fb",
+        "lineage_id": "lin_5e45f68c3e7f26ff",
+        "issue": "DRIVER ASSISTANCE — UNINTENDED BRAKING",
+        "signal_scope": "cluster",
+        "risk_score": 92.41,
+        "evidence_count": 12,
+        "failure_mechanism": "OTHER",
+        "consequence_family": "UNINTENDED_BRAKING",
+        "source_systems": [
+          "DRIVER ASSISTANCE"
+        ],
+        "posthoc_target_score": 0.0026,
+        "posthoc_target_breakdown": {
+          "component": 0.0,
+          "component_compatible": 0.0,
+          "consequence": 0.0476,
+          "consequence_family": 0.0,
+          "consequence_family_best": 0.0,
+          "consequence_family_weighted": 0.0,
+          "defect_family": 0.0,
+          "explicit_campaign_reference": 0.0,
+          "failure_mechanism": 0.0,
+          "final": 0.0026,
+          "semantic_lexical": 0.0569,
+          "subsystem": 0.0
+        }
+      },
+      {
+        "cutoff_date": "2021-11-30",
+        "signal_id": "sig_b888475b42693573",
+        "lineage_id": "lin_5e45f68c3e7f26ff",
+        "issue": "DRIVER ASSISTANCE — UNINTENDED BRAKING",
+        "signal_scope": "cluster",
+        "risk_score": 88.93,
+        "evidence_count": 14,
+        "failure_mechanism": "OTHER",
+        "consequence_family": "UNINTENDED_BRAKING",
+        "source_systems": [
+          "DRIVER ASSISTANCE"
+        ],
+        "posthoc_target_score": 0.0026,
+        "posthoc_target_breakdown": {
+          "component": 0.0,
+          "component_compatible": 0.0,
+          "consequence": 0.0476,
+          "consequence_family": 0.0,
+          "consequence_family_best": 0.0,
+          "consequence_family_weighted": 0.0,
+          "defect_family": 0.0,
+          "explicit_campaign_reference": 0.0,
+          "failure_mechanism": 0.0,
+          "final": 0.0026,
+          "semantic_lexical": 0.0556,
+          "subsystem": 0.0
+        }
+      },
+      {
+        "cutoff_date": "2021-11-30",
+        "signal_id": "sig_65d06faec7cc5bcd",
+        "lineage_id": "lin_db0f29dc5482c2c3",
+        "issue": "DRIVER ASSISTANCE — UNSPECIFIED FAILURE",
+        "signal_scope": "cluster",
+        "risk_score": 82.88,
+        "evidence_count": 10,
+        "failure_mechanism": "GENERAL_SAFETY",
+        "consequence_family": "GENERAL_SAFETY_SYSTEM_FAILURE",
+        "source_systems": [
+          "DRIVER ASSISTANCE"
+        ],
+        "posthoc_target_score": 0.0034,
+        "posthoc_target_breakdown": {
+          "component": 0.0,
+          "component_compatible": 0.0,
+          "consequence": 0.0714,
+          "consequence_family": 0.0,
+          "consequence_family_best": 0.0,
+          "consequence_family_weighted": 0.0,
+          "defect_family": 0.0,
+          "explicit_campaign_reference": 0.0,
+          "failure_mechanism": 0.0,
+          "final": 0.0034,
+          "semantic_lexical": 0.0644,
+          "subsystem": 0.0
+        }
+      },
+      {
+        "cutoff_date": "2021-12-07",
+        "signal_id": "sig_929d8a34ead9291b",
+        "lineage_id": "lin_5e45f68c3e7f26ff",
+        "issue": "DRIVER ASSISTANCE — UNINTENDED BRAKING",
+        "signal_scope": "cluster",
+        "risk_score": 92.11,
+        "evidence_count": 19,
+        "failure_mechanism": "OTHER",
+        "consequence_family": "UNINTENDED_BRAKING",
+        "source_systems": [
+          "DRIVER ASSISTANCE"
+        ],
+        "posthoc_target_score": 0.0026,
+        "posthoc_target_breakdown": {
+          "component": 0.0,
+          "component_compatible": 0.0,
+          "consequence": 0.0476,
+          "consequence_family": 0.0,
+          "consequence_family_best": 0.0,
+          "consequence_family_weighted": 0.0,
+          "defect_family": 0.0,
+          "explicit_campaign_reference": 0.0,
+          "failure_mechanism": 0.0,
+          "final": 0.0026,
+          "semantic_lexical": 0.0566,
+          "subsystem": 0.0
+        }
+      },
+      {
+        "cutoff_date": "2021-12-07",
+        "signal_id": "sig_2621ac1d85303d9a",
+        "lineage_id": "lin_db0f29dc5482c2c3",
+        "issue": "DRIVER ASSISTANCE — UNSPECIFIED FAILURE",
+        "signal_scope": "cluster",
+        "risk_score": 82.88,
+        "evidence_count": 10,
+        "failure_mechanism": "GENERAL_SAFETY",
+        "consequence_family": "GENERAL_SAFETY_SYSTEM_FAILURE",
+        "source_systems": [
+          "DRIVER ASSISTANCE"
+        ],
+        "posthoc_target_score": 0.0034,
+        "posthoc_target_breakdown": {
+          "component": 0.0,
+          "component_compatible": 0.0,
+          "consequence": 0.0714,
+          "consequence_family": 0.0,
+          "consequence_family_best": 0.0,
+          "consequence_family_weighted": 0.0,
+          "defect_family": 0.0,
+          "explicit_campaign_reference": 0.0,
+          "failure_mechanism": 0.0,
+          "final": 0.0034,
+          "semantic_lexical": 0.0644,
+          "subsystem": 0.0
+        }
+      },
+      {
+        "cutoff_date": "2021-12-14",
+        "signal_id": "sig_f26539264f163baf",
+        "lineage_id": "lin_5e45f68c3e7f26ff",
+        "issue": "DRIVER ASSISTANCE — UNINTENDED BRAKING",
+        "signal_scope": "cluster",
+        "risk_score": 87.46,
+        "evidence_count": 21,
+        "failure_mechanism": "OTHER",
+        "consequence_family": "UNINTENDED_BRAKING",
+        "source_systems": [
+          "DRIVER ASSISTANCE"
+        ],
+        "posthoc_target_score": 0.0026,
+        "posthoc_target_breakdown": {
+          "component": 0.0,
+          "component_compatible": 0.0,
+          "consequence": 0.0476,
+          "consequence_family": 0.0,
+          "consequence_family_best": 0.0,
+          "consequence_family_weighted": 0.0,
+          "defect_family": 0.0,
+          "explicit_campaign_reference": 0.0,
+          "failure_mechanism": 0.0,
+          "final": 0.0026,
+          "semantic_lexical": 0.0553,
+          "subsystem": 0.0
+        }
+      },
+      {
+        "cutoff_date": "2021-12-14",
+        "signal_id": "sig_e79a4d91e0b67df8",
+        "lineage_id": "lin_db0f29dc5482c2c3",
+        "issue": "DRIVER ASSISTANCE — UNSPECIFIED FAILURE",
+        "signal_scope": "cluster",
+        "risk_score": 76.94,
+        "evidence_count": 10,
+        "failure_mechanism": "GENERAL_SAFETY",
+        "consequence_family": "GENERAL_SAFETY_SYSTEM_FAILURE",
+        "source_systems": [
+          "DRIVER ASSISTANCE"
+        ],
+        "posthoc_target_score": 0.0034,
+        "posthoc_target_breakdown": {
+          "component": 0.0,
+          "component_compatible": 0.0,
+          "consequence": 0.0714,
+          "consequence_family": 0.0,
+          "consequence_family_best": 0.0,
+          "consequence_family_weighted": 0.0,
+          "defect_family": 0.0,
+          "explicit_campaign_reference": 0.0,
+          "failure_mechanism": 0.0,
+          "final": 0.0034,
+          "semantic_lexical": 0.0644,
+          "subsystem": 0.0
+        }
+      },
+      {
+        "cutoff_date": "2021-12-21",
+        "signal_id": "sig_642c98455c661431",
+        "lineage_id": "lin_5e45f68c3e7f26ff",
+        "issue": "DRIVER ASSISTANCE — UNINTENDED BRAKING",
+        "signal_scope": "cluster",
+        "risk_score": 81.86,
+        "evidence_count": 23,
+        "failure_mechanism": "OTHER",
+        "consequence_family": "UNINTENDED_BRAKING",
+        "source_systems": [
+          "DRIVER ASSISTANCE"
+        ],
+        "posthoc_target_score": 0.0026,
+        "posthoc_target_breakdown": {
+          "component": 0.0,
+          "component_compatible": 0.0,
+          "consequence": 0.0476,
+          "consequence_family": 0.0,
+          "consequence_family_best": 0.0,
+          "consequence_family_weighted": 0.0,
+          "defect_family": 0.0,
+          "explicit_campaign_reference": 0.0,
+          "failure_mechanism": 0.0,
+          "final": 0.0026,
+          "semantic_lexical": 0.0571,
+          "subsystem": 0.0
+        }
+      },
+      {
+        "cutoff_date": "2021-12-28",
+        "signal_id": "sig_e241a09d017a2fff",
+        "lineage_id": "lin_5e45f68c3e7f26ff",
+        "issue": "DRIVER ASSISTANCE — UNINTENDED BRAKING",
+        "signal_scope": "cluster",
+        "risk_score": 76.1,
+        "evidence_count": 23,
+        "failure_mechanism": "OTHER",
+        "consequence_family": "UNINTENDED_BRAKING",
+        "source_systems": [
+          "DRIVER ASSISTANCE"
+        ],
+        "posthoc_target_score": 0.0026,
+        "posthoc_target_breakdown": {
+          "component": 0.0,
+          "component_compatible": 0.0,
+          "consequence": 0.0476,
+          "consequence_family": 0.0,
+          "consequence_family_best": 0.0,
+          "consequence_family_weighted": 0.0,
+          "defect_family": 0.0,
+          "explicit_campaign_reference": 0.0,
+          "failure_mechanism": 0.0,
+          "final": 0.0026,
+          "semantic_lexical": 0.0571,
+          "subsystem": 0.0
+        }
+      }
+    ],
+    "best_target_candidates": [
+      {
+        "cutoff_date": "2021-04-06",
+        "signal_id": "sig_077ef970c931ed35",
+        "lineage_id": "lin_ede1935332621dec",
+        "issue": "ELECTRICAL SYSTEM — UNSPECIFIED FAILURE",
+        "alert": false,
+        "risk_score": 43.27,
+        "evidence_count": 4,
+        "failure_mechanism": "GENERAL_ELECTRICAL",
+        "consequence_family": "GENERAL_ELECTRICAL_FAILURE",
+        "source_systems": [
+          "ELECTRICAL SYSTEM"
+        ],
+        "posthoc_target_score": 0.214,
+        "posthoc_target_breakdown": {
+          "component": 1.0,
+          "component_compatible": 1.0,
+          "consequence": 0.0714,
+          "consequence_family": 0.0,
+          "consequence_family_best": 0.0,
+          "consequence_family_weighted": 0.0,
+          "defect_family": 0.0,
+          "explicit_campaign_reference": 0.0,
+          "failure_mechanism": 0.0,
+          "final": 0.214,
+          "semantic_lexical": 0.0686,
+          "subsystem": 0.0
+        }
+      },
+      {
+        "cutoff_date": "2021-08-10",
+        "signal_id": "sig_8c47b6bd33393fd4",
+        "lineage_id": "lin_ede1935332621dec",
+        "issue": "ELECTRICAL SYSTEM — UNSPECIFIED FAILURE",
+        "alert": false,
+        "risk_score": 49.58,
+        "evidence_count": 6,
+        "failure_mechanism": "GENERAL_ELECTRICAL",
+        "consequence_family": "GENERAL_ELECTRICAL_FAILURE",
+        "source_systems": [
+          "ELECTRICAL SYSTEM"
+        ],
+        "posthoc_target_score": 0.2134,
+        "posthoc_target_breakdown": {
+          "component": 1.0,
+          "component_compatible": 1.0,
+          "consequence": 0.0714,
+          "consequence_family": 0.0,
+          "consequence_family_best": 0.0,
+          "consequence_family_weighted": 0.0,
+          "defect_family": 0.0,
+          "explicit_campaign_reference": 0.0,
+          "failure_mechanism": 0.0,
+          "final": 0.2134,
+          "semantic_lexical": 0.0623,
+          "subsystem": 0.0
+        }
+      },
+      {
+        "cutoff_date": "2021-08-17",
+        "signal_id": "sig_c790e04012547d3a",
+        "lineage_id": "lin_ede1935332621dec",
+        "issue": "ELECTRICAL SYSTEM — UNSPECIFIED FAILURE",
+        "alert": false,
+        "risk_score": 49.58,
+        "evidence_count": 6,
+        "failure_mechanism": "GENERAL_ELECTRICAL",
+        "consequence_family": "GENERAL_ELECTRICAL_FAILURE",
+        "source_systems": [
+          "ELECTRICAL SYSTEM"
+        ],
+        "posthoc_target_score": 0.2134,
+        "posthoc_target_breakdown": {
+          "component": 1.0,
+          "component_compatible": 1.0,
+          "consequence": 0.0714,
+          "consequence_family": 0.0,
+          "consequence_family_best": 0.0,
+          "consequence_family_weighted": 0.0,
+          "defect_family": 0.0,
+          "explicit_campaign_reference": 0.0,
+          "failure_mechanism": 0.0,
+          "final": 0.2134,
+          "semantic_lexical": 0.0623,
+          "subsystem": 0.0
+        }
+      },
+      {
+        "cutoff_date": "2021-08-24",
+        "signal_id": "sig_7c11949f3a8c5231",
+        "lineage_id": "lin_ede1935332621dec",
+        "issue": "ELECTRICAL SYSTEM — UNSPECIFIED FAILURE",
+        "alert": false,
+        "risk_score": 65.63,
+        "evidence_count": 5,
+        "failure_mechanism": "GENERAL_ELECTRICAL",
+        "consequence_family": "GENERAL_ELECTRICAL_FAILURE",
+        "source_systems": [
+          "ELECTRICAL SYSTEM"
+        ],
+        "posthoc_target_score": 0.211,
+        "posthoc_target_breakdown": {
+          "component": 1.0,
+          "component_compatible": 1.0,
+          "consequence": 0.0476,
+          "consequence_family": 0.0,
+          "consequence_family_best": 0.0,
+          "consequence_family_weighted": 0.0,
+          "defect_family": 0.0,
+          "explicit_campaign_reference": 0.0,
+          "failure_mechanism": 0.0,
+          "final": 0.211,
+          "semantic_lexical": 0.0623,
+          "subsystem": 0.0
+        }
+      },
+      {
+        "cutoff_date": "2021-08-31",
+        "signal_id": "sig_c6a2a72f99b93f56",
+        "lineage_id": "lin_ede1935332621dec",
+        "issue": "ELECTRICAL SYSTEM — UNSPECIFIED FAILURE",
+        "alert": false,
+        "risk_score": 65.63,
+        "evidence_count": 5,
+        "failure_mechanism": "GENERAL_ELECTRICAL",
+        "consequence_family": "GENERAL_ELECTRICAL_FAILURE",
+        "source_systems": [
+          "ELECTRICAL SYSTEM"
+        ],
+        "posthoc_target_score": 0.211,
+        "posthoc_target_breakdown": {
+          "component": 1.0,
+          "component_compatible": 1.0,
+          "consequence": 0.0476,
+          "consequence_family": 0.0,
+          "consequence_family_best": 0.0,
+          "consequence_family_weighted": 0.0,
+          "defect_family": 0.0,
+          "explicit_campaign_reference": 0.0,
+          "failure_mechanism": 0.0,
+          "final": 0.211,
+          "semantic_lexical": 0.0623,
+          "subsystem": 0.0
+        }
+      },
+      {
+        "cutoff_date": "2021-09-07",
+        "signal_id": "sig_1e34b610f31778c2",
+        "lineage_id": "lin_ede1935332621dec",
+        "issue": "ELECTRICAL SYSTEM — UNSPECIFIED FAILURE",
+        "alert": false,
+        "risk_score": 55.82,
+        "evidence_count": 5,
+        "failure_mechanism": "GENERAL_ELECTRICAL",
+        "consequence_family": "GENERAL_ELECTRICAL_FAILURE",
+        "source_systems": [
+          "ELECTRICAL SYSTEM"
+        ],
+        "posthoc_target_score": 0.211,
+        "posthoc_target_breakdown": {
+          "component": 1.0,
+          "component_compatible": 1.0,
+          "consequence": 0.0476,
+          "consequence_family": 0.0,
+          "consequence_family_best": 0.0,
+          "consequence_family_weighted": 0.0,
+          "defect_family": 0.0,
+          "explicit_campaign_reference": 0.0,
+          "failure_mechanism": 0.0,
+          "final": 0.211,
+          "semantic_lexical": 0.0623,
+          "subsystem": 0.0
+        }
+      },
+      {
+        "cutoff_date": "2021-09-14",
+        "signal_id": "sig_1d6cbcffde1fc875",
+        "lineage_id": "lin_ede1935332621dec",
+        "issue": "ELECTRICAL SYSTEM — UNSPECIFIED FAILURE",
+        "alert": false,
+        "risk_score": 55.82,
+        "evidence_count": 5,
+        "failure_mechanism": "GENERAL_ELECTRICAL",
+        "consequence_family": "GENERAL_ELECTRICAL_FAILURE",
+        "source_systems": [
+          "ELECTRICAL SYSTEM"
+        ],
+        "posthoc_target_score": 0.211,
+        "posthoc_target_breakdown": {
+          "component": 1.0,
+          "component_compatible": 1.0,
+          "consequence": 0.0476,
+          "consequence_family": 0.0,
+          "consequence_family_best": 0.0,
+          "consequence_family_weighted": 0.0,
+          "defect_family": 0.0,
+          "explicit_campaign_reference": 0.0,
+          "failure_mechanism": 0.0,
+          "final": 0.211,
+          "semantic_lexical": 0.0623,
+          "subsystem": 0.0
+        }
+      },
+      {
+        "cutoff_date": "2021-09-21",
+        "signal_id": "sig_b7077a939915f6df",
+        "lineage_id": "lin_ede1935332621dec",
+        "issue": "ELECTRICAL SYSTEM — UNSPECIFIED FAILURE",
+        "alert": false,
+        "risk_score": 51.65,
+        "evidence_count": 5,
+        "failure_mechanism": "GENERAL_ELECTRICAL",
+        "consequence_family": "GENERAL_ELECTRICAL_FAILURE",
+        "source_systems": [
+          "ELECTRICAL SYSTEM"
+        ],
+        "posthoc_target_score": 0.211,
+        "posthoc_target_breakdown": {
+          "component": 1.0,
+          "component_compatible": 1.0,
+          "consequence": 0.0476,
+          "consequence_family": 0.0,
+          "consequence_family_best": 0.0,
+          "consequence_family_weighted": 0.0,
+          "defect_family": 0.0,
+          "explicit_campaign_reference": 0.0,
+          "failure_mechanism": 0.0,
+          "final": 0.211,
+          "semantic_lexical": 0.0623,
+          "subsystem": 0.0
+        }
+      },
+      {
+        "cutoff_date": "2021-09-28",
+        "signal_id": "sig_6b2973ed23cee0e2",
+        "lineage_id": "lin_ede1935332621dec",
+        "issue": "ELECTRICAL SYSTEM — UNSPECIFIED FAILURE",
+        "alert": false,
+        "risk_score": 51.65,
+        "evidence_count": 5,
+        "failure_mechanism": "GENERAL_ELECTRICAL",
+        "consequence_family": "GENERAL_ELECTRICAL_FAILURE",
+        "source_systems": [
+          "ELECTRICAL SYSTEM"
+        ],
+        "posthoc_target_score": 0.211,
+        "posthoc_target_breakdown": {
+          "component": 1.0,
+          "component_compatible": 1.0,
+          "consequence": 0.0476,
+          "consequence_family": 0.0,
+          "consequence_family_best": 0.0,
+          "consequence_family_weighted": 0.0,
+          "defect_family": 0.0,
+          "explicit_campaign_reference": 0.0,
+          "failure_mechanism": 0.0,
+          "final": 0.211,
+          "semantic_lexical": 0.0623,
+          "subsystem": 0.0
+        }
+      },
+      {
+        "cutoff_date": "2021-10-05",
+        "signal_id": "sig_e6eff150744c9718",
+        "lineage_id": "lin_ede1935332621dec",
+        "issue": "ELECTRICAL SYSTEM — UNSPECIFIED FAILURE",
+        "alert": false,
+        "risk_score": 51.65,
+        "evidence_count": 5,
+        "failure_mechanism": "GENERAL_ELECTRICAL",
+        "consequence_family": "GENERAL_ELECTRICAL_FAILURE",
+        "source_systems": [
+          "ELECTRICAL SYSTEM"
+        ],
+        "posthoc_target_score": 0.211,
+        "posthoc_target_breakdown": {
+          "component": 1.0,
+          "component_compatible": 1.0,
+          "consequence": 0.0476,
+          "consequence_family": 0.0,
+          "consequence_family_best": 0.0,
+          "consequence_family_weighted": 0.0,
+          "defect_family": 0.0,
+          "explicit_campaign_reference": 0.0,
+          "failure_mechanism": 0.0,
+          "final": 0.211,
+          "semantic_lexical": 0.0623,
+          "subsystem": 0.0
+        }
+      }
+    ]
+  },
+  {
+    "case_id": "case_26d977ae1ccb623a",
+    "name": "Volkswagen ID.4 exterior door handle recall",
+    "campaign_number": "23V312000",
+    "boundary_date": "2023-05-03",
+    "first_alert_date": "2023-04-25",
+    "max_risk_score": 77.3,
+    "alert_candidates": [
+      {
+        "cutoff_date": "2023-04-25",
+        "signal_id": "sig_40d31bce8891df44",
+        "lineage_id": "lin_5e4d2964a4dcc3f0",
+        "issue": "ELECTRICAL SYSTEM — UNSPECIFIED FAILURE",
+        "signal_scope": "cluster",
+        "risk_score": 77.3,
+        "evidence_count": 24,
+        "failure_mechanism": "GENERAL_ELECTRICAL",
+        "consequence_family": "GENERAL_ELECTRICAL_FAILURE",
+        "source_systems": [
+          "ELECTRICAL SYSTEM"
+        ],
+        "posthoc_target_score": 0.0077,
+        "posthoc_target_breakdown": {
+          "component": 0.0,
+          "component_compatible": 0.0,
+          "consequence": 0.2195,
+          "consequence_family": 0.0,
+          "consequence_family_best": 0.0,
+          "consequence_family_weighted": 0.0,
+          "defect_family": 0.0,
+          "explicit_campaign_reference": 0.0,
+          "failure_mechanism": 0.0,
+          "final": 0.0077,
+          "semantic_lexical": 0.064,
+          "subsystem": 0.0256
+        }
+      }
+    ],
+    "best_target_candidates": [
+      {
+        "cutoff_date": "2023-04-11",
+        "signal_id": "sig_8fb3a866b86587a7",
+        "lineage_id": "lin_bdc4c06e0001cb7b",
+        "issue": "UNKNOWN OR OTHER — UNSPECIFIED FAILURE",
+        "alert": false,
+        "risk_score": 48.48,
+        "evidence_count": 7,
+        "failure_mechanism": "OTHER",
+        "consequence_family": "OTHER",
+        "source_systems": [
+          "UNKNOWN OR OTHER"
+        ],
+        "posthoc_target_score": 0.0079,
+        "posthoc_target_breakdown": {
+          "component": 0.0,
+          "component_compatible": 0.0,
+          "consequence": 0.0976,
+          "consequence_family": 0.0,
+          "consequence_family_best": 0.0,
+          "consequence_family_weighted": 0.0,
+          "defect_family": 0.0,
+          "explicit_campaign_reference": 0.0,
+          "failure_mechanism": 0.0,
+          "final": 0.0079,
+          "semantic_lexical": 0.0604,
+          "subsystem": 0.1579
+        }
+      },
+      {
+        "cutoff_date": "2023-04-18",
+        "signal_id": "sig_f3f535c9228b63b7",
+        "lineage_id": "lin_bdc4c06e0001cb7b",
+        "issue": "UNKNOWN OR OTHER — UNSPECIFIED FAILURE",
+        "alert": false,
+        "risk_score": 48.48,
+        "evidence_count": 7,
+        "failure_mechanism": "OTHER",
+        "consequence_family": "OTHER",
+        "source_systems": [
+          "UNKNOWN OR OTHER"
+        ],
+        "posthoc_target_score": 0.0079,
+        "posthoc_target_breakdown": {
+          "component": 0.0,
+          "component_compatible": 0.0,
+          "consequence": 0.0976,
+          "consequence_family": 0.0,
+          "consequence_family_best": 0.0,
+          "consequence_family_weighted": 0.0,
+          "defect_family": 0.0,
+          "explicit_campaign_reference": 0.0,
+          "failure_mechanism": 0.0,
+          "final": 0.0079,
+          "semantic_lexical": 0.0604,
+          "subsystem": 0.1579
+        }
+      },
+      {
+        "cutoff_date": "2023-04-25",
+        "signal_id": "sig_40d31bce8891df44",
+        "lineage_id": "lin_5e4d2964a4dcc3f0",
+        "issue": "ELECTRICAL SYSTEM — UNSPECIFIED FAILURE",
+        "alert": true,
+        "risk_score": 77.3,
+        "evidence_count": 24,
+        "failure_mechanism": "GENERAL_ELECTRICAL",
+        "consequence_family": "GENERAL_ELECTRICAL_FAILURE",
+        "source_systems": [
+          "ELECTRICAL SYSTEM"
+        ],
+        "posthoc_target_score": 0.0077,
+        "posthoc_target_breakdown": {
+          "component": 0.0,
+          "component_compatible": 0.0,
+          "consequence": 0.2195,
+          "consequence_family": 0.0,
+          "consequence_family_best": 0.0,
+          "consequence_family_weighted": 0.0,
+          "defect_family": 0.0,
+          "explicit_campaign_reference": 0.0,
+          "failure_mechanism": 0.0,
+          "final": 0.0077,
+          "semantic_lexical": 0.064,
+          "subsystem": 0.0256
+        }
+      },
+      {
+        "cutoff_date": "2023-05-02",
+        "signal_id": "sig_11fa93c44cdccade",
+        "lineage_id": "lin_5e4d2964a4dcc3f0",
+        "issue": "ELECTRICAL SYSTEM — UNSPECIFIED FAILURE",
+        "alert": false,
+        "risk_score": 67.48,
+        "evidence_count": 24,
+        "failure_mechanism": "GENERAL_ELECTRICAL",
+        "consequence_family": "GENERAL_ELECTRICAL_FAILURE",
+        "source_systems": [
+          "ELECTRICAL SYSTEM"
+        ],
+        "posthoc_target_score": 0.0077,
+        "posthoc_target_breakdown": {
+          "component": 0.0,
+          "component_compatible": 0.0,
+          "consequence": 0.2195,
+          "consequence_family": 0.0,
+          "consequence_family_best": 0.0,
+          "consequence_family_weighted": 0.0,
+          "defect_family": 0.0,
+          "explicit_campaign_reference": 0.0,
+          "failure_mechanism": 0.0,
+          "final": 0.0077,
+          "semantic_lexical": 0.064,
+          "subsystem": 0.0256
+        }
+      },
+      {
+        "cutoff_date": "2022-09-20",
+        "signal_id": "sig_ce1d9b6255f61bab",
+        "lineage_id": "lin_5e4d2964a4dcc3f0",
+        "issue": "ELECTRICAL SYSTEM — UNSPECIFIED FAILURE",
+        "alert": false,
+        "risk_score": 64.96,
+        "evidence_count": 16,
+        "failure_mechanism": "GENERAL_ELECTRICAL",
+        "consequence_family": "GENERAL_ELECTRICAL_FAILURE",
+        "source_systems": [
+          "ELECTRICAL SYSTEM"
+        ],
+        "posthoc_target_score": 0.007,
+        "posthoc_target_breakdown": {
+          "component": 0.0,
+          "component_compatible": 0.0,
+          "consequence": 0.2195,
+          "consequence_family": 0.0,
+          "consequence_family_best": 0.0,
+          "consequence_family_weighted": 0.0,
+          "defect_family": 0.0,
+          "explicit_campaign_reference": 0.0,
+          "failure_mechanism": 0.0,
+          "final": 0.007,
+          "semantic_lexical": 0.0606,
+          "subsystem": 0.0
+        }
+      },
+      {
+        "cutoff_date": "2022-09-27",
+        "signal_id": "sig_6c7701d8de7baf03",
+        "lineage_id": "lin_5e4d2964a4dcc3f0",
+        "issue": "ELECTRICAL SYSTEM — UNSPECIFIED FAILURE",
+        "alert": false,
+        "risk_score": 60.78,
+        "evidence_count": 16,
+        "failure_mechanism": "GENERAL_ELECTRICAL",
+        "consequence_family": "GENERAL_ELECTRICAL_FAILURE",
+        "source_systems": [
+          "ELECTRICAL SYSTEM"
+        ],
+        "posthoc_target_score": 0.007,
+        "posthoc_target_breakdown": {
+          "component": 0.0,
+          "component_compatible": 0.0,
+          "consequence": 0.2195,
+          "consequence_family": 0.0,
+          "consequence_family_best": 0.0,
+          "consequence_family_weighted": 0.0,
+          "defect_family": 0.0,
+          "explicit_campaign_reference": 0.0,
+          "failure_mechanism": 0.0,
+          "final": 0.007,
+          "semantic_lexical": 0.0606,
+          "subsystem": 0.0
+        }
+      },
+      {
+        "cutoff_date": "2022-10-04",
+        "signal_id": "sig_004b321bd6a80339",
+        "lineage_id": "lin_5e4d2964a4dcc3f0",
+        "issue": "ELECTRICAL SYSTEM — UNSPECIFIED FAILURE",
+        "alert": false,
+        "risk_score": 60.78,
+        "evidence_count": 16,
+        "failure_mechanism": "GENERAL_ELECTRICAL",
+        "consequence_family": "GENERAL_ELECTRICAL_FAILURE",
+        "source_systems": [
+          "ELECTRICAL SYSTEM"
+        ],
+        "posthoc_target_score": 0.007,
+        "posthoc_target_breakdown": {
+          "component": 0.0,
+          "component_compatible": 0.0,
+          "consequence": 0.2195,
+          "consequence_family": 0.0,
+          "consequence_family_best": 0.0,
+          "consequence_family_weighted": 0.0,
+          "defect_family": 0.0,
+          "explicit_campaign_reference": 0.0,
+          "failure_mechanism": 0.0,
+          "final": 0.007,
+          "semantic_lexical": 0.0606,
+          "subsystem": 0.0
+        }
+      },
+      {
+        "cutoff_date": "2022-10-11",
+        "signal_id": "sig_156628d8ff7c1025",
+        "lineage_id": "lin_5e4d2964a4dcc3f0",
+        "issue": "ELECTRICAL SYSTEM — UNSPECIFIED FAILURE",
+        "alert": false,
+        "risk_score": 49.28,
+        "evidence_count": 16,
+        "failure_mechanism": "GENERAL_ELECTRICAL",
+        "consequence_family": "GENERAL_ELECTRICAL_FAILURE",
+        "source_systems": [
+          "ELECTRICAL SYSTEM"
+        ],
+        "posthoc_target_score": 0.007,
+        "posthoc_target_breakdown": {
+          "component": 0.0,
+          "component_compatible": 0.0,
+          "consequence": 0.2195,
+          "consequence_family": 0.0,
+          "consequence_family_best": 0.0,
+          "consequence_family_weighted": 0.0,
+          "defect_family": 0.0,
+          "explicit_campaign_reference": 0.0,
+          "failure_mechanism": 0.0,
+          "final": 0.007,
+          "semantic_lexical": 0.0606,
+          "subsystem": 0.0
+        }
+      },
+      {
+        "cutoff_date": "2022-10-18",
+        "signal_id": "sig_6d3bfb9fbba22d1f",
+        "lineage_id": "lin_5e4d2964a4dcc3f0",
+        "issue": "ELECTRICAL SYSTEM — UNSPECIFIED FAILURE",
+        "alert": false,
+        "risk_score": 47.41,
+        "evidence_count": 16,
+        "failure_mechanism": "GENERAL_ELECTRICAL",
+        "consequence_family": "GENERAL_ELECTRICAL_FAILURE",
+        "source_systems": [
+          "ELECTRICAL SYSTEM"
+        ],
+        "posthoc_target_score": 0.007,
+        "posthoc_target_breakdown": {
+          "component": 0.0,
+          "component_compatible": 0.0,
+          "consequence": 0.2195,
+          "consequence_family": 0.0,
+          "consequence_family_best": 0.0,
+          "consequence_family_weighted": 0.0,
+          "defect_family": 0.0,
+          "explicit_campaign_reference": 0.0,
+          "failure_mechanism": 0.0,
+          "final": 0.007,
+          "semantic_lexical": 0.0606,
+          "subsystem": 0.0
+        }
+      },
+      {
+        "cutoff_date": "2022-10-25",
+        "signal_id": "sig_148ddc0b4507c603",
+        "lineage_id": "lin_5e4d2964a4dcc3f0",
+        "issue": "ELECTRICAL SYSTEM — UNSPECIFIED FAILURE",
+        "alert": false,
+        "risk_score": 47.41,
+        "evidence_count": 16,
+        "failure_mechanism": "GENERAL_ELECTRICAL",
+        "consequence_family": "GENERAL_ELECTRICAL_FAILURE",
+        "source_systems": [
+          "ELECTRICAL SYSTEM"
+        ],
+        "posthoc_target_score": 0.007,
+        "posthoc_target_breakdown": {
+          "component": 0.0,
+          "component_compatible": 0.0,
+          "consequence": 0.2195,
+          "consequence_family": 0.0,
+          "consequence_family_best": 0.0,
+          "consequence_family_weighted": 0.0,
+          "defect_family": 0.0,
+          "explicit_campaign_reference": 0.0,
+          "failure_mechanism": 0.0,
+          "final": 0.007,
+          "semantic_lexical": 0.0606,
+          "subsystem": 0.0
+        }
+      }
+    ]
+  },
+  {
+    "case_id": "case_5424e1117a13f0e6",
+    "name": "Ford Fusion steering wheel fastening recall",
+    "campaign_number": "18V167000",
+    "boundary_date": "2018-03-12",
+    "first_alert_date": "2017-09-03",
+    "max_risk_score": 75.94,
+    "alert_candidates": [
+      {
+        "cutoff_date": "2017-09-03",
+        "signal_id": "sig_3d70299544ae8ad5",
+        "lineage_id": "lin_9307574e851622ec",
+        "issue": "ELECTRICAL SYSTEM — UNSPECIFIED FAILURE",
+        "signal_scope": "cluster",
+        "risk_score": 75.94,
+        "evidence_count": 7,
+        "failure_mechanism": "GENERAL_ELECTRICAL",
+        "consequence_family": "GENERAL_ELECTRICAL_FAILURE",
+        "source_systems": [
+          "ELECTRICAL SYSTEM"
+        ],
+        "posthoc_target_score": 0.0068,
+        "posthoc_target_breakdown": {
+          "component": 0.0,
+          "component_compatible": 0.0,
+          "consequence": 0.1538,
+          "consequence_family": 0.0,
+          "consequence_family_best": 0.0,
+          "consequence_family_weighted": 0.0,
+          "defect_family": 0.0,
+          "explicit_campaign_reference": 0.0,
+          "failure_mechanism": 0.0,
+          "final": 0.0068,
+          "semantic_lexical": 0.0573,
+          "subsystem": 0.0625
+        }
+      },
+      {
+        "cutoff_date": "2017-09-10",
+        "signal_id": "sig_729c6f31ad8c8afd",
+        "lineage_id": "lin_9307574e851622ec",
+        "issue": "ELECTRICAL SYSTEM — UNSPECIFIED FAILURE",
+        "signal_scope": "cluster",
+        "risk_score": 75.94,
+        "evidence_count": 7,
+        "failure_mechanism": "GENERAL_ELECTRICAL",
+        "consequence_family": "GENERAL_ELECTRICAL_FAILURE",
+        "source_systems": [
+          "ELECTRICAL SYSTEM"
+        ],
+        "posthoc_target_score": 0.0068,
+        "posthoc_target_breakdown": {
+          "component": 0.0,
+          "component_compatible": 0.0,
+          "consequence": 0.1538,
+          "consequence_family": 0.0,
+          "consequence_family_best": 0.0,
+          "consequence_family_weighted": 0.0,
+          "defect_family": 0.0,
+          "explicit_campaign_reference": 0.0,
+          "failure_mechanism": 0.0,
+          "final": 0.0068,
+          "semantic_lexical": 0.0573,
+          "subsystem": 0.0625
+        }
+      }
+    ],
+    "best_target_candidates": [
+      {
+        "cutoff_date": "2017-11-05",
+        "signal_id": "sig_20284eef3322bdb3",
+        "lineage_id": "lin_0b3c22fe4ab1e657",
+        "issue": "STEERING — STEERING ASSIST FAULT",
+        "alert": false,
+        "risk_score": 36.0,
+        "evidence_count": 1,
+        "failure_mechanism": "STEERING_SYSTEM",
+        "consequence_family": "OTHER",
+        "source_systems": [
+          "STEERING"
+        ],
+        "posthoc_target_score": 0.5304,
+        "posthoc_target_breakdown": {
+          "component": 1.0,
+          "component_compatible": 1.0,
+          "consequence": 0.0,
+          "consequence_family": 0.0,
+          "consequence_family_best": 0.0,
+          "consequence_family_weighted": 0.0,
+          "defect_family": 1.0,
+          "explicit_campaign_reference": 0.0,
+          "failure_mechanism": 1.0,
+          "final": 0.5304,
+          "semantic_lexical": 0.0545,
+          "subsystem": 0.25
+        }
+      },
+      {
+        "cutoff_date": "2017-11-12",
+        "signal_id": "sig_08a43e4629d286e3",
+        "lineage_id": "lin_0b3c22fe4ab1e657",
+        "issue": "STEERING — STEERING ASSIST FAULT",
+        "alert": false,
+        "risk_score": 36.0,
+        "evidence_count": 1,
+        "failure_mechanism": "STEERING_SYSTEM",
+        "consequence_family": "OTHER",
+        "source_systems": [
+          "STEERING"
+        ],
+        "posthoc_target_score": 0.5304,
+        "posthoc_target_breakdown": {
+          "component": 1.0,
+          "component_compatible": 1.0,
+          "consequence": 0.0,
+          "consequence_family": 0.0,
+          "consequence_family_best": 0.0,
+          "consequence_family_weighted": 0.0,
+          "defect_family": 1.0,
+          "explicit_campaign_reference": 0.0,
+          "failure_mechanism": 1.0,
+          "final": 0.5304,
+          "semantic_lexical": 0.0545,
+          "subsystem": 0.25
+        }
+      },
+      {
+        "cutoff_date": "2017-11-26",
+        "signal_id": "sig_c6216b08e4de7358",
+        "lineage_id": "lin_0ea593bb35a4518c",
+        "issue": "ELECTRONIC STABILITY CONTROL (ESC) — UNSPECIFIED FAILURE",
+        "alert": false,
+        "risk_score": 49.92,
+        "evidence_count": 1,
+        "failure_mechanism": "STEERING_SYSTEM",
+        "consequence_family": "LOSS_OF_STEERING",
+        "source_systems": [
+          "ELECTRONIC STABILITY CONTROL (ESC)"
+        ],
+        "posthoc_target_score": 0.44,
+        "posthoc_target_breakdown": {
+          "component": 0.0,
+          "component_compatible": 0.0,
+          "consequence": 0.1429,
+          "consequence_family": 1.0,
+          "consequence_family_best": 1.0,
+          "consequence_family_weighted": 1.0,
+          "defect_family": 1.0,
+          "explicit_campaign_reference": 0.0,
+          "failure_mechanism": 1.0,
+          "final": 0.44,
+          "semantic_lexical": 0.072,
+          "subsystem": 0.0
+        }
+      },
+      {
+        "cutoff_date": "2017-12-10",
+        "signal_id": "sig_9a6d31b60b283d0d",
+        "lineage_id": "lin_0ea593bb35a4518c",
+        "issue": "ELECTRONIC STABILITY CONTROL (ESC) — UNSPECIFIED FAILURE",
+        "alert": false,
+        "risk_score": 49.92,
+        "evidence_count": 1,
+        "failure_mechanism": "STEERING_SYSTEM",
+        "consequence_family": "LOSS_OF_STEERING",
+        "source_systems": [
+          "ELECTRONIC STABILITY CONTROL (ESC)"
+        ],
+        "posthoc_target_score": 0.44,
+        "posthoc_target_breakdown": {
+          "component": 0.0,
+          "component_compatible": 0.0,
+          "consequence": 0.1429,
+          "consequence_family": 1.0,
+          "consequence_family_best": 1.0,
+          "consequence_family_weighted": 1.0,
+          "defect_family": 1.0,
+          "explicit_campaign_reference": 0.0,
+          "failure_mechanism": 1.0,
+          "final": 0.44,
+          "semantic_lexical": 0.072,
+          "subsystem": 0.0
+        }
+      },
+      {
+        "cutoff_date": "2017-12-17",
+        "signal_id": "sig_eeaf751357c98a15",
+        "lineage_id": "lin_0ea593bb35a4518c",
+        "issue": "ELECTRONIC STABILITY CONTROL (ESC) — UNSPECIFIED FAILURE",
+        "alert": false,
+        "risk_score": 49.92,
+        "evidence_count": 1,
+        "failure_mechanism": "STEERING_SYSTEM",
+        "consequence_family": "LOSS_OF_STEERING",
+        "source_systems": [
+          "ELECTRONIC STABILITY CONTROL (ESC)"
+        ],
+        "posthoc_target_score": 0.44,
+        "posthoc_target_breakdown": {
+          "component": 0.0,
+          "component_compatible": 0.0,
+          "consequence": 0.1429,
+          "consequence_family": 1.0,
+          "consequence_family_best": 1.0,
+          "consequence_family_weighted": 1.0,
+          "defect_family": 1.0,
+          "explicit_campaign_reference": 0.0,
+          "failure_mechanism": 1.0,
+          "final": 0.44,
+          "semantic_lexical": 0.072,
+          "subsystem": 0.0
+        }
+      },
+      {
+        "cutoff_date": "2018-01-07",
+        "signal_id": "sig_04f82dce75afb127",
+        "lineage_id": "lin_4521da86133cc472",
+        "issue": "STEERING — LOOSE STEERING WHEEL",
+        "alert": false,
+        "risk_score": 45.72,
+        "evidence_count": 4,
+        "failure_mechanism": "OTHER",
+        "consequence_family": "OTHER",
+        "source_systems": [
+          "STEERING"
+        ],
+        "posthoc_target_score": 0.248,
+        "posthoc_target_breakdown": {
+          "component": 1.0,
+          "component_compatible": 1.0,
+          "consequence": 0.1667,
+          "consequence_family": 0.0,
+          "consequence_family_best": 0.0,
+          "consequence_family_weighted": 0.0,
+          "defect_family": 0.0,
+          "explicit_campaign_reference": 0.0,
+          "failure_mechanism": 0.0,
+          "final": 0.248,
+          "semantic_lexical": 0.0915,
+          "subsystem": 0.2222
+        }
+      },
+      {
+        "cutoff_date": "2018-01-14",
+        "signal_id": "sig_7766988073ba4d8f",
+        "lineage_id": "lin_4521da86133cc472",
+        "issue": "STEERING — LOOSE STEERING WHEEL",
+        "alert": false,
+        "risk_score": 45.72,
+        "evidence_count": 4,
+        "failure_mechanism": "OTHER",
+        "consequence_family": "OTHER",
+        "source_systems": [
+          "STEERING"
+        ],
+        "posthoc_target_score": 0.248,
+        "posthoc_target_breakdown": {
+          "component": 1.0,
+          "component_compatible": 1.0,
+          "consequence": 0.1667,
+          "consequence_family": 0.0,
+          "consequence_family_best": 0.0,
+          "consequence_family_weighted": 0.0,
+          "defect_family": 0.0,
+          "explicit_campaign_reference": 0.0,
+          "failure_mechanism": 0.0,
+          "final": 0.248,
+          "semantic_lexical": 0.0915,
+          "subsystem": 0.2222
+        }
+      },
+      {
+        "cutoff_date": "2018-01-21",
+        "signal_id": "sig_4f90ddc4ca983083",
+        "lineage_id": "lin_4521da86133cc472",
+        "issue": "STEERING — LOOSE STEERING WHEEL",
+        "alert": false,
+        "risk_score": 45.72,
+        "evidence_count": 4,
+        "failure_mechanism": "OTHER",
+        "consequence_family": "OTHER",
+        "source_systems": [
+          "STEERING"
+        ],
+        "posthoc_target_score": 0.248,
+        "posthoc_target_breakdown": {
+          "component": 1.0,
+          "component_compatible": 1.0,
+          "consequence": 0.1667,
+          "consequence_family": 0.0,
+          "consequence_family_best": 0.0,
+          "consequence_family_weighted": 0.0,
+          "defect_family": 0.0,
+          "explicit_campaign_reference": 0.0,
+          "failure_mechanism": 0.0,
+          "final": 0.248,
+          "semantic_lexical": 0.0915,
+          "subsystem": 0.2222
+        }
+      },
+      {
+        "cutoff_date": "2017-11-12",
+        "signal_id": "sig_54b4bc2fa3ff021b",
+        "lineage_id": "lin_f4c58a027ce3aba8",
+        "issue": "STEERING — UNSPECIFIED FAILURE",
+        "alert": false,
+        "risk_score": 54.05,
+        "evidence_count": 1,
+        "failure_mechanism": "RESTRAINT_SYSTEM",
+        "consequence_family": "RESTRAINT_FAILURE",
+        "source_systems": [
+          "STEERING"
+        ],
+        "posthoc_target_score": 0.2056,
+        "posthoc_target_breakdown": {
+          "component": 1.0,
+          "component_compatible": 1.0,
+          "consequence": 0.0,
+          "consequence_family": 0.0,
+          "consequence_family_best": 0.0,
+          "consequence_family_weighted": 0.0,
+          "defect_family": 0.0,
+          "explicit_campaign_reference": 0.0,
+          "failure_mechanism": 0.0,
+          "final": 0.2056,
+          "semantic_lexical": 0.056,
+          "subsystem": 0.0
+        }
+      },
+      {
+        "cutoff_date": "2017-11-19",
+        "signal_id": "sig_880a955cde2bb2c8",
+        "lineage_id": "lin_f4c58a027ce3aba8",
+        "issue": "STEERING — UNSPECIFIED FAILURE",
+        "alert": false,
+        "risk_score": 54.05,
+        "evidence_count": 1,
+        "failure_mechanism": "RESTRAINT_SYSTEM",
+        "consequence_family": "RESTRAINT_FAILURE",
+        "source_systems": [
+          "STEERING"
+        ],
+        "posthoc_target_score": 0.2056,
+        "posthoc_target_breakdown": {
+          "component": 1.0,
+          "component_compatible": 1.0,
+          "consequence": 0.0,
+          "consequence_family": 0.0,
+          "consequence_family_best": 0.0,
+          "consequence_family_weighted": 0.0,
+          "defect_family": 0.0,
+          "explicit_campaign_reference": 0.0,
+          "failure_mechanism": 0.0,
+          "final": 0.2056,
+          "semantic_lexical": 0.056,
+          "subsystem": 0.0
+        }
+      }
+    ]
+  },
+  {
+    "case_id": "case_6bce6fe3365050e7",
+    "name": "Hyundai Sonata engine bearing wear stall recall",
+    "campaign_number": "17V226000",
+    "boundary_date": "2017-03-31",
+    "first_alert_date": "2016-09-22",
+    "max_risk_score": 85.04,
+    "alert_candidates": [
+      {
+        "cutoff_date": "2016-09-22",
+        "signal_id": "sig_1269b44c623e4f30",
+        "lineage_id": "lin_e7f098eb012e8704",
+        "issue": "STEERING — UNSPECIFIED FAILURE",
+        "signal_scope": "cluster",
+        "risk_score": 79.42,
+        "evidence_count": 54,
+        "failure_mechanism": "OTHER",
+        "consequence_family": "OTHER",
+        "source_systems": [
+          "STEERING"
+        ],
+        "posthoc_target_score": 0.0041,
+        "posthoc_target_breakdown": {
+          "component": 0.0,
+          "component_compatible": 0.0,
+          "consequence": 0.1154,
+          "consequence_family": 0.0,
+          "consequence_family_best": 0.0,
+          "consequence_family_weighted": 0.0,
+          "defect_family": 0.0,
+          "explicit_campaign_reference": 0.0,
+          "failure_mechanism": 0.0,
+          "final": 0.0041,
+          "semantic_lexical": 0.0492,
+          "subsystem": 0.0
+        }
+      },
+      {
+        "cutoff_date": "2016-09-29",
+        "signal_id": "sig_32250ad109dffabd",
+        "lineage_id": "lin_e7f098eb012e8704",
+        "issue": "STEERING — UNSPECIFIED FAILURE",
+        "signal_scope": "cluster",
+        "risk_score": 77.66,
+        "evidence_count": 46,
+        "failure_mechanism": "OTHER",
+        "consequence_family": "OTHER",
+        "source_systems": [
+          "STEERING"
+        ],
+        "posthoc_target_score": 0.0041,
+        "posthoc_target_breakdown": {
+          "component": 0.0,
+          "component_compatible": 0.0,
+          "consequence": 0.1154,
+          "consequence_family": 0.0,
+          "consequence_family_best": 0.0,
+          "consequence_family_weighted": 0.0,
+          "defect_family": 0.0,
+          "explicit_campaign_reference": 0.0,
+          "failure_mechanism": 0.0,
+          "final": 0.0041,
+          "semantic_lexical": 0.0505,
+          "subsystem": 0.0
+        }
+      },
+      {
+        "cutoff_date": "2016-10-06",
+        "signal_id": "sig_42926a8337d741bf",
+        "lineage_id": "lin_e7f098eb012e8704",
+        "issue": "STEERING — UNSPECIFIED FAILURE",
+        "signal_scope": "cluster",
+        "risk_score": 85.04,
+        "evidence_count": 48,
+        "failure_mechanism": "OTHER",
+        "consequence_family": "OTHER",
+        "source_systems": [
+          "STEERING"
+        ],
+        "posthoc_target_score": 0.0041,
+        "posthoc_target_breakdown": {
+          "component": 0.0,
+          "component_compatible": 0.0,
+          "consequence": 0.1154,
+          "consequence_family": 0.0,
+          "consequence_family_best": 0.0,
+          "consequence_family_weighted": 0.0,
+          "defect_family": 0.0,
+          "explicit_campaign_reference": 0.0,
+          "failure_mechanism": 0.0,
+          "final": 0.0041,
+          "semantic_lexical": 0.0498,
+          "subsystem": 0.0
+        }
+      },
+      {
+        "cutoff_date": "2016-10-13",
+        "signal_id": "sig_5ccb69ba5f8656c1",
+        "lineage_id": "lin_e7f098eb012e8704",
+        "issue": "STEERING — UNSPECIFIED FAILURE",
+        "signal_scope": "cluster",
+        "risk_score": 85.02,
+        "evidence_count": 40,
+        "failure_mechanism": "OTHER",
+        "consequence_family": "OTHER",
+        "source_systems": [
+          "STEERING"
+        ],
+        "posthoc_target_score": 0.0041,
+        "posthoc_target_breakdown": {
+          "component": 0.0,
+          "component_compatible": 0.0,
+          "consequence": 0.1154,
+          "consequence_family": 0.0,
+          "consequence_family_best": 0.0,
+          "consequence_family_weighted": 0.0,
+          "defect_family": 0.0,
+          "explicit_campaign_reference": 0.0,
+          "failure_mechanism": 0.0,
+          "final": 0.0041,
+          "semantic_lexical": 0.0503,
+          "subsystem": 0.0
+        }
+      },
+      {
+        "cutoff_date": "2016-10-20",
+        "signal_id": "sig_49962cc6fbf82ee8",
+        "lineage_id": "lin_e7f098eb012e8704",
+        "issue": "STEERING — UNSPECIFIED FAILURE",
+        "signal_scope": "cluster",
+        "risk_score": 76.7,
+        "evidence_count": 40,
+        "failure_mechanism": "OTHER",
+        "consequence_family": "OTHER",
+        "source_systems": [
+          "STEERING"
+        ],
+        "posthoc_target_score": 0.0041,
+        "posthoc_target_breakdown": {
+          "component": 0.0,
+          "component_compatible": 0.0,
+          "consequence": 0.1154,
+          "consequence_family": 0.0,
+          "consequence_family_best": 0.0,
+          "consequence_family_weighted": 0.0,
+          "defect_family": 0.0,
+          "explicit_campaign_reference": 0.0,
+          "failure_mechanism": 0.0,
+          "final": 0.0041,
+          "semantic_lexical": 0.0503,
+          "subsystem": 0.0
+        }
+      },
+      {
+        "cutoff_date": "2016-12-15",
+        "signal_id": "sig_866efa73bb4bf200",
+        "lineage_id": "lin_5f18f5ab72ff6b3d",
+        "issue": "META — Thermal / overheating",
+        "signal_scope": "meta",
+        "risk_score": 76.82,
+        "evidence_count": 16,
+        "failure_mechanism": "THERMAL_SYSTEM",
+        "consequence_family": "THERMAL_EVENT",
+        "source_systems": [
+          "ELECTRICAL SYSTEM",
+          "ENGINE",
+          "EXTERIOR LIGHTING",
+          "FUEL/PROPULSION SYSTEM",
+          "POWER TRAIN",
+          "SEATS",
+          "SERVICE BRAKES"
+        ],
+        "posthoc_target_score": 0.2131,
+        "posthoc_target_breakdown": {
+          "component": 1.0,
+          "component_compatible": 1.0,
+          "consequence": 0.0385,
+          "consequence_family": 0.0,
+          "consequence_family_best": 0.0,
+          "consequence_family_weighted": 0.0,
+          "defect_family": 0.0,
+          "explicit_campaign_reference": 0.0,
+          "failure_mechanism": 0.0,
+          "final": 0.2131,
+          "semantic_lexical": 0.0475,
+          "subsystem": 0.0455
+        }
+      },
+      {
+        "cutoff_date": "2016-12-22",
+        "signal_id": "sig_0b9beb0abac6fe88",
+        "lineage_id": "lin_5f18f5ab72ff6b3d",
+        "issue": "META — Thermal / overheating",
+        "signal_scope": "meta",
+        "risk_score": 76.82,
+        "evidence_count": 16,
+        "failure_mechanism": "THERMAL_SYSTEM",
+        "consequence_family": "THERMAL_EVENT",
+        "source_systems": [
+          "ELECTRICAL SYSTEM",
+          "ENGINE",
+          "EXTERIOR LIGHTING",
+          "FUEL/PROPULSION SYSTEM",
+          "POWER TRAIN",
+          "SEATS",
+          "SERVICE BRAKES"
+        ],
+        "posthoc_target_score": 0.2131,
+        "posthoc_target_breakdown": {
+          "component": 1.0,
+          "component_compatible": 1.0,
+          "consequence": 0.0385,
+          "consequence_family": 0.0,
+          "consequence_family_best": 0.0,
+          "consequence_family_weighted": 0.0,
+          "defect_family": 0.0,
+          "explicit_campaign_reference": 0.0,
+          "failure_mechanism": 0.0,
+          "final": 0.2131,
+          "semantic_lexical": 0.0475,
+          "subsystem": 0.0455
+        }
+      },
+      {
+        "cutoff_date": "2016-12-29",
+        "signal_id": "sig_e0b5779b72782764",
+        "lineage_id": "lin_5f18f5ab72ff6b3d",
+        "issue": "META — Thermal / overheating",
+        "signal_scope": "meta",
+        "risk_score": 76.82,
+        "evidence_count": 16,
+        "failure_mechanism": "THERMAL_SYSTEM",
+        "consequence_family": "THERMAL_EVENT",
+        "source_systems": [
+          "ELECTRICAL SYSTEM",
+          "ENGINE",
+          "EXTERIOR LIGHTING",
+          "FUEL/PROPULSION SYSTEM",
+          "POWER TRAIN",
+          "SEATS",
+          "SERVICE BRAKES"
+        ],
+        "posthoc_target_score": 0.2131,
+        "posthoc_target_breakdown": {
+          "component": 1.0,
+          "component_compatible": 1.0,
+          "consequence": 0.0385,
+          "consequence_family": 0.0,
+          "consequence_family_best": 0.0,
+          "consequence_family_weighted": 0.0,
+          "defect_family": 0.0,
+          "explicit_campaign_reference": 0.0,
+          "failure_mechanism": 0.0,
+          "final": 0.2131,
+          "semantic_lexical": 0.0475,
+          "subsystem": 0.0455
+        }
+      },
+      {
+        "cutoff_date": "2017-01-05",
+        "signal_id": "sig_c58bfb3ff8366045",
+        "lineage_id": "lin_f1ca4a63284955d1",
+        "issue": "VEHICLE SPEED CONTROL — UNINTENDED ACCELERATION",
+        "signal_scope": "cluster",
+        "risk_score": 75.73,
+        "evidence_count": 16,
+        "failure_mechanism": "OTHER",
+        "consequence_family": "UNINTENDED_ACCELERATION",
+        "source_systems": [
+          "VEHICLE SPEED CONTROL"
+        ],
+        "posthoc_target_score": 0.0031,
+        "posthoc_target_breakdown": {
+          "component": 0.0,
+          "component_compatible": 0.0,
+          "consequence": 0.0769,
+          "consequence_family": 0.0,
+          "consequence_family_best": 0.0,
+          "consequence_family_weighted": 0.0,
+          "defect_family": 0.0,
+          "explicit_campaign_reference": 0.0,
+          "failure_mechanism": 0.0,
+          "final": 0.0031,
+          "semantic_lexical": 0.0467,
+          "subsystem": 0.0
+        }
+      },
+      {
+        "cutoff_date": "2017-01-12",
+        "signal_id": "sig_67fdf1f1117782fe",
+        "lineage_id": "lin_e7f098eb012e8704",
+        "issue": "STEERING — UNSPECIFIED FAILURE",
+        "signal_scope": "cluster",
+        "risk_score": 76.3,
+        "evidence_count": 57,
+        "failure_mechanism": "OTHER",
+        "consequence_family": "OTHER",
+        "source_systems": [
+          "STEERING"
+        ],
+        "posthoc_target_score": 0.0041,
+        "posthoc_target_breakdown": {
+          "component": 0.0,
+          "component_compatible": 0.0,
+          "consequence": 0.1154,
+          "consequence_family": 0.0,
+          "consequence_family_best": 0.0,
+          "consequence_family_weighted": 0.0,
+          "defect_family": 0.0,
+          "explicit_campaign_reference": 0.0,
+          "failure_mechanism": 0.0,
+          "final": 0.0041,
+          "semantic_lexical": 0.0492,
+          "subsystem": 0.0
+        }
+      },
+      {
+        "cutoff_date": "2017-01-12",
+        "signal_id": "sig_cc38b51fce2a3d37",
+        "lineage_id": "lin_f1ca4a63284955d1",
+        "issue": "VEHICLE SPEED CONTROL — UNINTENDED ACCELERATION",
+        "signal_scope": "cluster",
+        "risk_score": 75.73,
+        "evidence_count": 16,
+        "failure_mechanism": "OTHER",
+        "consequence_family": "UNINTENDED_ACCELERATION",
+        "source_systems": [
+          "VEHICLE SPEED CONTROL"
+        ],
+        "posthoc_target_score": 0.0031,
+        "posthoc_target_breakdown": {
+          "component": 0.0,
+          "component_compatible": 0.0,
+          "consequence": 0.0769,
+          "consequence_family": 0.0,
+          "consequence_family_best": 0.0,
+          "consequence_family_weighted": 0.0,
+          "defect_family": 0.0,
+          "explicit_campaign_reference": 0.0,
+          "failure_mechanism": 0.0,
+          "final": 0.0031,
+          "semantic_lexical": 0.0467,
+          "subsystem": 0.0
+        }
+      },
+      {
+        "cutoff_date": "2017-01-19",
+        "signal_id": "sig_75d6812c48753df1",
+        "lineage_id": "lin_f1ca4a63284955d1",
+        "issue": "VEHICLE SPEED CONTROL — UNINTENDED ACCELERATION",
+        "signal_scope": "cluster",
+        "risk_score": 75.73,
+        "evidence_count": 16,
+        "failure_mechanism": "OTHER",
+        "consequence_family": "UNINTENDED_ACCELERATION",
+        "source_systems": [
+          "VEHICLE SPEED CONTROL"
+        ],
+        "posthoc_target_score": 0.0031,
+        "posthoc_target_breakdown": {
+          "component": 0.0,
+          "component_compatible": 0.0,
+          "consequence": 0.0769,
+          "consequence_family": 0.0,
+          "consequence_family_best": 0.0,
+          "consequence_family_weighted": 0.0,
+          "defect_family": 0.0,
+          "explicit_campaign_reference": 0.0,
+          "failure_mechanism": 0.0,
+          "final": 0.0031,
+          "semantic_lexical": 0.0467,
+          "subsystem": 0.0
+        }
+      },
+      {
+        "cutoff_date": "2017-01-26",
+        "signal_id": "sig_041101cda06c4c50",
+        "lineage_id": "lin_f1ca4a63284955d1",
+        "issue": "VEHICLE SPEED CONTROL — UNINTENDED ACCELERATION",
+        "signal_scope": "cluster",
+        "risk_score": 75.73,
+        "evidence_count": 16,
+        "failure_mechanism": "OTHER",
+        "consequence_family": "UNINTENDED_ACCELERATION",
+        "source_systems": [
+          "VEHICLE SPEED CONTROL"
+        ],
+        "posthoc_target_score": 0.0031,
+        "posthoc_target_breakdown": {
+          "component": 0.0,
+          "component_compatible": 0.0,
+          "consequence": 0.0769,
+          "consequence_family": 0.0,
+          "consequence_family_best": 0.0,
+          "consequence_family_weighted": 0.0,
+          "defect_family": 0.0,
+          "explicit_campaign_reference": 0.0,
+          "failure_mechanism": 0.0,
+          "final": 0.0031,
+          "semantic_lexical": 0.0467,
+          "subsystem": 0.0
+        }
+      },
+      {
+        "cutoff_date": "2017-02-16",
+        "signal_id": "sig_7c38601b922376ef",
+        "lineage_id": "lin_5f18f5ab72ff6b3d",
+        "issue": "META — Thermal / overheating",
+        "signal_scope": "meta",
+        "risk_score": 81.25,
+        "evidence_count": 20,
+        "failure_mechanism": "THERMAL_SYSTEM",
+        "consequence_family": "THERMAL_EVENT",
+        "source_systems": [
+          "ELECTRICAL SYSTEM",
+          "ENGINE",
+          "EXTERIOR LIGHTING",
+          "FUEL/PROPULSION SYSTEM",
+          "POWER TRAIN",
+          "SEATS",
+          "SERVICE BRAKES"
+        ],
+        "posthoc_target_score": 0.2131,
+        "posthoc_target_breakdown": {
+          "component": 1.0,
+          "component_compatible": 1.0,
+          "consequence": 0.0385,
+          "consequence_family": 0.0,
+          "consequence_family_best": 0.0,
+          "consequence_family_weighted": 0.0,
+          "defect_family": 0.0,
+          "explicit_campaign_reference": 0.0,
+          "failure_mechanism": 0.0,
+          "final": 0.2131,
+          "semantic_lexical": 0.0475,
+          "subsystem": 0.0455
+        }
+      },
+      {
+        "cutoff_date": "2017-02-23",
+        "signal_id": "sig_dcc073aa6fa538a8",
+        "lineage_id": "lin_5f18f5ab72ff6b3d",
+        "issue": "META — Thermal / overheating",
+        "signal_scope": "meta",
+        "risk_score": 81.25,
+        "evidence_count": 20,
+        "failure_mechanism": "THERMAL_SYSTEM",
+        "consequence_family": "THERMAL_EVENT",
+        "source_systems": [
+          "ELECTRICAL SYSTEM",
+          "ENGINE",
+          "EXTERIOR LIGHTING",
+          "FUEL/PROPULSION SYSTEM",
+          "POWER TRAIN",
+          "SEATS",
+          "SERVICE BRAKES"
+        ],
+        "posthoc_target_score": 0.2131,
+        "posthoc_target_breakdown": {
+          "component": 1.0,
+          "component_compatible": 1.0,
+          "consequence": 0.0385,
+          "consequence_family": 0.0,
+          "consequence_family_best": 0.0,
+          "consequence_family_weighted": 0.0,
+          "defect_family": 0.0,
+          "explicit_campaign_reference": 0.0,
+          "failure_mechanism": 0.0,
+          "final": 0.2131,
+          "semantic_lexical": 0.0475,
+          "subsystem": 0.0455
+        }
+      },
+      {
+        "cutoff_date": "2017-03-09",
+        "signal_id": "sig_f88bd7ca3482f4ec",
+        "lineage_id": "lin_21dcdce5bb5c7cb7",
+        "issue": "ENGINE — ENGINE STALL",
+        "signal_scope": "cluster",
+        "risk_score": 75.51,
+        "evidence_count": 16,
+        "failure_mechanism": "GENERAL_POWERTRAIN",
+        "consequence_family": "LOSS_OF_MOTIVE_POWER",
+        "source_systems": [
+          "ENGINE"
+        ],
+        "posthoc_target_score": 0.2131,
+        "posthoc_target_breakdown": {
+          "component": 1.0,
+          "component_compatible": 1.0,
+          "consequence": 0.0385,
+          "consequence_family": 0.0,
+          "consequence_family_best": 0.0,
+          "consequence_family_weighted": 0.0,
+          "defect_family": 0.0,
+          "explicit_campaign_reference": 0.0,
+          "failure_mechanism": 0.0,
+          "final": 0.2131,
+          "semantic_lexical": 0.0425,
+          "subsystem": 0.05
+        }
+      },
+      {
+        "cutoff_date": "2017-03-16",
+        "signal_id": "sig_9ab23160020d2bd4",
+        "lineage_id": "lin_e7f098eb012e8704",
+        "issue": "STEERING — UNSPECIFIED FAILURE",
+        "signal_scope": "cluster",
+        "risk_score": 77.63,
+        "evidence_count": 59,
+        "failure_mechanism": "OTHER",
+        "consequence_family": "OTHER",
+        "source_systems": [
+          "STEERING"
+        ],
+        "posthoc_target_score": 0.0041,
+        "posthoc_target_breakdown": {
+          "component": 0.0,
+          "component_compatible": 0.0,
+          "consequence": 0.1154,
+          "consequence_family": 0.0,
+          "consequence_family_best": 0.0,
+          "consequence_family_weighted": 0.0,
+          "defect_family": 0.0,
+          "explicit_campaign_reference": 0.0,
+          "failure_mechanism": 0.0,
+          "final": 0.0041,
+          "semantic_lexical": 0.0502,
+          "subsystem": 0.0
+        }
+      },
+      {
+        "cutoff_date": "2017-03-16",
+        "signal_id": "sig_71a6c8b38292282a",
+        "lineage_id": "lin_21dcdce5bb5c7cb7",
+        "issue": "ENGINE — ENGINE STALL",
+        "signal_scope": "cluster",
+        "risk_score": 75.51,
+        "evidence_count": 16,
+        "failure_mechanism": "GENERAL_POWERTRAIN",
+        "consequence_family": "LOSS_OF_MOTIVE_POWER",
+        "source_systems": [
+          "ENGINE"
+        ],
+        "posthoc_target_score": 0.2131,
+        "posthoc_target_breakdown": {
+          "component": 1.0,
+          "component_compatible": 1.0,
+          "consequence": 0.0385,
+          "consequence_family": 0.0,
+          "consequence_family_best": 0.0,
+          "consequence_family_weighted": 0.0,
+          "defect_family": 0.0,
+          "explicit_campaign_reference": 0.0,
+          "failure_mechanism": 0.0,
+          "final": 0.2131,
+          "semantic_lexical": 0.0425,
+          "subsystem": 0.05
+        }
+      },
+      {
+        "cutoff_date": "2017-03-23",
+        "signal_id": "sig_2e602f206dad44eb",
+        "lineage_id": "lin_e7f098eb012e8704",
+        "issue": "STEERING — UNSPECIFIED FAILURE",
+        "signal_scope": "cluster",
+        "risk_score": 77.63,
+        "evidence_count": 59,
+        "failure_mechanism": "OTHER",
+        "consequence_family": "OTHER",
+        "source_systems": [
+          "STEERING"
+        ],
+        "posthoc_target_score": 0.0041,
+        "posthoc_target_breakdown": {
+          "component": 0.0,
+          "component_compatible": 0.0,
+          "consequence": 0.1154,
+          "consequence_family": 0.0,
+          "consequence_family_best": 0.0,
+          "consequence_family_weighted": 0.0,
+          "defect_family": 0.0,
+          "explicit_campaign_reference": 0.0,
+          "failure_mechanism": 0.0,
+          "final": 0.0041,
+          "semantic_lexical": 0.0502,
+          "subsystem": 0.0
+        }
+      }
+    ],
+    "best_target_candidates": [
+      {
+        "cutoff_date": "2016-03-31",
+        "signal_id": "sig_e3453be55b13c484",
+        "lineage_id": "lin_5d9dc81efdca33f8",
+        "issue": "META — Charging system",
+        "alert": false,
+        "risk_score": 57.71,
+        "evidence_count": 3,
+        "failure_mechanism": "CHARGING_SYSTEM",
+        "consequence_family": "LOSS_OF_BRAKING",
+        "source_systems": [
+          "ELECTRICAL SYSTEM",
+          "ENGINE",
+          "SERVICE BRAKES"
+        ],
+        "posthoc_target_score": 0.2263,
+        "posthoc_target_breakdown": {
+          "component": 1.0,
+          "component_compatible": 1.0,
+          "consequence": 0.0769,
+          "consequence_family": 0.0,
+          "consequence_family_best": 0.0,
+          "consequence_family_weighted": 0.0,
+          "defect_family": 0.0,
+          "explicit_campaign_reference": 0.0,
+          "failure_mechanism": 0.0,
+          "final": 0.2263,
+          "semantic_lexical": 0.0434,
+          "subsystem": 0.1429
+        }
+      },
+      {
+        "cutoff_date": "2016-08-11",
+        "signal_id": "sig_e513862e8e8c63c8",
+        "lineage_id": "lin_5d9dc81efdca33f8",
+        "issue": "META — Charging system",
+        "alert": false,
+        "risk_score": 58.94,
+        "evidence_count": 4,
+        "failure_mechanism": "CHARGING_SYSTEM",
+        "consequence_family": "GENERAL_POWERTRAIN_FAILURE",
+        "source_systems": [
+          "ELECTRICAL SYSTEM",
+          "ENGINE",
+          "POWER TRAIN",
+          "SERVICE BRAKES"
+        ],
+        "posthoc_target_score": 0.2216,
+        "posthoc_target_breakdown": {
+          "component": 1.0,
+          "component_compatible": 1.0,
+          "consequence": 0.0769,
+          "consequence_family": 0.0,
+          "consequence_family_best": 0.0,
+          "consequence_family_weighted": 0.0,
+          "defect_family": 0.0,
+          "explicit_campaign_reference": 0.0,
+          "failure_mechanism": 0.0,
+          "final": 0.2216,
+          "semantic_lexical": 0.0483,
+          "subsystem": 0.0909
+        }
+      },
+      {
+        "cutoff_date": "2017-03-09",
+        "signal_id": "sig_d331a6e742a0fdbb",
+        "lineage_id": "lin_2593e799f524b455",
+        "issue": "ENGINE — THERMAL EVENT",
+        "alert": false,
+        "risk_score": 60.14,
+        "evidence_count": 6,
+        "failure_mechanism": "THERMAL_SYSTEM",
+        "consequence_family": "THERMAL_EVENT",
+        "source_systems": [
+          "ENGINE"
+        ],
+        "posthoc_target_score": 0.2189,
+        "posthoc_target_breakdown": {
+          "component": 1.0,
+          "component_compatible": 1.0,
+          "consequence": 0.0385,
+          "consequence_family": 0.0,
+          "consequence_family_best": 0.0,
+          "consequence_family_weighted": 0.0,
+          "defect_family": 0.0,
+          "explicit_campaign_reference": 0.0,
+          "failure_mechanism": 0.0,
+          "final": 0.2189,
+          "semantic_lexical": 0.0504,
+          "subsystem": 0.1
+        }
+      },
+      {
+        "cutoff_date": "2016-03-31",
+        "signal_id": "sig_ab2fe046ffc9fbf2",
+        "lineage_id": "lin_e062083dd76c1d98",
+        "issue": "ENGINE — UNSPECIFIED FAILURE",
+        "alert": false,
+        "risk_score": 59.49,
+        "evidence_count": 6,
+        "failure_mechanism": "OTHER",
+        "consequence_family": "OTHER",
+        "source_systems": [
+          "ENGINE"
+        ],
+        "posthoc_target_score": 0.2172,
+        "posthoc_target_breakdown": {
+          "component": 1.0,
+          "component_compatible": 1.0,
+          "consequence": 0.0385,
+          "consequence_family": 0.0,
+          "consequence_family_best": 0.0,
+          "consequence_family_weighted": 0.0,
+          "defect_family": 0.0,
+          "explicit_campaign_reference": 0.0,
+          "failure_mechanism": 0.0,
+          "final": 0.2172,
+          "semantic_lexical": 0.05,
+          "subsystem": 0.0833
+        }
+      },
+      {
+        "cutoff_date": "2016-04-07",
+        "signal_id": "sig_77748e6b4c8fc56a",
+        "lineage_id": "lin_e062083dd76c1d98",
+        "issue": "ENGINE — UNSPECIFIED FAILURE",
+        "alert": false,
+        "risk_score": 59.49,
+        "evidence_count": 6,
+        "failure_mechanism": "OTHER",
+        "consequence_family": "OTHER",
+        "source_systems": [
+          "ENGINE"
+        ],
+        "posthoc_target_score": 0.2172,
+        "posthoc_target_breakdown": {
+          "component": 1.0,
+          "component_compatible": 1.0,
+          "consequence": 0.0385,
+          "consequence_family": 0.0,
+          "consequence_family_best": 0.0,
+          "consequence_family_weighted": 0.0,
+          "defect_family": 0.0,
+          "explicit_campaign_reference": 0.0,
+          "failure_mechanism": 0.0,
+          "final": 0.2172,
+          "semantic_lexical": 0.05,
+          "subsystem": 0.0833
+        }
+      },
+      {
+        "cutoff_date": "2016-04-14",
+        "signal_id": "sig_069e454f9108d381",
+        "lineage_id": "lin_e062083dd76c1d98",
+        "issue": "ENGINE — UNSPECIFIED FAILURE",
+        "alert": false,
+        "risk_score": 59.49,
+        "evidence_count": 6,
+        "failure_mechanism": "OTHER",
+        "consequence_family": "OTHER",
+        "source_systems": [
+          "ENGINE"
+        ],
+        "posthoc_target_score": 0.2172,
+        "posthoc_target_breakdown": {
+          "component": 1.0,
+          "component_compatible": 1.0,
+          "consequence": 0.0385,
+          "consequence_family": 0.0,
+          "consequence_family_best": 0.0,
+          "consequence_family_weighted": 0.0,
+          "defect_family": 0.0,
+          "explicit_campaign_reference": 0.0,
+          "failure_mechanism": 0.0,
+          "final": 0.2172,
+          "semantic_lexical": 0.05,
+          "subsystem": 0.0833
+        }
+      },
+      {
+        "cutoff_date": "2016-04-14",
+        "signal_id": "sig_06364ad3dd5417ca",
+        "lineage_id": "lin_2593e799f524b455",
+        "issue": "ENGINE — ENGINE SEIZURE",
+        "alert": false,
+        "risk_score": 60.79,
+        "evidence_count": 7,
+        "failure_mechanism": "THERMAL_SYSTEM",
+        "consequence_family": "THERMAL_EVENT",
+        "source_systems": [
+          "ENGINE"
+        ],
+        "posthoc_target_score": 0.2164,
+        "posthoc_target_breakdown": {
+          "component": 1.0,
+          "component_compatible": 1.0,
+          "consequence": 0.0385,
+          "consequence_family": 0.0,
+          "consequence_family_best": 0.0,
+          "consequence_family_weighted": 0.0,
+          "defect_family": 0.0,
+          "explicit_campaign_reference": 0.0,
+          "failure_mechanism": 0.0,
+          "final": 0.2164,
+          "semantic_lexical": 0.0483,
+          "subsystem": 0.0769
+        }
+      },
+      {
+        "cutoff_date": "2016-04-21",
+        "signal_id": "sig_b5810f02edd7c060",
+        "lineage_id": "lin_2593e799f524b455",
+        "issue": "ENGINE — ENGINE SEIZURE",
+        "alert": false,
+        "risk_score": 60.79,
+        "evidence_count": 7,
+        "failure_mechanism": "THERMAL_SYSTEM",
+        "consequence_family": "THERMAL_EVENT",
+        "source_systems": [
+          "ENGINE"
+        ],
+        "posthoc_target_score": 0.2164,
+        "posthoc_target_breakdown": {
+          "component": 1.0,
+          "component_compatible": 1.0,
+          "consequence": 0.0385,
+          "consequence_family": 0.0,
+          "consequence_family_best": 0.0,
+          "consequence_family_weighted": 0.0,
+          "defect_family": 0.0,
+          "explicit_campaign_reference": 0.0,
+          "failure_mechanism": 0.0,
+          "final": 0.2164,
+          "semantic_lexical": 0.0483,
+          "subsystem": 0.0769
+        }
+      },
+      {
+        "cutoff_date": "2016-04-28",
+        "signal_id": "sig_eef7c6cf81dad039",
+        "lineage_id": "lin_2593e799f524b455",
+        "issue": "ENGINE — ENGINE SEIZURE",
+        "alert": false,
+        "risk_score": 60.79,
+        "evidence_count": 7,
+        "failure_mechanism": "THERMAL_SYSTEM",
+        "consequence_family": "THERMAL_EVENT",
+        "source_systems": [
+          "ENGINE"
+        ],
+        "posthoc_target_score": 0.2164,
+        "posthoc_target_breakdown": {
+          "component": 1.0,
+          "component_compatible": 1.0,
+          "consequence": 0.0385,
+          "consequence_family": 0.0,
+          "consequence_family_best": 0.0,
+          "consequence_family_weighted": 0.0,
+          "defect_family": 0.0,
+          "explicit_campaign_reference": 0.0,
+          "failure_mechanism": 0.0,
+          "final": 0.2164,
+          "semantic_lexical": 0.0483,
+          "subsystem": 0.0769
+        }
+      },
+      {
+        "cutoff_date": "2016-05-05",
+        "signal_id": "sig_587bcb71e607ff35",
+        "lineage_id": "lin_2593e799f524b455",
+        "issue": "ENGINE — ENGINE SEIZURE",
+        "alert": false,
+        "risk_score": 60.79,
+        "evidence_count": 7,
+        "failure_mechanism": "THERMAL_SYSTEM",
+        "consequence_family": "THERMAL_EVENT",
+        "source_systems": [
+          "ENGINE"
+        ],
+        "posthoc_target_score": 0.2164,
+        "posthoc_target_breakdown": {
+          "component": 1.0,
+          "component_compatible": 1.0,
+          "consequence": 0.0385,
+          "consequence_family": 0.0,
+          "consequence_family_best": 0.0,
+          "consequence_family_weighted": 0.0,
+          "defect_family": 0.0,
+          "explicit_campaign_reference": 0.0,
+          "failure_mechanism": 0.0,
+          "final": 0.2164,
+          "semantic_lexical": 0.0483,
+          "subsystem": 0.0769
+        }
+      }
+    ]
+  },
+  {
+    "case_id": "case_3f34c3b212bd59b0",
+    "name": "Jeep Grand Cherokee crank position sensor tone-wheel recall",
+    "campaign_number": "20V475000",
+    "boundary_date": "2020-08-13",
+    "first_alert_date": "2019-09-18",
+    "max_risk_score": 89.98,
+    "alert_candidates": [
+      {
+        "cutoff_date": "2019-09-18",
+        "signal_id": "sig_82e3b1473cfac80b",
+        "lineage_id": "lin_ce56cd8a50cc67cb",
+        "issue": "ELECTRICAL SYSTEM — UNSPECIFIED FAILURE",
+        "signal_scope": "cluster",
+        "risk_score": 76.18,
+        "evidence_count": 18,
+        "failure_mechanism": "GENERAL_ELECTRICAL",
+        "consequence_family": "GENERAL_ELECTRICAL_FAILURE",
+        "source_systems": [
+          "ELECTRICAL SYSTEM"
+        ],
+        "posthoc_target_score": 0.0042,
+        "posthoc_target_breakdown": {
+          "component": 0.0,
+          "component_compatible": 0.0,
+          "consequence": 0.1,
+          "consequence_family": 0.0,
+          "consequence_family_best": 0.0,
+          "consequence_family_weighted": 0.0,
+          "defect_family": 0.0,
+          "explicit_campaign_reference": 0.0,
+          "failure_mechanism": 0.0,
+          "final": 0.0042,
+          "semantic_lexical": 0.0415,
+          "subsystem": 0.027
+        }
+      },
+      {
+        "cutoff_date": "2019-09-25",
+        "signal_id": "sig_275d3977eb58a69c",
+        "lineage_id": "lin_ce56cd8a50cc67cb",
+        "issue": "ELECTRICAL SYSTEM — UNSPECIFIED FAILURE",
+        "signal_scope": "cluster",
+        "risk_score": 76.18,
+        "evidence_count": 18,
+        "failure_mechanism": "GENERAL_ELECTRICAL",
+        "consequence_family": "GENERAL_ELECTRICAL_FAILURE",
+        "source_systems": [
+          "ELECTRICAL SYSTEM"
+        ],
+        "posthoc_target_score": 0.0042,
+        "posthoc_target_breakdown": {
+          "component": 0.0,
+          "component_compatible": 0.0,
+          "consequence": 0.1,
+          "consequence_family": 0.0,
+          "consequence_family_best": 0.0,
+          "consequence_family_weighted": 0.0,
+          "defect_family": 0.0,
+          "explicit_campaign_reference": 0.0,
+          "failure_mechanism": 0.0,
+          "final": 0.0042,
+          "semantic_lexical": 0.0415,
+          "subsystem": 0.027
+        }
+      },
+      {
+        "cutoff_date": "2019-10-02",
+        "signal_id": "sig_b3d6fc2888e2f31b",
+        "lineage_id": "lin_ce56cd8a50cc67cb",
+        "issue": "ELECTRICAL SYSTEM — UNSPECIFIED FAILURE",
+        "signal_scope": "cluster",
+        "risk_score": 76.18,
+        "evidence_count": 18,
+        "failure_mechanism": "GENERAL_ELECTRICAL",
+        "consequence_family": "GENERAL_ELECTRICAL_FAILURE",
+        "source_systems": [
+          "ELECTRICAL SYSTEM"
+        ],
+        "posthoc_target_score": 0.0042,
+        "posthoc_target_breakdown": {
+          "component": 0.0,
+          "component_compatible": 0.0,
+          "consequence": 0.1,
+          "consequence_family": 0.0,
+          "consequence_family_best": 0.0,
+          "consequence_family_weighted": 0.0,
+          "defect_family": 0.0,
+          "explicit_campaign_reference": 0.0,
+          "failure_mechanism": 0.0,
+          "final": 0.0042,
+          "semantic_lexical": 0.0415,
+          "subsystem": 0.027
+        }
+      },
+      {
+        "cutoff_date": "2019-11-27",
+        "signal_id": "sig_5157643ecccb2ed2",
+        "lineage_id": "lin_ecee659298166fde",
+        "issue": "SEATS — UNSPECIFIED FAILURE",
+        "signal_scope": "cluster",
+        "risk_score": 80.51,
+        "evidence_count": 14,
+        "failure_mechanism": "OTHER",
+        "consequence_family": "OTHER",
+        "source_systems": [
+          "SEATS"
+        ],
+        "posthoc_target_score": 0.0018,
+        "posthoc_target_breakdown": {
+          "component": 0.0,
+          "component_compatible": 0.0,
+          "consequence": 0.025,
+          "consequence_family": 0.0,
+          "consequence_family_best": 0.0,
+          "consequence_family_weighted": 0.0,
+          "defect_family": 0.0,
+          "explicit_campaign_reference": 0.0,
+          "failure_mechanism": 0.0,
+          "final": 0.0018,
+          "semantic_lexical": 0.0464,
+          "subsystem": 0.0
+        }
+      },
+      {
+        "cutoff_date": "2020-01-08",
+        "signal_id": "sig_813c76d5947de85d",
+        "lineage_id": "lin_348be7e1140ce739",
+        "issue": "AIR BAGS — UNEXPECTED DEPLOYMENT",
+        "signal_scope": "cluster",
+        "risk_score": 81.62,
+        "evidence_count": 12,
+        "failure_mechanism": "OTHER",
+        "consequence_family": "OTHER",
+        "source_systems": [
+          "AIR BAGS"
+        ],
+        "posthoc_target_score": 0.0012,
+        "posthoc_target_breakdown": {
+          "component": 0.0,
+          "component_compatible": 0.0,
+          "consequence": 0.0,
+          "consequence_family": 0.0,
+          "consequence_family_best": 0.0,
+          "consequence_family_weighted": 0.0,
+          "defect_family": 0.0,
+          "explicit_campaign_reference": 0.0,
+          "failure_mechanism": 0.0,
+          "final": 0.0012,
+          "semantic_lexical": 0.0464,
+          "subsystem": 0.0
+        }
+      },
+      {
+        "cutoff_date": "2020-01-15",
+        "signal_id": "sig_082172ac56ec2b33",
+        "lineage_id": "lin_348be7e1140ce739",
+        "issue": "AIR BAGS — UNEXPECTED DEPLOYMENT",
+        "signal_scope": "cluster",
+        "risk_score": 81.62,
+        "evidence_count": 12,
+        "failure_mechanism": "OTHER",
+        "consequence_family": "OTHER",
+        "source_systems": [
+          "AIR BAGS"
+        ],
+        "posthoc_target_score": 0.0012,
+        "posthoc_target_breakdown": {
+          "component": 0.0,
+          "component_compatible": 0.0,
+          "consequence": 0.0,
+          "consequence_family": 0.0,
+          "consequence_family_best": 0.0,
+          "consequence_family_weighted": 0.0,
+          "defect_family": 0.0,
+          "explicit_campaign_reference": 0.0,
+          "failure_mechanism": 0.0,
+          "final": 0.0012,
+          "semantic_lexical": 0.0464,
+          "subsystem": 0.0
+        }
+      },
+      {
+        "cutoff_date": "2020-01-22",
+        "signal_id": "sig_8da0a33e7b46b75d",
+        "lineage_id": "lin_348be7e1140ce739",
+        "issue": "AIR BAGS — UNEXPECTED DEPLOYMENT",
+        "signal_scope": "cluster",
+        "risk_score": 76.12,
+        "evidence_count": 12,
+        "failure_mechanism": "OTHER",
+        "consequence_family": "OTHER",
+        "source_systems": [
+          "AIR BAGS"
+        ],
+        "posthoc_target_score": 0.0012,
+        "posthoc_target_breakdown": {
+          "component": 0.0,
+          "component_compatible": 0.0,
+          "consequence": 0.0,
+          "consequence_family": 0.0,
+          "consequence_family_best": 0.0,
+          "consequence_family_weighted": 0.0,
+          "defect_family": 0.0,
+          "explicit_campaign_reference": 0.0,
+          "failure_mechanism": 0.0,
+          "final": 0.0012,
+          "semantic_lexical": 0.0464,
+          "subsystem": 0.0
+        }
+      },
+      {
+        "cutoff_date": "2020-01-29",
+        "signal_id": "sig_7fb42563a81863e9",
+        "lineage_id": "lin_ecee659298166fde",
+        "issue": "SEATS — HEADREST DETACHMENT",
+        "signal_scope": "cluster",
+        "risk_score": 75.52,
+        "evidence_count": 15,
+        "failure_mechanism": "OTHER",
+        "consequence_family": "OTHER",
+        "source_systems": [
+          "SEATS"
+        ],
+        "posthoc_target_score": 0.0018,
+        "posthoc_target_breakdown": {
+          "component": 0.0,
+          "component_compatible": 0.0,
+          "consequence": 0.025,
+          "consequence_family": 0.0,
+          "consequence_family_best": 0.0,
+          "consequence_family_weighted": 0.0,
+          "defect_family": 0.0,
+          "explicit_campaign_reference": 0.0,
+          "failure_mechanism": 0.0,
+          "final": 0.0018,
+          "semantic_lexical": 0.0455,
+          "subsystem": 0.0
+        }
+      },
+      {
+        "cutoff_date": "2020-02-05",
+        "signal_id": "sig_b94a70ddba7b77d0",
+        "lineage_id": "lin_ecee659298166fde",
+        "issue": "SEATS — HEADREST DETACHMENT",
+        "signal_scope": "cluster",
+        "risk_score": 75.52,
+        "evidence_count": 15,
+        "failure_mechanism": "OTHER",
+        "consequence_family": "OTHER",
+        "source_systems": [
+          "SEATS"
+        ],
+        "posthoc_target_score": 0.0018,
+        "posthoc_target_breakdown": {
+          "component": 0.0,
+          "component_compatible": 0.0,
+          "consequence": 0.025,
+          "consequence_family": 0.0,
+          "consequence_family_best": 0.0,
+          "consequence_family_weighted": 0.0,
+          "defect_family": 0.0,
+          "explicit_campaign_reference": 0.0,
+          "failure_mechanism": 0.0,
+          "final": 0.0018,
+          "semantic_lexical": 0.0455,
+          "subsystem": 0.0
+        }
+      },
+      {
+        "cutoff_date": "2020-02-12",
+        "signal_id": "sig_e9c35afbb39a366b",
+        "lineage_id": "lin_ecee659298166fde",
+        "issue": "SEATS — HEADREST DETACHMENT",
+        "signal_scope": "cluster",
+        "risk_score": 75.52,
+        "evidence_count": 15,
+        "failure_mechanism": "OTHER",
+        "consequence_family": "OTHER",
+        "source_systems": [
+          "SEATS"
+        ],
+        "posthoc_target_score": 0.0018,
+        "posthoc_target_breakdown": {
+          "component": 0.0,
+          "component_compatible": 0.0,
+          "consequence": 0.025,
+          "consequence_family": 0.0,
+          "consequence_family_best": 0.0,
+          "consequence_family_weighted": 0.0,
+          "defect_family": 0.0,
+          "explicit_campaign_reference": 0.0,
+          "failure_mechanism": 0.0,
+          "final": 0.0018,
+          "semantic_lexical": 0.0455,
+          "subsystem": 0.0
+        }
+      },
+      {
+        "cutoff_date": "2020-05-13",
+        "signal_id": "sig_c5fbfb33c49bb7dc",
+        "lineage_id": "lin_ecee659298166fde",
+        "issue": "SEATS — UNSPECIFIED FAILURE",
+        "signal_scope": "cluster",
+        "risk_score": 80.11,
+        "evidence_count": 38,
+        "failure_mechanism": "OTHER",
+        "consequence_family": "OTHER",
+        "source_systems": [
+          "SEATS"
+        ],
+        "posthoc_target_score": 0.0038,
+        "posthoc_target_breakdown": {
+          "component": 0.0,
+          "component_compatible": 0.0,
+          "consequence": 0.1,
+          "consequence_family": 0.0,
+          "consequence_family_best": 0.0,
+          "consequence_family_weighted": 0.0,
+          "defect_family": 0.0,
+          "explicit_campaign_reference": 0.0,
+          "failure_mechanism": 0.0,
+          "final": 0.0038,
+          "semantic_lexical": 0.0519,
+          "subsystem": 0.0
+        }
+      },
+      {
+        "cutoff_date": "2020-06-03",
+        "signal_id": "sig_9b89338fc700b3b7",
+        "lineage_id": "lin_ecee659298166fde",
+        "issue": "SEATS — UNSPECIFIED FAILURE",
+        "signal_scope": "cluster",
+        "risk_score": 76.92,
+        "evidence_count": 41,
+        "failure_mechanism": "OTHER",
+        "consequence_family": "OTHER",
+        "source_systems": [
+          "SEATS"
+        ],
+        "posthoc_target_score": 0.0038,
+        "posthoc_target_breakdown": {
+          "component": 0.0,
+          "component_compatible": 0.0,
+          "consequence": 0.1,
+          "consequence_family": 0.0,
+          "consequence_family_best": 0.0,
+          "consequence_family_weighted": 0.0,
+          "defect_family": 0.0,
+          "explicit_campaign_reference": 0.0,
+          "failure_mechanism": 0.0,
+          "final": 0.0038,
+          "semantic_lexical": 0.0519,
+          "subsystem": 0.0
+        }
+      },
+      {
+        "cutoff_date": "2020-06-17",
+        "signal_id": "sig_e7e4244996239a94",
+        "lineage_id": "lin_ecee659298166fde",
+        "issue": "SEATS — UNSPECIFIED FAILURE",
+        "signal_scope": "cluster",
+        "risk_score": 81.49,
+        "evidence_count": 45,
+        "failure_mechanism": "OTHER",
+        "consequence_family": "OTHER",
+        "source_systems": [
+          "SEATS"
+        ],
+        "posthoc_target_score": 0.0038,
+        "posthoc_target_breakdown": {
+          "component": 0.0,
+          "component_compatible": 0.0,
+          "consequence": 0.1,
+          "consequence_family": 0.0,
+          "consequence_family_best": 0.0,
+          "consequence_family_weighted": 0.0,
+          "defect_family": 0.0,
+          "explicit_campaign_reference": 0.0,
+          "failure_mechanism": 0.0,
+          "final": 0.0038,
+          "semantic_lexical": 0.0517,
+          "subsystem": 0.0
+        }
+      },
+      {
+        "cutoff_date": "2020-06-24",
+        "signal_id": "sig_222f25119d696434",
+        "lineage_id": "lin_ecee659298166fde",
+        "issue": "SEATS — UNSPECIFIED FAILURE",
+        "signal_scope": "cluster",
+        "risk_score": 89.98,
+        "evidence_count": 44,
+        "failure_mechanism": "OTHER",
+        "consequence_family": "OTHER",
+        "source_systems": [
+          "SEATS"
+        ],
+        "posthoc_target_score": 0.0038,
+        "posthoc_target_breakdown": {
+          "component": 0.0,
+          "component_compatible": 0.0,
+          "consequence": 0.1,
+          "consequence_family": 0.0,
+          "consequence_family_best": 0.0,
+          "consequence_family_weighted": 0.0,
+          "defect_family": 0.0,
+          "explicit_campaign_reference": 0.0,
+          "failure_mechanism": 0.0,
+          "final": 0.0038,
+          "semantic_lexical": 0.0521,
+          "subsystem": 0.0
+        }
+      },
+      {
+        "cutoff_date": "2020-07-01",
+        "signal_id": "sig_be34f74fb6ad1776",
+        "lineage_id": "lin_ecee659298166fde",
+        "issue": "SEATS — UNSPECIFIED FAILURE",
+        "signal_scope": "cluster",
+        "risk_score": 81.06,
+        "evidence_count": 44,
+        "failure_mechanism": "OTHER",
+        "consequence_family": "OTHER",
+        "source_systems": [
+          "SEATS"
+        ],
+        "posthoc_target_score": 0.0038,
+        "posthoc_target_breakdown": {
+          "component": 0.0,
+          "component_compatible": 0.0,
+          "consequence": 0.1,
+          "consequence_family": 0.0,
+          "consequence_family_best": 0.0,
+          "consequence_family_weighted": 0.0,
+          "defect_family": 0.0,
+          "explicit_campaign_reference": 0.0,
+          "failure_mechanism": 0.0,
+          "final": 0.0038,
+          "semantic_lexical": 0.0521,
+          "subsystem": 0.0
+        }
+      },
+      {
+        "cutoff_date": "2020-07-08",
+        "signal_id": "sig_34b1787b17d5c72d",
+        "lineage_id": "lin_ecee659298166fde",
+        "issue": "SEATS — UNSPECIFIED FAILURE",
+        "signal_scope": "cluster",
+        "risk_score": 78.95,
+        "evidence_count": 49,
+        "failure_mechanism": "OTHER",
+        "consequence_family": "OTHER",
+        "source_systems": [
+          "SEATS"
+        ],
+        "posthoc_target_score": 0.0038,
+        "posthoc_target_breakdown": {
+          "component": 0.0,
+          "component_compatible": 0.0,
+          "consequence": 0.1,
+          "consequence_family": 0.0,
+          "consequence_family_best": 0.0,
+          "consequence_family_weighted": 0.0,
+          "defect_family": 0.0,
+          "explicit_campaign_reference": 0.0,
+          "failure_mechanism": 0.0,
+          "final": 0.0038,
+          "semantic_lexical": 0.0533,
+          "subsystem": 0.0
+        }
+      },
+      {
+        "cutoff_date": "2020-07-15",
+        "signal_id": "sig_57743198f11d38ac",
+        "lineage_id": "lin_ecee659298166fde",
+        "issue": "SEATS — UNSPECIFIED FAILURE",
+        "signal_scope": "cluster",
+        "risk_score": 78.03,
+        "evidence_count": 50,
+        "failure_mechanism": "OTHER",
+        "consequence_family": "OTHER",
+        "source_systems": [
+          "SEATS"
+        ],
+        "posthoc_target_score": 0.0038,
+        "posthoc_target_breakdown": {
+          "component": 0.0,
+          "component_compatible": 0.0,
+          "consequence": 0.1,
+          "consequence_family": 0.0,
+          "consequence_family_best": 0.0,
+          "consequence_family_weighted": 0.0,
+          "defect_family": 0.0,
+          "explicit_campaign_reference": 0.0,
+          "failure_mechanism": 0.0,
+          "final": 0.0038,
+          "semantic_lexical": 0.0536,
+          "subsystem": 0.0
+        }
+      },
+      {
+        "cutoff_date": "2020-07-22",
+        "signal_id": "sig_21208a5b03421778",
+        "lineage_id": "lin_ecee659298166fde",
+        "issue": "SEATS — UNSPECIFIED FAILURE",
+        "signal_scope": "cluster",
+        "risk_score": 78.18,
+        "evidence_count": 53,
+        "failure_mechanism": "OTHER",
+        "consequence_family": "OTHER",
+        "source_systems": [
+          "SEATS"
+        ],
+        "posthoc_target_score": 0.0038,
+        "posthoc_target_breakdown": {
+          "component": 0.0,
+          "component_compatible": 0.0,
+          "consequence": 0.1,
+          "consequence_family": 0.0,
+          "consequence_family_best": 0.0,
+          "consequence_family_weighted": 0.0,
+          "defect_family": 0.0,
+          "explicit_campaign_reference": 0.0,
+          "failure_mechanism": 0.0,
+          "final": 0.0038,
+          "semantic_lexical": 0.0527,
+          "subsystem": 0.0
+        }
+      },
+      {
+        "cutoff_date": "2020-07-29",
+        "signal_id": "sig_32044f47b553b225",
+        "lineage_id": "lin_ecee659298166fde",
+        "issue": "SEATS — UNSPECIFIED FAILURE",
+        "signal_scope": "cluster",
+        "risk_score": 76.28,
+        "evidence_count": 36,
+        "failure_mechanism": "OTHER",
+        "consequence_family": "OTHER",
+        "source_systems": [
+          "SEATS"
+        ],
+        "posthoc_target_score": 0.0032,
+        "posthoc_target_breakdown": {
+          "component": 0.0,
+          "component_compatible": 0.0,
+          "consequence": 0.075,
+          "consequence_family": 0.0,
+          "consequence_family_best": 0.0,
+          "consequence_family_weighted": 0.0,
+          "defect_family": 0.0,
+          "explicit_campaign_reference": 0.0,
+          "failure_mechanism": 0.0,
+          "final": 0.0032,
+          "semantic_lexical": 0.0531,
+          "subsystem": 0.0
+        }
+      },
+      {
+        "cutoff_date": "2020-07-29",
+        "signal_id": "sig_a29c5d3ab36a9657",
+        "lineage_id": "lin_ecee659298166fde",
+        "issue": "SEATS — SPONTANEOUS DEPLOYMENT",
+        "signal_scope": "cluster",
+        "risk_score": 75.63,
+        "evidence_count": 23,
+        "failure_mechanism": "OTHER",
+        "consequence_family": "OTHER",
+        "source_systems": [
+          "SEATS"
+        ],
+        "posthoc_target_score": 0.0031,
+        "posthoc_target_breakdown": {
+          "component": 0.0,
+          "component_compatible": 0.0,
+          "consequence": 0.075,
+          "consequence_family": 0.0,
+          "consequence_family_best": 0.0,
+          "consequence_family_weighted": 0.0,
+          "defect_family": 0.0,
+          "explicit_campaign_reference": 0.0,
+          "failure_mechanism": 0.0,
+          "final": 0.0031,
+          "semantic_lexical": 0.0479,
+          "subsystem": 0.0
+        }
+      },
+      {
+        "cutoff_date": "2020-08-05",
+        "signal_id": "sig_e6d3d808b88a0d46",
+        "lineage_id": "lin_ecee659298166fde",
+        "issue": "SEATS — UNEXPECTED DEPLOYMENT",
+        "signal_scope": "cluster",
+        "risk_score": 80.33,
+        "evidence_count": 53,
+        "failure_mechanism": "OTHER",
+        "consequence_family": "OTHER",
+        "source_systems": [
+          "SEATS"
+        ],
+        "posthoc_target_score": 0.0038,
+        "posthoc_target_breakdown": {
+          "component": 0.0,
+          "component_compatible": 0.0,
+          "consequence": 0.1,
+          "consequence_family": 0.0,
+          "consequence_family_best": 0.0,
+          "consequence_family_weighted": 0.0,
+          "defect_family": 0.0,
+          "explicit_campaign_reference": 0.0,
+          "failure_mechanism": 0.0,
+          "final": 0.0038,
+          "semantic_lexical": 0.0521,
+          "subsystem": 0.0
+        }
+      },
+      {
+        "cutoff_date": "2020-08-12",
+        "signal_id": "sig_eb5f6bca9e2c78cf",
+        "lineage_id": "lin_ecee659298166fde",
+        "issue": "SEATS — UNEXPECTED DEPLOYMENT",
+        "signal_scope": "cluster",
+        "risk_score": 78.36,
+        "evidence_count": 54,
+        "failure_mechanism": "OTHER",
+        "consequence_family": "OTHER",
+        "source_systems": [
+          "SEATS"
+        ],
+        "posthoc_target_score": 0.0038,
+        "posthoc_target_breakdown": {
+          "component": 0.0,
+          "component_compatible": 0.0,
+          "consequence": 0.1,
+          "consequence_family": 0.0,
+          "consequence_family_best": 0.0,
+          "consequence_family_weighted": 0.0,
+          "defect_family": 0.0,
+          "explicit_campaign_reference": 0.0,
+          "failure_mechanism": 0.0,
+          "final": 0.0038,
+          "semantic_lexical": 0.0528,
+          "subsystem": 0.0
+        }
+      }
+    ],
+    "best_target_candidates": [
+      {
+        "cutoff_date": "2020-07-08",
+        "signal_id": "sig_a60b729595bf7618",
+        "lineage_id": "lin_4f7b8027fd8ed559",
+        "issue": "ENGINE — UNSPECIFIED FAILURE",
+        "alert": false,
+        "risk_score": 59.87,
+        "evidence_count": 6,
+        "failure_mechanism": "GENERAL_POWERTRAIN",
+        "consequence_family": "LOSS_OF_MOTIVE_POWER",
+        "source_systems": [
+          "ENGINE"
+        ],
+        "posthoc_target_score": 0.4453,
+        "posthoc_target_breakdown": {
+          "component": 1.0,
+          "component_compatible": 1.0,
+          "consequence": 0.1,
+          "consequence_family": 1.0,
+          "consequence_family_best": 1.0,
+          "consequence_family_weighted": 1.0,
+          "defect_family": 1.0,
+          "explicit_campaign_reference": 0.0,
+          "failure_mechanism": 0.0,
+          "final": 0.4453,
+          "semantic_lexical": 0.0806,
+          "subsystem": 0.2727
+        }
+      },
+      {
+        "cutoff_date": "2020-07-15",
+        "signal_id": "sig_112f0a4e27978712",
+        "lineage_id": "lin_4f7b8027fd8ed559",
+        "issue": "ENGINE — UNSPECIFIED FAILURE",
+        "alert": false,
+        "risk_score": 59.87,
+        "evidence_count": 6,
+        "failure_mechanism": "GENERAL_POWERTRAIN",
+        "consequence_family": "LOSS_OF_MOTIVE_POWER",
+        "source_systems": [
+          "ENGINE"
+        ],
+        "posthoc_target_score": 0.4453,
+        "posthoc_target_breakdown": {
+          "component": 1.0,
+          "component_compatible": 1.0,
+          "consequence": 0.1,
+          "consequence_family": 1.0,
+          "consequence_family_best": 1.0,
+          "consequence_family_weighted": 1.0,
+          "defect_family": 1.0,
+          "explicit_campaign_reference": 0.0,
+          "failure_mechanism": 0.0,
+          "final": 0.4453,
+          "semantic_lexical": 0.0806,
+          "subsystem": 0.2727
+        }
+      },
+      {
+        "cutoff_date": "2020-07-22",
+        "signal_id": "sig_bca3272d77dfa228",
+        "lineage_id": "lin_4f7b8027fd8ed559",
+        "issue": "ENGINE — UNSPECIFIED FAILURE",
+        "alert": false,
+        "risk_score": 59.87,
+        "evidence_count": 6,
+        "failure_mechanism": "GENERAL_POWERTRAIN",
+        "consequence_family": "LOSS_OF_MOTIVE_POWER",
+        "source_systems": [
+          "ENGINE"
+        ],
+        "posthoc_target_score": 0.4453,
+        "posthoc_target_breakdown": {
+          "component": 1.0,
+          "component_compatible": 1.0,
+          "consequence": 0.1,
+          "consequence_family": 1.0,
+          "consequence_family_best": 1.0,
+          "consequence_family_weighted": 1.0,
+          "defect_family": 1.0,
+          "explicit_campaign_reference": 0.0,
+          "failure_mechanism": 0.0,
+          "final": 0.4453,
+          "semantic_lexical": 0.0806,
+          "subsystem": 0.2727
+        }
+      },
+      {
+        "cutoff_date": "2019-10-16",
+        "signal_id": "sig_d90d02790d119ee7",
+        "lineage_id": "lin_4f7b8027fd8ed559",
+        "issue": "ENGINE — UNSPECIFIED FAILURE",
+        "alert": false,
+        "risk_score": 62.8,
+        "evidence_count": 9,
+        "failure_mechanism": "GENERAL_POWERTRAIN",
+        "consequence_family": "LOSS_OF_MOTIVE_POWER",
+        "source_systems": [
+          "ENGINE"
+        ],
+        "posthoc_target_score": 0.4345,
+        "posthoc_target_breakdown": {
+          "component": 1.0,
+          "component_compatible": 1.0,
+          "consequence": 0.1,
+          "consequence_family": 1.0,
+          "consequence_family_best": 1.0,
+          "consequence_family_weighted": 1.0,
+          "defect_family": 1.0,
+          "explicit_campaign_reference": 0.0,
+          "failure_mechanism": 0.0,
+          "final": 0.4345,
+          "semantic_lexical": 0.0782,
+          "subsystem": 0.1667
+        }
+      },
+      {
+        "cutoff_date": "2019-10-23",
+        "signal_id": "sig_63d7dead04c3e269",
+        "lineage_id": "lin_4f7b8027fd8ed559",
+        "issue": "ENGINE — UNSPECIFIED FAILURE",
+        "alert": false,
+        "risk_score": 62.8,
+        "evidence_count": 9,
+        "failure_mechanism": "GENERAL_POWERTRAIN",
+        "consequence_family": "LOSS_OF_MOTIVE_POWER",
+        "source_systems": [
+          "ENGINE"
+        ],
+        "posthoc_target_score": 0.4345,
+        "posthoc_target_breakdown": {
+          "component": 1.0,
+          "component_compatible": 1.0,
+          "consequence": 0.1,
+          "consequence_family": 1.0,
+          "consequence_family_best": 1.0,
+          "consequence_family_weighted": 1.0,
+          "defect_family": 1.0,
+          "explicit_campaign_reference": 0.0,
+          "failure_mechanism": 0.0,
+          "final": 0.4345,
+          "semantic_lexical": 0.0782,
+          "subsystem": 0.1667
+        }
+      },
+      {
+        "cutoff_date": "2019-10-30",
+        "signal_id": "sig_74281ee2268067a0",
+        "lineage_id": "lin_4f7b8027fd8ed559",
+        "issue": "ENGINE — UNSPECIFIED FAILURE",
+        "alert": false,
+        "risk_score": 62.8,
+        "evidence_count": 9,
+        "failure_mechanism": "GENERAL_POWERTRAIN",
+        "consequence_family": "LOSS_OF_MOTIVE_POWER",
+        "source_systems": [
+          "ENGINE"
+        ],
+        "posthoc_target_score": 0.4345,
+        "posthoc_target_breakdown": {
+          "component": 1.0,
+          "component_compatible": 1.0,
+          "consequence": 0.1,
+          "consequence_family": 1.0,
+          "consequence_family_best": 1.0,
+          "consequence_family_weighted": 1.0,
+          "defect_family": 1.0,
+          "explicit_campaign_reference": 0.0,
+          "failure_mechanism": 0.0,
+          "final": 0.4345,
+          "semantic_lexical": 0.0782,
+          "subsystem": 0.1667
+        }
+      },
+      {
+        "cutoff_date": "2019-11-06",
+        "signal_id": "sig_c437ef23c3d73852",
+        "lineage_id": "lin_4f7b8027fd8ed559",
+        "issue": "ENGINE — UNSPECIFIED FAILURE",
+        "alert": false,
+        "risk_score": 62.8,
+        "evidence_count": 9,
+        "failure_mechanism": "GENERAL_POWERTRAIN",
+        "consequence_family": "LOSS_OF_MOTIVE_POWER",
+        "source_systems": [
+          "ENGINE"
+        ],
+        "posthoc_target_score": 0.4345,
+        "posthoc_target_breakdown": {
+          "component": 1.0,
+          "component_compatible": 1.0,
+          "consequence": 0.1,
+          "consequence_family": 1.0,
+          "consequence_family_best": 1.0,
+          "consequence_family_weighted": 1.0,
+          "defect_family": 1.0,
+          "explicit_campaign_reference": 0.0,
+          "failure_mechanism": 0.0,
+          "final": 0.4345,
+          "semantic_lexical": 0.0782,
+          "subsystem": 0.1667
+        }
+      },
+      {
+        "cutoff_date": "2019-12-04",
+        "signal_id": "sig_d3d424ed8ed91400",
+        "lineage_id": "lin_4f7b8027fd8ed559",
+        "issue": "ENGINE — UNSPECIFIED FAILURE",
+        "alert": false,
+        "risk_score": 59.85,
+        "evidence_count": 10,
+        "failure_mechanism": "GENERAL_POWERTRAIN",
+        "consequence_family": "LOSS_OF_MOTIVE_POWER",
+        "source_systems": [
+          "ENGINE"
+        ],
+        "posthoc_target_score": 0.4345,
+        "posthoc_target_breakdown": {
+          "component": 1.0,
+          "component_compatible": 1.0,
+          "consequence": 0.1,
+          "consequence_family": 1.0,
+          "consequence_family_best": 1.0,
+          "consequence_family_weighted": 1.0,
+          "defect_family": 1.0,
+          "explicit_campaign_reference": 0.0,
+          "failure_mechanism": 0.0,
+          "final": 0.4345,
+          "semantic_lexical": 0.0786,
+          "subsystem": 0.1667
+        }
+      },
+      {
+        "cutoff_date": "2019-12-11",
+        "signal_id": "sig_fd3d8e5dd7a1ba5c",
+        "lineage_id": "lin_4f7b8027fd8ed559",
+        "issue": "ENGINE — UNSPECIFIED FAILURE",
+        "alert": false,
+        "risk_score": 59.85,
+        "evidence_count": 10,
+        "failure_mechanism": "GENERAL_POWERTRAIN",
+        "consequence_family": "LOSS_OF_MOTIVE_POWER",
+        "source_systems": [
+          "ENGINE"
+        ],
+        "posthoc_target_score": 0.4345,
+        "posthoc_target_breakdown": {
+          "component": 1.0,
+          "component_compatible": 1.0,
+          "consequence": 0.1,
+          "consequence_family": 1.0,
+          "consequence_family_best": 1.0,
+          "consequence_family_weighted": 1.0,
+          "defect_family": 1.0,
+          "explicit_campaign_reference": 0.0,
+          "failure_mechanism": 0.0,
+          "final": 0.4345,
+          "semantic_lexical": 0.0786,
+          "subsystem": 0.1667
+        }
+      },
+      {
+        "cutoff_date": "2020-02-05",
+        "signal_id": "sig_c94cdd3b40cdc5aa",
+        "lineage_id": "lin_6f2e3821ef0e589f",
+        "issue": "META — Propulsion / powertrain control",
+        "alert": false,
+        "risk_score": 63.63,
+        "evidence_count": 9,
+        "failure_mechanism": "PROPULSION_CONTROL",
+        "consequence_family": "GENERAL_POWERTRAIN_FAILURE",
+        "source_systems": [
+          "ENGINE",
+          "POWER TRAIN",
+          "UNKNOWN OR OTHER",
+          "VISIBILITY"
+        ],
+        "posthoc_target_score": 0.3306,
+        "posthoc_target_breakdown": {
+          "component": 1.0,
+          "component_compatible": 1.0,
+          "consequence": 0.05,
+          "consequence_family": 0.6011,
+          "consequence_family_best": 1.0,
+          "consequence_family_weighted": 0.2022,
+          "defect_family": 0.6011,
+          "explicit_campaign_reference": 0.0,
+          "failure_mechanism": 0.0,
+          "final": 0.3306,
+          "semantic_lexical": 0.0539,
+          "subsystem": 0.0
+        }
+      }
+    ]
+  }
+]

@@ -1,0 +1,267 @@
+[
+  {
+    "case_id": "case_d8e964268da5faf4",
+    "name": "Tesla Model Y windshield defrost heat-pump recall",
+    "first_alert_date": "2021-11-16",
+    "max_risk_score": 92.41,
+    "top_best": [
+      {
+        "signal_id": "sig_077ef970c931ed35",
+        "lineage_id": "lin_ede1935332621dec",
+        "issue": "ELECTRICAL SYSTEM — UNSPECIFIED FAILURE",
+        "alert": false,
+        "posthoc_target_score": 0.214,
+        "posthoc_target_breakdown": {
+          "component": null,
+          "component_compatible": null,
+          "failure_mechanism": "GENERAL_ELECTRICAL",
+          "consequence": null,
+          "consequence_family": "GENERAL_ELECTRICAL_FAILURE",
+          "semantic_lexical": null
+        }
+      },
+      {
+        "signal_id": "sig_8c47b6bd33393fd4",
+        "lineage_id": "lin_ede1935332621dec",
+        "issue": "ELECTRICAL SYSTEM — UNSPECIFIED FAILURE",
+        "alert": false,
+        "posthoc_target_score": 0.2134,
+        "posthoc_target_breakdown": {
+          "component": null,
+          "component_compatible": null,
+          "failure_mechanism": "GENERAL_ELECTRICAL",
+          "consequence": null,
+          "consequence_family": "GENERAL_ELECTRICAL_FAILURE",
+          "semantic_lexical": null
+        }
+      },
+      {
+        "signal_id": "sig_c790e04012547d3a",
+        "lineage_id": "lin_ede1935332621dec",
+        "issue": "ELECTRICAL SYSTEM — UNSPECIFIED FAILURE",
+        "alert": false,
+        "posthoc_target_score": 0.2134,
+        "posthoc_target_breakdown": {
+          "component": null,
+          "component_compatible": null,
+          "failure_mechanism": "GENERAL_ELECTRICAL",
+          "consequence": null,
+          "consequence_family": "GENERAL_ELECTRICAL_FAILURE",
+          "semantic_lexical": null
+        }
+      }
+    ]
+  },
+  {
+    "case_id": "case_26d977ae1ccb623a",
+    "name": "Volkswagen ID.4 exterior door handle recall",
+    "first_alert_date": "2023-04-25",
+    "max_risk_score": 77.3,
+    "top_best": [
+      {
+        "signal_id": "sig_8fb3a866b86587a7",
+        "lineage_id": "lin_bdc4c06e0001cb7b",
+        "issue": "UNKNOWN OR OTHER — UNSPECIFIED FAILURE",
+        "alert": false,
+        "posthoc_target_score": 0.0079,
+        "posthoc_target_breakdown": {
+          "component": null,
+          "component_compatible": null,
+          "failure_mechanism": "OTHER",
+          "consequence": null,
+          "consequence_family": "OTHER",
+          "semantic_lexical": null
+        }
+      },
+      {
+        "signal_id": "sig_f3f535c9228b63b7",
+        "lineage_id": "lin_bdc4c06e0001cb7b",
+        "issue": "UNKNOWN OR OTHER — UNSPECIFIED FAILURE",
+        "alert": false,
+        "posthoc_target_score": 0.0079,
+        "posthoc_target_breakdown": {
+          "component": null,
+          "component_compatible": null,
+          "failure_mechanism": "OTHER",
+          "consequence": null,
+          "consequence_family": "OTHER",
+          "semantic_lexical": null
+        }
+      },
+      {
+        "signal_id": "sig_40d31bce8891df44",
+        "lineage_id": "lin_5e4d2964a4dcc3f0",
+        "issue": "ELECTRICAL SYSTEM — UNSPECIFIED FAILURE",
+        "alert": true,
+        "posthoc_target_score": 0.0077,
+        "posthoc_target_breakdown": {
+          "component": null,
+          "component_compatible": null,
+          "failure_mechanism": "GENERAL_ELECTRICAL",
+          "consequence": null,
+          "consequence_family": "GENERAL_ELECTRICAL_FAILURE",
+          "semantic_lexical": null
+        }
+      }
+    ]
+  },
+  {
+    "case_id": "case_5424e1117a13f0e6",
+    "name": "Ford Fusion steering wheel fastening recall",
+    "first_alert_date": "2017-09-03",
+    "max_risk_score": 75.94,
+    "top_best": [
+      {
+        "signal_id": "sig_20284eef3322bdb3",
+        "lineage_id": "lin_0b3c22fe4ab1e657",
+        "issue": "STEERING — STEERING ASSIST FAULT",
+        "alert": false,
+        "posthoc_target_score": 0.5304,
+        "posthoc_target_breakdown": {
+          "component": null,
+          "component_compatible": null,
+          "failure_mechanism": "STEERING_SYSTEM",
+          "consequence": null,
+          "consequence_family": "OTHER",
+          "semantic_lexical": null
+        }
+      },
+      {
+        "signal_id": "sig_08a43e4629d286e3",
+        "lineage_id": "lin_0b3c22fe4ab1e657",
+        "issue": "STEERING — STEERING ASSIST FAULT",
+        "alert": false,
+        "posthoc_target_score": 0.5304,
+        "posthoc_target_breakdown": {
+          "component": null,
+          "component_compatible": null,
+          "failure_mechanism": "STEERING_SYSTEM",
+          "consequence": null,
+          "consequence_family": "OTHER",
+          "semantic_lexical": null
+        }
+      },
+      {
+        "signal_id": "sig_c6216b08e4de7358",
+        "lineage_id": "lin_0ea593bb35a4518c",
+        "issue": "ELECTRONIC STABILITY CONTROL (ESC) — UNSPECIFIED FAILURE",
+        "alert": false,
+        "posthoc_target_score": 0.44,
+        "posthoc_target_breakdown": {
+          "component": null,
+          "component_compatible": null,
+          "failure_mechanism": "STEERING_SYSTEM",
+          "consequence": null,
+          "consequence_family": "LOSS_OF_STEERING",
+          "semantic_lexical": null
+        }
+      }
+    ]
+  },
+  {
+    "case_id": "case_6bce6fe3365050e7",
+    "name": "Hyundai Sonata engine bearing wear stall recall",
+    "first_alert_date": "2016-09-22",
+    "max_risk_score": 85.04,
+    "top_best": [
+      {
+        "signal_id": "sig_e3453be55b13c484",
+        "lineage_id": "lin_5d9dc81efdca33f8",
+        "issue": "META — Charging system",
+        "alert": false,
+        "posthoc_target_score": 0.2263,
+        "posthoc_target_breakdown": {
+          "component": null,
+          "component_compatible": null,
+          "failure_mechanism": "CHARGING_SYSTEM",
+          "consequence": null,
+          "consequence_family": "LOSS_OF_BRAKING",
+          "semantic_lexical": null
+        }
+      },
+      {
+        "signal_id": "sig_e513862e8e8c63c8",
+        "lineage_id": "lin_5d9dc81efdca33f8",
+        "issue": "META — Charging system",
+        "alert": false,
+        "posthoc_target_score": 0.2216,
+        "posthoc_target_breakdown": {
+          "component": null,
+          "component_compatible": null,
+          "failure_mechanism": "CHARGING_SYSTEM",
+          "consequence": null,
+          "consequence_family": "GENERAL_POWERTRAIN_FAILURE",
+          "semantic_lexical": null
+        }
+      },
+      {
+        "signal_id": "sig_d331a6e742a0fdbb",
+        "lineage_id": "lin_2593e799f524b455",
+        "issue": "ENGINE — THERMAL EVENT",
+        "alert": false,
+        "posthoc_target_score": 0.2189,
+        "posthoc_target_breakdown": {
+          "component": null,
+          "component_compatible": null,
+          "failure_mechanism": "THERMAL_SYSTEM",
+          "consequence": null,
+          "consequence_family": "THERMAL_EVENT",
+          "semantic_lexical": null
+        }
+      }
+    ]
+  },
+  {
+    "case_id": "case_3f34c3b212bd59b0",
+    "name": "Jeep Grand Cherokee crank position sensor tone-wheel recall",
+    "first_alert_date": "2019-09-18",
+    "max_risk_score": 89.98,
+    "top_best": [
+      {
+        "signal_id": "sig_a60b729595bf7618",
+        "lineage_id": "lin_4f7b8027fd8ed559",
+        "issue": "ENGINE — UNSPECIFIED FAILURE",
+        "alert": false,
+        "posthoc_target_score": 0.4453,
+        "posthoc_target_breakdown": {
+          "component": null,
+          "component_compatible": null,
+          "failure_mechanism": "GENERAL_POWERTRAIN",
+          "consequence": null,
+          "consequence_family": "LOSS_OF_MOTIVE_POWER",
+          "semantic_lexical": null
+        }
+      },
+      {
+        "signal_id": "sig_112f0a4e27978712",
+        "lineage_id": "lin_4f7b8027fd8ed559",
+        "issue": "ENGINE — UNSPECIFIED FAILURE",
+        "alert": false,
+        "posthoc_target_score": 0.4453,
+        "posthoc_target_breakdown": {
+          "component": null,
+          "component_compatible": null,
+          "failure_mechanism": "GENERAL_POWERTRAIN",
+          "consequence": null,
+          "consequence_family": "LOSS_OF_MOTIVE_POWER",
+          "semantic_lexical": null
+        }
+      },
+      {
+        "signal_id": "sig_bca3272d77dfa228",
+        "lineage_id": "lin_4f7b8027fd8ed559",
+        "issue": "ENGINE — UNSPECIFIED FAILURE",
+        "alert": false,
+        "posthoc_target_score": 0.4453,
+        "posthoc_target_breakdown": {
+          "component": null,
+          "component_compatible": null,
+          "failure_mechanism": "GENERAL_POWERTRAIN",
+          "consequence": null,
+          "consequence_family": "LOSS_OF_MOTIVE_POWER",
+          "semantic_lexical": null
+        }
+      }
+    ]
+  }
+]

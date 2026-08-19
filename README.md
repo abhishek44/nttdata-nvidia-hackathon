@@ -25,7 +25,7 @@ This repository is a clean rebuild based on the supplied RecallZero design docum
 
 ### Detector Freeze v1 and 0.3.5.post2 validation phase
 
-Detector Freeze v1 keeps the 0.3.3a2 calibration and downstream detection logic; before validation locking, 0.3.5.post2 revises only the semantic extraction contract needed to make local NIM output schema-safe and all-NIM in strict validation. RecallZero 0.3.5 adds validation infrastructure without changing detector math or eligibility rules. The 0.3.5.post1 maintenance patch corrected NHTSA complaint addressing. The 0.3.5.post2 pre-validation patch additionally hardens the local-NIM structured extraction contract and makes strict benchmark runs fail closed instead of accepting heuristic fallback. Detector calibration, taxonomy, clustering, severity, meta construction, trend/risk math, matcher logic, thresholds, weights, windows, and leakage rules remain frozen. The 75-point alert threshold, 30/25/15/20/10 risk weights, 28/84-day windows, DBSCAN parameters, severity validator, taxonomy, meta construction, recall matcher, and anti-leakage rules remain frozen.
+Detector Freeze v1 keeps the 0.3.3a2 calibration and downstream detection logic. RecallZero 0.3.5 adds validation infrastructure without changing detector math or eligibility rules; post1 corrected NHTSA complaint addressing; post2 hardened local-NIM structured extraction; and post3 adds a narrow extraction-stability normalization plus an isolated evaluation-only embedding attribution experiment. Detector calibration, taxonomy, clustering, severity, meta construction, trend/risk math, live recall matcher logic, thresholds, weights, windows, and leakage rules remain frozen. The 75-point alert threshold, 30/25/15/20/10 risk weights, 28/84-day windows, DBSCAN parameters, severity validator, taxonomy, meta construction, live recall matcher, and anti-leakage rules remain frozen.
 
 The freeze manifest hashes detector-critical modules (including `analytics/severity.py`, `analytics/risk_engine.py`, `pipeline.py`, and `recall/matcher.py`) and verifies the *live loaded* risk/clustering/trend/model settings. The validation harness adds preregistered `development` / `validation` / `holdout` splits, preflight, manifest locking, signed threshold margins, input fingerprints, semantic provenance, alert persistence, Wilson confidence intervals, and post-hoc control adjudication. Deferred TAX-001 and META-001 issues remain documented under `benchmarks/KNOWN_GAPS.md`; they are not silently fixed against validation cases.
 
@@ -296,6 +296,19 @@ recallzero benchmark-compare \
   data/runs/benchmark_v2.json \
   --json data/runs/benchmark_compare.json
 ```
+
+Run the isolated post-hoc TF-IDF-vs-NVIDIA-embedding target-attribution experiment without rerunning Detector v1:
+
+```bash
+recallzero benchmark-attribution-experiment \
+  data_detector_v1_localnim_post2/runs/detector_v1_validation_raw.json \
+  --manifest config/candidates.yml \
+  --target-match-threshold 0.45 \
+  --top-target-count 10 \
+  --json data_detector_v1_localnim_post2/runs/target_attribution_experiment_a.json
+```
+
+This command is a development diagnostic: it performs zero LLM calls and zero detector replays, reconstructs frozen candidates from their persisted member IDs plus local caches, and changes only the 10% semantic target-attribution term from TF-IDF cosine to NIM embedding cosine. It does **not** change live `recall_gap` risk scoring. See `docs/TARGET_ATTRIBUTION_EXPERIMENT.md`.
 
 `unique_alert_lineages` and unconfirmed-lineage burden must be interpreted with TAX-001 in `benchmarks/KNOWN_GAPS.md`, because taxonomy-driven lineage fragmentation can inflate unique-lineage counts.
 

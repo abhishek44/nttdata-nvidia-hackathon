@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.3.5.post3 — Stability normalization + isolated embedding attribution experiment
+
+- Keep Detector v1 calibration, live visible-recall matching, risk weights, 75-point alert threshold, taxonomy, clustering, severity scoring, trend windows, and Time Machine leakage rules unchanged.
+- Treat unsupported auxiliary NIM `severity_indicators` labels (for example the observed Wrangler `airbag_deployed`) as non-fatal vocabulary drift: log and drop them from the canonical signature before detector use. Core structured extraction failures such as invalid JSON or missing required fields still receive one repair attempt and remain fail-closed in strict benchmarks.
+- Add an evaluation-only `TargetAttributor` that is structurally separate from `RecallMatcher.find_best_match`; live `recall_gap` risk cannot call the experimental embedding path.
+- Add `recallzero benchmark-attribution-experiment` to compare the frozen TF-IDF target-attribution semantic term against NVIDIA embedding cosine while keeping the exact 10% semantic weight, structured axes, component gate, 0.45 threshold, frozen risk scores, and alert decisions unchanged.
+- The attribution experiment uses persisted candidate `member_ids` plus local complaint/signature/recall caches, recomputes the baseline target score as a provenance check, performs zero LLM calls and zero detector replays, batches unique embedding texts, and stops if the reconstructed baseline drifts from the frozen raw artifact.
+- Mark Experiment A explicitly as development-only and require discrimination rather than general score inflation: unrelated alert candidates are retained as falsifiability guardrails.
+- Add regression tests for Wrangler auxiliary-label normalization, exact 10% embedding substitution arithmetic, preservation of the component gate, and cache-only attribution execution.
+
 ## 0.3.5.post2 — Local NIM structured-extraction reliability gate
 
 - Keep Detector v1 calibration and downstream scoring behavior frozen: no changes to severity, taxonomy, clustering, meta-signal construction, trend/risk math, recall matching, alert threshold, weights, windows, or Time Machine leakage rules.

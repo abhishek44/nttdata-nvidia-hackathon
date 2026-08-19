@@ -19,5 +19,6 @@ data/cache/*
 !data/runs/.gitkeep
 !data/cache/.gitkeep
 data_detector_v1_localnim_post2/cache/*
-data_detector_v1_localnim_post2/raw/*
 data_detector_v1_localnim_post2/normalized/*
+data_detector_v1_localnim_post2/raw/*
+!data_detector_v1_localnim_post2/cache/.gitkeep

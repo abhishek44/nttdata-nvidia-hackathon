@@ -34,6 +34,7 @@ from recallzero.benchmark_adjudication import (
     build_validation_report,
     write_validation_report_csv,
 )
+from recallzero.benchmark_attribution import run_attribution_experiment
 from recallzero.config import get_settings
 from recallzero.demo import build_demo_records
 from recallzero.freeze import verify_freeze
@@ -574,6 +575,66 @@ def benchmark(
             console.print(f"Saved raw CSV: {csv_output}")
 
     _run_cli_async(_run(), "Benchmark")
+
+
+@app.command("benchmark-attribution-experiment")
+def benchmark_attribution_experiment(
+    raw_result: Path = typer.Argument(..., exists=True, readable=True),
+    manifest: Path = typer.Option(Path("config/candidates.yml"), "--manifest"),
+    json_output: Path = typer.Option(
+        Path("data/runs/target_attribution_experiment_a.json"),
+        "--json",
+        help="Development-only TF-IDF vs NIM-embedding attribution comparison.",
+    ),
+    top_target_count: int = typer.Option(
+        10,
+        "--top-target-count",
+        min=1,
+        max=50,
+        help="Per unmatched positive case, include this many highest baseline target candidates plus every alert candidate.",
+    ),
+    target_match_threshold: float = typer.Option(
+        0.45,
+        "--target-match-threshold",
+        min=0.0,
+        max=1.0,
+        help="Evaluation-only qualification threshold; keep at the frozen value for Experiment A.",
+    ),
+) -> None:
+    """Run isolated Target Attribution Experiment A without rerunning Detector v1."""
+    settings = get_settings()
+    configure_logging(settings.log_level)
+
+    async def _run() -> None:
+        result = await run_attribution_experiment(
+            settings=settings,
+            raw_result_path=raw_result,
+            candidates_path=manifest,
+            target_match_threshold=target_match_threshold,
+            top_target_count=top_target_count,
+        )
+        json_output.parent.mkdir(parents=True, exist_ok=True)
+        json_output.write_text(dumps_json(result.model_dump(mode="json")), encoding="utf-8")
+        console.print(f"[bold]Experiment:[/bold] {result.experiment_id}")
+        console.print("[bold]Scope:[/bold] development diagnostic only")
+        console.print(f"[bold]Source benchmark:[/bold] {result.source_benchmark_run_id}")
+        console.print(f"[bold]Cases:[/bold] {result.case_count}  [bold]Candidates:[/bold] {result.candidate_count}")
+        console.print(
+            f"[bold]New work:[/bold] 0 LLM calls, 0 detector replays, "
+            f"~{result.estimated_embedding_api_calls} embedding API call(s) "
+            f"for {result.unique_text_count} unique texts"
+        )
+        console.print(
+            f"[bold]Alert candidates qualifying target:[/bold] "
+            f"baseline={result.baseline_qualified_alert_count}, "
+            f"embedding-experiment={result.experimental_qualified_alert_count}"
+        )
+        console.print(
+            "[yellow]Interpret discrimination, not score inflation: unrelated alert candidates should remain below the target threshold.[/yellow]"
+        )
+        console.print(f"Saved attribution experiment JSON: {json_output}")
+
+    _run_cli_async(_run(), "Target attribution experiment")
 
 
 @app.command("benchmark-adjudicate")

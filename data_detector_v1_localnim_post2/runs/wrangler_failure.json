@@ -1,0 +1,26 @@
+{
+  "name": "Jeep Wrangler 2018 targetless control",
+  "status": "INVALID_CASE",
+  "invalid_reason": "NIM_EXTRACTION_FAILURE",
+  "warnings": [
+    "Benchmark case failed before a valid detector outcome could be recorded: NIM structured extraction failed after one repair attempt for ODI 11130246: 1 validation error for NIMFailureSignaturePayload\nseverity_indicators.2\n  Input should be 'crash_reported', 'fire_or_thermal_event', 'injury_reported', 'fatality_reported', 'loss_of_braking', 'loss_of_steering', 'loss_of_motive_power', 'loss_of_control', 'restraint_failure', 'unintended_acceleration', 'unintended_braking' or 'vehicle_in_motion' [type=literal_error, input_value='airbag_deployed', input_type=str]\n    For further information visit https://errors.pydantic.dev/2.13/v/literal_error"
+  ],
+  "semantic_provenance": {
+    "cached_count": 0,
+    "degraded_snapshot_count": 0,
+    "heuristic_count": 0,
+    "nim_count": 0,
+    "nim_fraction": null,
+    "other_count": 0,
+    "signature_count": 0
+  },
+  "input_provenance": {
+    "complaint_count_eligible": 0,
+    "complaint_count_raw": 0,
+    "complaint_dataset_sha256": null,
+    "eligible_complaint_dataset_sha256": null,
+    "recall_count_raw": 0,
+    "recall_dataset_sha256": null,
+    "signature_cache_sha256": null
+  }
+}

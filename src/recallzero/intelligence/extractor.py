@@ -6,7 +6,7 @@ import logging
 import re
 from collections import Counter
 from collections.abc import Iterable, Sequence
-from typing import Any, Callable, Literal, Protocol
+from typing import Any, Callable, Protocol
 
 from pydantic import BaseModel, ConfigDict, Field, ValidationError, field_validator
 
@@ -175,20 +175,22 @@ Required JSON keys:
 """
 
 
-SeverityIndicator = Literal[
-    "crash_reported",
-    "fire_or_thermal_event",
-    "injury_reported",
-    "fatality_reported",
-    "loss_of_braking",
-    "loss_of_steering",
-    "loss_of_motive_power",
-    "loss_of_control",
-    "restraint_failure",
-    "unintended_acceleration",
-    "unintended_braking",
-    "vehicle_in_motion",
-]
+SUPPORTED_SEVERITY_INDICATORS: frozenset[str] = frozenset(
+    {
+        "crash_reported",
+        "fire_or_thermal_event",
+        "injury_reported",
+        "fatality_reported",
+        "loss_of_braking",
+        "loss_of_steering",
+        "loss_of_motive_power",
+        "loss_of_control",
+        "restraint_failure",
+        "unintended_acceleration",
+        "unintended_braking",
+        "vehicle_in_motion",
+    }
+)
 
 
 class NIMFailureSignaturePayload(BaseModel):
@@ -207,7 +209,11 @@ class NIMFailureSignaturePayload(BaseModel):
     symptom: str | None
     operating_state: str | None
     consequence: str | None
-    severity_indicators: list[SeverityIndicator]
+    # Keep this as strings rather than a JSON-Schema enum. Some otherwise healthy local NIM
+    # profiles can emit an auxiliary label outside RecallZero's canonical severity vocabulary
+    # even under guided decoding. Unknown labels are normalized away before they can enter the
+    # detector; malformed/non-string structures still fail validation.
+    severity_indicators: list[str]
     confidence: float
 
     @field_validator("system", "failure_mode")
@@ -217,6 +223,17 @@ class NIMFailureSignaturePayload(BaseModel):
         if not normalized:
             raise ValueError("must not be empty")
         return normalized
+
+    @field_validator("severity_indicators")
+    @classmethod
+    def normalize_severity_indicators(cls, value: list[str]) -> list[str]:
+        return sorted(
+            {
+                str(item).strip().lower().replace(" ", "_")
+                for item in value
+                if str(item).strip()
+            }
+        )
 
     @field_validator("confidence")
     @classmethod
@@ -269,6 +286,29 @@ class NIMFailureExtractor:
         # parser for hosted/local endpoints that still wrap JSON in fences.
         parsed = cls._extract_json(content)
         return NIMFailureSignaturePayload.model_validate(parsed)
+
+    @staticmethod
+    def _drop_unsupported_severity_indicators(
+        payload: NIMFailureSignaturePayload, *, complaint_id: str
+    ) -> NIMFailureSignaturePayload:
+        unsupported = sorted(
+            set(payload.severity_indicators) - SUPPORTED_SEVERITY_INDICATORS
+        )
+        if not unsupported:
+            return payload
+        supported = [
+            item
+            for item in payload.severity_indicators
+            if item in SUPPORTED_SEVERITY_INDICATORS
+        ]
+        logger.warning(
+            "NIM extraction for ODI %s returned unsupported auxiliary severity indicator(s) %s; "
+            "dropping them from the canonical signature. Deterministic SeverityEngine validation "
+            "remains authoritative.",
+            complaint_id,
+            unsupported,
+        )
+        return payload.model_copy(update={"severity_indicators": supported})
 
     async def _repair_structured_extraction(
         self,
@@ -347,6 +387,9 @@ class NIMFailureExtractor:
                 invalid_content=content,
                 validation_error=exc,
             )
+        payload = self._drop_unsupported_severity_indicators(
+            payload, complaint_id=complaint.odi_number
+        )
         return FailureSignature(
             complaint_id=complaint.odi_number,
             **payload.model_dump(),
