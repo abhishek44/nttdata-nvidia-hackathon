@@ -36,6 +36,7 @@ from recallzero.benchmark_adjudication import (
 )
 from recallzero.benchmark_attribution import run_attribution_experiment
 from recallzero.benchmark_risk_audit import build_target_risk_audit
+from recallzero.benchmark_recurrence_experiment import build_recurrence_separation_experiment
 from recallzero.config import get_settings
 from recallzero.demo import build_demo_records
 from recallzero.freeze import verify_freeze
@@ -701,6 +702,95 @@ def benchmark_target_risk_audit(
         "[yellow]Diagnostic only: candidates are the raw benchmark's persisted top-N-by-risk plus alerts, not every detector signal.[/yellow]"
     )
     console.print(f"Saved target risk audit JSON: {json_output}")
+
+
+@app.command("benchmark-recurrence-separation")
+def benchmark_recurrence_separation(
+    raw_result: Path = typer.Argument(..., exists=True, readable=True),
+    json_output: Path = typer.Option(
+        Path("data/runs/long_horizon_recurrence_experiment_a.json"),
+        "--json",
+        help="Development-only long-horizon recurrence separation experiment.",
+    ),
+    target_match_threshold: float = typer.Option(
+        0.45,
+        "--target-match-threshold",
+        min=0.0,
+        max=1.0,
+        help="Post-hoc target threshold used only to stratify positive lineages.",
+    ),
+    control_lineages_per_case: int = typer.Option(
+        1,
+        "--control-lineages-per-case",
+        min=1,
+        max=5,
+        help="Number of highest-risk persisted lineages retained per valid control case.",
+    ),
+) -> None:
+    """Compare slow-burn recurrence in target-positive and near-threshold control lineages."""
+    result = build_recurrence_separation_experiment(
+        raw_result_path=raw_result,
+        target_match_threshold=target_match_threshold,
+        control_lineages_per_case=control_lineages_per_case,
+    )
+    json_output.parent.mkdir(parents=True, exist_ok=True)
+    json_output.write_text(dumps_json(result.model_dump(mode="json")), encoding="utf-8")
+
+    console.print(f"[bold]Experiment:[/bold] {result.experiment_id}")
+    console.print(f"[bold]Source benchmark:[/bold] {result.source_benchmark_run_id}")
+    console.print(
+        f"[bold]Valid cases:[/bold] positives={result.valid_positive_case_count}, "
+        f"controls={result.valid_control_case_count}; "
+        f"target-matched positives={result.target_matched_positive_case_count}"
+    )
+    table = Table(title="Long-horizon recurrence separation")
+    table.add_column("Gate")
+    table.add_column("Positive")
+    table.add_column("Target-matched +")
+    table.add_column("Controls")
+    table.add_column("Matched-control delta")
+    for row in result.gate_separation:
+        table.add_row(
+            row.gate_name,
+            f"{row.positive_pass_count}/{row.valid_positive_count}",
+            f"{row.target_matched_positive_pass_count}/{row.target_matched_positive_count}",
+            f"{row.control_pass_count}/{row.valid_control_count}",
+            (
+                f"{row.target_matched_positive_minus_control_rate:+.3f}"
+                if row.target_matched_positive_minus_control_rate is not None
+                else "n/a"
+            ),
+        )
+    console.print(table)
+
+    metric_table = Table(title="Continuous recurrence separation")
+    metric_table.add_column("Metric")
+    metric_table.add_column("Positive median")
+    metric_table.add_column("Matched + median")
+    metric_table.add_column("Control median")
+    metric_table.add_column("Matched vs control AUC")
+    for row in result.metric_separation:
+        metric_table.add_row(
+            row.metric,
+            f"{row.positive_median:.2f}" if row.positive_median is not None else "n/a",
+            (
+                f"{row.target_matched_positive_median:.2f}"
+                if row.target_matched_positive_median is not None
+                else "n/a"
+            ),
+            f"{row.control_median:.2f}" if row.control_median is not None else "n/a",
+            (
+                f"{row.target_matched_positive_vs_control_pairwise_auc:.3f}"
+                if row.target_matched_positive_vs_control_pairwise_auc is not None
+                else "n/a"
+            ),
+        )
+    console.print(metric_table)
+    console.print(
+        "[yellow]Development screening only: do not tune the 75 risk gate from this output. "
+        "Look for recurrence discrimination between target-matched positives and near-threshold controls.[/yellow]"
+    )
+    console.print(f"Saved recurrence separation JSON: {json_output}")
 
 
 @app.command("benchmark-adjudicate")

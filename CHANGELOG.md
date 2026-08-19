@@ -1,5 +1,17 @@
 # Changelog
 
+## 0.3.5.post5 — Long-horizon recurrence separation experiment
+
+- Keep Detector v1 scoring, the 75-point alert threshold, all risk weights, severity, taxonomy, clustering, trend windows, visible-recall matching, and Time Machine behavior unchanged.
+- Add `recallzero benchmark-recurrence-separation`, a read-only development experiment over a freeze-verified and lock-verified raw benchmark artifact.
+- Compare the best persisted post-hoc target lineage in each valid positive case against the highest frozen max-risk lineage in each valid negative control. Positive target selection remains evaluation-only and cannot feed live detector scoring.
+- Define recurrence conservatively from increases in the running maximum independent `evidence_count`; repeated weekly persistence without new evidence is not counted as recurrence.
+- Report three fixed screening gates plus continuous medians and pairwise AUC values for evidence-growth months, evidence-growth span, growth events, evidence gain after first persistence, and maximum evidence.
+- Perform zero LLM calls, zero embedding calls, zero detector replays, zero clustering reruns, and zero risk recomputation.
+- Preserve the historical Detector v1 Validation Run 1 result and explicitly treat the exposed 20-case cohort as development evidence only.
+- Archive the exact 0.3.5.post4 freeze manifest before recording the post5 diagnostic hashes.
+
+
 ## 0.3.5.post4 — Read-only target-risk audit diagnostic
 
 - Keep Detector v1 extraction, taxonomy, clustering, severity, trend, risk, live recall-gap matching, post-hoc target matching, alert threshold, weights, and Time Machine behavior unchanged from 0.3.5.post3.

@@ -1,0 +1,1482 @@
+{
+  "cases": [
+    {
+      "benchmark_valid": true,
+      "campaign_number": "21V560000",
+      "case_id": "case_2fc0e691db1fa2b1",
+      "caveats": [],
+      "detector_status": "NO_EARLY_SIGNAL",
+      "expected_role": "positive",
+      "invalid_reason": null,
+      "name": "Chevrolet Bolt EV high-voltage battery fire recall",
+      "selected_lineages": [
+        {
+          "best_target_score": 0.7862,
+          "ever_alerted": false,
+          "evidence_gain_after_first": 11,
+          "evidence_growth_dates": [
+            "2020-07-23",
+            "2020-09-03",
+            "2020-10-08",
+            "2020-10-22",
+            "2020-11-05",
+            "2021-05-20",
+            "2021-05-27",
+            "2021-07-15",
+            "2021-07-22"
+          ],
+          "evidence_growth_event_count": 9,
+          "evidence_growth_month_count": 6,
+          "evidence_growth_span_days": 364,
+          "first_evidence_count": 1,
+          "first_persisted_date": "2020-07-23",
+          "last_persisted_date": "2021-07-22",
+          "lineage_id": "lin_7070759495f0097b",
+          "max_evidence_count": 12,
+          "max_risk_score": 65.37,
+          "max_threshold_margin": -9.63,
+          "persisted_occurrence_count": 53,
+          "persisted_span_days": 364,
+          "recurrence_gates": [
+            {
+              "min_evidence_gain_after_first": 2,
+              "min_growth_months": 3,
+              "min_growth_span_days": 90,
+              "min_max_evidence": 4,
+              "name": "LHREC_PRIMARY_90D_3M_4E",
+              "passed": true
+            },
+            {
+              "min_evidence_gain_after_first": 3,
+              "min_growth_months": 4,
+              "min_growth_span_days": 120,
+              "min_max_evidence": 5,
+              "name": "LHREC_MODERATE_120D_4M_5E",
+              "passed": true
+            },
+            {
+              "min_evidence_gain_after_first": 4,
+              "min_growth_months": 5,
+              "min_growth_span_days": 180,
+              "min_max_evidence": 6,
+              "name": "LHREC_STRICT_180D_5M_6E",
+              "passed": true
+            }
+          ],
+          "representative_issue": "ELECTRICAL SYSTEM — SPONTANEOUS COMBUSTION",
+          "selection_reason": "best_posthoc_target_lineage",
+          "signal_scope": "cluster",
+          "target_match_qualified": true
+        }
+      ]
+    },
+    {
+      "benchmark_valid": true,
+      "campaign_number": "22V050000",
+      "case_id": "case_d8e964268da5faf4",
+      "caveats": [],
+      "detector_status": "EARLY_ALERT_TARGET_UNMATCHED",
+      "expected_role": "positive",
+      "invalid_reason": null,
+      "name": "Tesla Model Y windshield defrost heat-pump recall",
+      "selected_lineages": [
+        {
+          "best_target_score": 0.214,
+          "ever_alerted": false,
+          "evidence_gain_after_first": 2,
+          "evidence_growth_dates": [
+            "2021-04-06",
+            "2021-08-10"
+          ],
+          "evidence_growth_event_count": 2,
+          "evidence_growth_month_count": 2,
+          "evidence_growth_span_days": 126,
+          "first_evidence_count": 4,
+          "first_persisted_date": "2021-04-06",
+          "last_persisted_date": "2021-11-09",
+          "lineage_id": "lin_ede1935332621dec",
+          "max_evidence_count": 6,
+          "max_risk_score": 65.63,
+          "max_threshold_margin": -9.37,
+          "persisted_occurrence_count": 18,
+          "persisted_span_days": 217,
+          "recurrence_gates": [
+            {
+              "min_evidence_gain_after_first": 2,
+              "min_growth_months": 3,
+              "min_growth_span_days": 90,
+              "min_max_evidence": 4,
+              "name": "LHREC_PRIMARY_90D_3M_4E",
+              "passed": false
+            },
+            {
+              "min_evidence_gain_after_first": 3,
+              "min_growth_months": 4,
+              "min_growth_span_days": 120,
+              "min_max_evidence": 5,
+              "name": "LHREC_MODERATE_120D_4M_5E",
+              "passed": false
+            },
+            {
+              "min_evidence_gain_after_first": 4,
+              "min_growth_months": 5,
+              "min_growth_span_days": 180,
+              "min_max_evidence": 6,
+              "name": "LHREC_STRICT_180D_5M_6E",
+              "passed": false
+            }
+          ],
+          "representative_issue": "ELECTRICAL SYSTEM — UNSPECIFIED FAILURE",
+          "selection_reason": "best_posthoc_target_lineage",
+          "signal_scope": "cluster",
+          "target_match_qualified": false
+        }
+      ]
+    },
+    {
+      "benchmark_valid": true,
+      "campaign_number": "23V312000",
+      "case_id": "case_26d977ae1ccb623a",
+      "caveats": [],
+      "detector_status": "EARLY_ALERT_TARGET_UNMATCHED",
+      "expected_role": "positive",
+      "invalid_reason": null,
+      "name": "Volkswagen ID.4 exterior door handle recall",
+      "selected_lineages": [
+        {
+          "best_target_score": 0.0079,
+          "ever_alerted": false,
+          "evidence_gain_after_first": 0,
+          "evidence_growth_dates": [
+            "2023-04-11"
+          ],
+          "evidence_growth_event_count": 1,
+          "evidence_growth_month_count": 1,
+          "evidence_growth_span_days": 0,
+          "first_evidence_count": 7,
+          "first_persisted_date": "2023-04-11",
+          "last_persisted_date": "2023-04-18",
+          "lineage_id": "lin_bdc4c06e0001cb7b",
+          "max_evidence_count": 7,
+          "max_risk_score": 48.48,
+          "max_threshold_margin": -26.52,
+          "persisted_occurrence_count": 2,
+          "persisted_span_days": 7,
+          "recurrence_gates": [
+            {
+              "min_evidence_gain_after_first": 2,
+              "min_growth_months": 3,
+              "min_growth_span_days": 90,
+              "min_max_evidence": 4,
+              "name": "LHREC_PRIMARY_90D_3M_4E",
+              "passed": false
+            },
+            {
+              "min_evidence_gain_after_first": 3,
+              "min_growth_months": 4,
+              "min_growth_span_days": 120,
+              "min_max_evidence": 5,
+              "name": "LHREC_MODERATE_120D_4M_5E",
+              "passed": false
+            },
+            {
+              "min_evidence_gain_after_first": 4,
+              "min_growth_months": 5,
+              "min_growth_span_days": 180,
+              "min_max_evidence": 6,
+              "name": "LHREC_STRICT_180D_5M_6E",
+              "passed": false
+            }
+          ],
+          "representative_issue": "UNKNOWN OR OTHER — UNSPECIFIED FAILURE",
+          "selection_reason": "best_posthoc_target_lineage",
+          "signal_scope": "cluster",
+          "target_match_qualified": false
+        }
+      ]
+    },
+    {
+      "benchmark_valid": true,
+      "campaign_number": "22V859000",
+      "case_id": "case_01fe68acba645eaf",
+      "caveats": [],
+      "detector_status": "NO_EARLY_SIGNAL",
+      "expected_role": "positive",
+      "invalid_reason": null,
+      "name": "Ford Escape cracked fuel injector fire recall",
+      "selected_lineages": [
+        {
+          "best_target_score": 0.7269,
+          "ever_alerted": false,
+          "evidence_gain_after_first": 9,
+          "evidence_growth_dates": [
+            "2022-01-13",
+            "2022-01-27",
+            "2022-02-24",
+            "2022-07-07",
+            "2022-07-14",
+            "2022-08-04",
+            "2022-08-18",
+            "2022-09-29",
+            "2022-10-13",
+            "2022-11-17"
+          ],
+          "evidence_growth_event_count": 10,
+          "evidence_growth_month_count": 7,
+          "evidence_growth_span_days": 308,
+          "first_evidence_count": 5,
+          "first_persisted_date": "2022-01-13",
+          "last_persisted_date": "2022-11-17",
+          "lineage_id": "lin_c1e44e9b60a12939",
+          "max_evidence_count": 14,
+          "max_risk_score": 68.89,
+          "max_threshold_margin": -6.11,
+          "persisted_occurrence_count": 33,
+          "persisted_span_days": 308,
+          "recurrence_gates": [
+            {
+              "min_evidence_gain_after_first": 2,
+              "min_growth_months": 3,
+              "min_growth_span_days": 90,
+              "min_max_evidence": 4,
+              "name": "LHREC_PRIMARY_90D_3M_4E",
+              "passed": true
+            },
+            {
+              "min_evidence_gain_after_first": 3,
+              "min_growth_months": 4,
+              "min_growth_span_days": 120,
+              "min_max_evidence": 5,
+              "name": "LHREC_MODERATE_120D_4M_5E",
+              "passed": true
+            },
+            {
+              "min_evidence_gain_after_first": 4,
+              "min_growth_months": 5,
+              "min_growth_span_days": 180,
+              "min_max_evidence": 6,
+              "name": "LHREC_STRICT_180D_5M_6E",
+              "passed": true
+            }
+          ],
+          "representative_issue": "META — Thermal / overheating",
+          "selection_reason": "best_posthoc_target_lineage",
+          "signal_scope": "meta",
+          "target_match_qualified": true
+        }
+      ]
+    },
+    {
+      "benchmark_valid": true,
+      "campaign_number": "18V167000",
+      "case_id": "case_5424e1117a13f0e6",
+      "caveats": [],
+      "detector_status": "EARLY_ALERT_TARGET_UNMATCHED",
+      "expected_role": "positive",
+      "invalid_reason": null,
+      "name": "Ford Fusion steering wheel fastening recall",
+      "selected_lineages": [
+        {
+          "best_target_score": 0.5304,
+          "ever_alerted": false,
+          "evidence_gain_after_first": 0,
+          "evidence_growth_dates": [
+            "2017-11-05"
+          ],
+          "evidence_growth_event_count": 1,
+          "evidence_growth_month_count": 1,
+          "evidence_growth_span_days": 0,
+          "first_evidence_count": 1,
+          "first_persisted_date": "2017-11-05",
+          "last_persisted_date": "2017-11-12",
+          "lineage_id": "lin_0b3c22fe4ab1e657",
+          "max_evidence_count": 1,
+          "max_risk_score": 36.0,
+          "max_threshold_margin": -39.0,
+          "persisted_occurrence_count": 2,
+          "persisted_span_days": 7,
+          "recurrence_gates": [
+            {
+              "min_evidence_gain_after_first": 2,
+              "min_growth_months": 3,
+              "min_growth_span_days": 90,
+              "min_max_evidence": 4,
+              "name": "LHREC_PRIMARY_90D_3M_4E",
+              "passed": false
+            },
+            {
+              "min_evidence_gain_after_first": 3,
+              "min_growth_months": 4,
+              "min_growth_span_days": 120,
+              "min_max_evidence": 5,
+              "name": "LHREC_MODERATE_120D_4M_5E",
+              "passed": false
+            },
+            {
+              "min_evidence_gain_after_first": 4,
+              "min_growth_months": 5,
+              "min_growth_span_days": 180,
+              "min_max_evidence": 6,
+              "name": "LHREC_STRICT_180D_5M_6E",
+              "passed": false
+            }
+          ],
+          "representative_issue": "STEERING — STEERING ASSIST FAULT",
+          "selection_reason": "best_posthoc_target_lineage",
+          "signal_scope": "cluster",
+          "target_match_qualified": true
+        }
+      ]
+    },
+    {
+      "benchmark_valid": true,
+      "campaign_number": "20V012000",
+      "case_id": "case_febda2afdc119daa",
+      "caveats": [],
+      "detector_status": "NO_EARLY_SIGNAL",
+      "expected_role": "positive",
+      "invalid_reason": null,
+      "name": "Toyota Camry low-pressure fuel pump stall recall",
+      "selected_lineages": [
+        {
+          "best_target_score": 0.3387,
+          "ever_alerted": false,
+          "evidence_gain_after_first": 0,
+          "evidence_growth_dates": [
+            "2019-05-12"
+          ],
+          "evidence_growth_event_count": 1,
+          "evidence_growth_month_count": 1,
+          "evidence_growth_span_days": 0,
+          "first_evidence_count": 1,
+          "first_persisted_date": "2019-05-12",
+          "last_persisted_date": "2019-09-22",
+          "lineage_id": "lin_2e55d557a323a1c9",
+          "max_evidence_count": 1,
+          "max_risk_score": 50.01,
+          "max_threshold_margin": -24.99,
+          "persisted_occurrence_count": 18,
+          "persisted_span_days": 133,
+          "recurrence_gates": [
+            {
+              "min_evidence_gain_after_first": 2,
+              "min_growth_months": 3,
+              "min_growth_span_days": 90,
+              "min_max_evidence": 4,
+              "name": "LHREC_PRIMARY_90D_3M_4E",
+              "passed": false
+            },
+            {
+              "min_evidence_gain_after_first": 3,
+              "min_growth_months": 4,
+              "min_growth_span_days": 120,
+              "min_max_evidence": 5,
+              "name": "LHREC_MODERATE_120D_4M_5E",
+              "passed": false
+            },
+            {
+              "min_evidence_gain_after_first": 4,
+              "min_growth_months": 5,
+              "min_growth_span_days": 180,
+              "min_max_evidence": 6,
+              "name": "LHREC_STRICT_180D_5M_6E",
+              "passed": false
+            }
+          ],
+          "representative_issue": "ELECTRICAL SYSTEM — LOSS OF MOTIVE POWER",
+          "selection_reason": "best_posthoc_target_lineage",
+          "signal_scope": "cluster",
+          "target_match_qualified": false
+        }
+      ]
+    },
+    {
+      "benchmark_valid": true,
+      "campaign_number": "17V226000",
+      "case_id": "case_6bce6fe3365050e7",
+      "caveats": [],
+      "detector_status": "EARLY_ALERT_TARGET_UNMATCHED",
+      "expected_role": "positive",
+      "invalid_reason": null,
+      "name": "Hyundai Sonata engine bearing wear stall recall",
+      "selected_lineages": [
+        {
+          "best_target_score": 0.2263,
+          "ever_alerted": false,
+          "evidence_gain_after_first": 1,
+          "evidence_growth_dates": [
+            "2016-03-31",
+            "2016-08-11"
+          ],
+          "evidence_growth_event_count": 2,
+          "evidence_growth_month_count": 2,
+          "evidence_growth_span_days": 133,
+          "first_evidence_count": 3,
+          "first_persisted_date": "2016-03-31",
+          "last_persisted_date": "2016-08-11",
+          "lineage_id": "lin_5d9dc81efdca33f8",
+          "max_evidence_count": 4,
+          "max_risk_score": 58.94,
+          "max_threshold_margin": -16.06,
+          "persisted_occurrence_count": 2,
+          "persisted_span_days": 133,
+          "recurrence_gates": [
+            {
+              "min_evidence_gain_after_first": 2,
+              "min_growth_months": 3,
+              "min_growth_span_days": 90,
+              "min_max_evidence": 4,
+              "name": "LHREC_PRIMARY_90D_3M_4E",
+              "passed": false
+            },
+            {
+              "min_evidence_gain_after_first": 3,
+              "min_growth_months": 4,
+              "min_growth_span_days": 120,
+              "min_max_evidence": 5,
+              "name": "LHREC_MODERATE_120D_4M_5E",
+              "passed": false
+            },
+            {
+              "min_evidence_gain_after_first": 4,
+              "min_growth_months": 5,
+              "min_growth_span_days": 180,
+              "min_max_evidence": 6,
+              "name": "LHREC_STRICT_180D_5M_6E",
+              "passed": false
+            }
+          ],
+          "representative_issue": "META — Charging system",
+          "selection_reason": "best_posthoc_target_lineage",
+          "signal_scope": "meta",
+          "target_match_qualified": false
+        }
+      ]
+    },
+    {
+      "benchmark_valid": true,
+      "campaign_number": "20V475000",
+      "case_id": "case_3f34c3b212bd59b0",
+      "caveats": [],
+      "detector_status": "EARLY_ALERT_TARGET_UNMATCHED",
+      "expected_role": "positive",
+      "invalid_reason": null,
+      "name": "Jeep Grand Cherokee crank position sensor tone-wheel recall",
+      "selected_lineages": [
+        {
+          "best_target_score": 0.4453,
+          "ever_alerted": false,
+          "evidence_gain_after_first": 1,
+          "evidence_growth_dates": [
+            "2019-10-16",
+            "2019-12-04"
+          ],
+          "evidence_growth_event_count": 2,
+          "evidence_growth_month_count": 2,
+          "evidence_growth_span_days": 49,
+          "first_evidence_count": 9,
+          "first_persisted_date": "2019-10-16",
+          "last_persisted_date": "2020-07-22",
+          "lineage_id": "lin_4f7b8027fd8ed559",
+          "max_evidence_count": 10,
+          "max_risk_score": 62.8,
+          "max_threshold_margin": -12.2,
+          "persisted_occurrence_count": 9,
+          "persisted_span_days": 280,
+          "recurrence_gates": [
+            {
+              "min_evidence_gain_after_first": 2,
+              "min_growth_months": 3,
+              "min_growth_span_days": 90,
+              "min_max_evidence": 4,
+              "name": "LHREC_PRIMARY_90D_3M_4E",
+              "passed": false
+            },
+            {
+              "min_evidence_gain_after_first": 3,
+              "min_growth_months": 4,
+              "min_growth_span_days": 120,
+              "min_max_evidence": 5,
+              "name": "LHREC_MODERATE_120D_4M_5E",
+              "passed": false
+            },
+            {
+              "min_evidence_gain_after_first": 4,
+              "min_growth_months": 5,
+              "min_growth_span_days": 180,
+              "min_max_evidence": 6,
+              "name": "LHREC_STRICT_180D_5M_6E",
+              "passed": false
+            }
+          ],
+          "representative_issue": "ENGINE — UNSPECIFIED FAILURE",
+          "selection_reason": "best_posthoc_target_lineage",
+          "signal_scope": "cluster",
+          "target_match_qualified": false
+        }
+      ]
+    },
+    {
+      "benchmark_valid": true,
+      "campaign_number": "20V332000",
+      "case_id": "case_46c0f16060cb563b",
+      "caveats": [],
+      "detector_status": "EARLY_SIGNAL_DETECTED",
+      "expected_role": "positive",
+      "invalid_reason": null,
+      "name": "Ford F-150 brake master cylinder recall",
+      "selected_lineages": [
+        {
+          "best_target_score": 0.7768,
+          "ever_alerted": true,
+          "evidence_gain_after_first": 7,
+          "evidence_growth_dates": [
+            "2019-06-09",
+            "2019-06-16",
+            "2019-06-23",
+            "2019-07-14",
+            "2019-09-01",
+            "2019-10-06"
+          ],
+          "evidence_growth_event_count": 6,
+          "evidence_growth_month_count": 4,
+          "evidence_growth_span_days": 119,
+          "first_evidence_count": 40,
+          "first_persisted_date": "2019-06-09",
+          "last_persisted_date": "2020-06-07",
+          "lineage_id": "lin_2ede3b604946762f",
+          "max_evidence_count": 47,
+          "max_risk_score": 88.52,
+          "max_threshold_margin": 13.52,
+          "persisted_occurrence_count": 34,
+          "persisted_span_days": 364,
+          "recurrence_gates": [
+            {
+              "min_evidence_gain_after_first": 2,
+              "min_growth_months": 3,
+              "min_growth_span_days": 90,
+              "min_max_evidence": 4,
+              "name": "LHREC_PRIMARY_90D_3M_4E",
+              "passed": true
+            },
+            {
+              "min_evidence_gain_after_first": 3,
+              "min_growth_months": 4,
+              "min_growth_span_days": 120,
+              "min_max_evidence": 5,
+              "name": "LHREC_MODERATE_120D_4M_5E",
+              "passed": false
+            },
+            {
+              "min_evidence_gain_after_first": 4,
+              "min_growth_months": 5,
+              "min_growth_span_days": 180,
+              "min_max_evidence": 6,
+              "name": "LHREC_STRICT_180D_5M_6E",
+              "passed": false
+            }
+          ],
+          "representative_issue": "SERVICE BRAKES — BRAKE FAILURE",
+          "selection_reason": "best_posthoc_target_lineage",
+          "signal_scope": "cluster",
+          "target_match_qualified": true
+        }
+      ]
+    },
+    {
+      "benchmark_valid": true,
+      "campaign_number": "18V795000",
+      "case_id": "case_a792beada8ba5cc3",
+      "caveats": [],
+      "detector_status": "NO_EARLY_SIGNAL",
+      "expected_role": "positive",
+      "invalid_reason": null,
+      "name": "Honda Odyssey power sliding door latch recall",
+      "selected_lineages": [
+        {
+          "best_target_score": 0.0213,
+          "ever_alerted": false,
+          "evidence_gain_after_first": 7,
+          "evidence_growth_dates": [
+            "2017-12-07",
+            "2018-05-03",
+            "2018-06-21",
+            "2018-07-05",
+            "2018-08-16",
+            "2018-09-06"
+          ],
+          "evidence_growth_event_count": 6,
+          "evidence_growth_month_count": 6,
+          "evidence_growth_span_days": 273,
+          "first_evidence_count": 1,
+          "first_persisted_date": "2017-12-07",
+          "last_persisted_date": "2018-09-20",
+          "lineage_id": "lin_87c3fe7913c5b6f5",
+          "max_evidence_count": 8,
+          "max_risk_score": 55.26,
+          "max_threshold_margin": -19.74,
+          "persisted_occurrence_count": 26,
+          "persisted_span_days": 287,
+          "recurrence_gates": [
+            {
+              "min_evidence_gain_after_first": 2,
+              "min_growth_months": 3,
+              "min_growth_span_days": 90,
+              "min_max_evidence": 4,
+              "name": "LHREC_PRIMARY_90D_3M_4E",
+              "passed": true
+            },
+            {
+              "min_evidence_gain_after_first": 3,
+              "min_growth_months": 4,
+              "min_growth_span_days": 120,
+              "min_max_evidence": 5,
+              "name": "LHREC_MODERATE_120D_4M_5E",
+              "passed": true
+            },
+            {
+              "min_evidence_gain_after_first": 4,
+              "min_growth_months": 5,
+              "min_growth_span_days": 180,
+              "min_max_evidence": 6,
+              "name": "LHREC_STRICT_180D_5M_6E",
+              "passed": true
+            }
+          ],
+          "representative_issue": "STRUCTURE — DOOR WILL NOT CLOSE AUTOMATICALLY",
+          "selection_reason": "best_posthoc_target_lineage",
+          "signal_scope": "cluster",
+          "target_match_qualified": false
+        }
+      ]
+    },
+    {
+      "benchmark_valid": true,
+      "campaign_number": null,
+      "case_id": "case_131e28dedfe2ad22",
+      "caveats": [],
+      "detector_status": "CONTROL_ALERT_REQUIRES_ADJUDICATION",
+      "expected_role": "negative",
+      "invalid_reason": null,
+      "name": "Honda CR-V 2019 targetless control",
+      "selected_lineages": [
+        {
+          "best_target_score": null,
+          "ever_alerted": true,
+          "evidence_gain_after_first": 19,
+          "evidence_growth_dates": [
+            "2019-07-16",
+            "2019-07-23",
+            "2019-07-30",
+            "2019-08-06",
+            "2019-08-13",
+            "2019-08-20",
+            "2019-08-27",
+            "2019-09-03",
+            "2019-09-10",
+            "2019-09-17",
+            "2019-09-24",
+            "2019-11-26"
+          ],
+          "evidence_growth_event_count": 12,
+          "evidence_growth_month_count": 4,
+          "evidence_growth_span_days": 133,
+          "first_evidence_count": 7,
+          "first_persisted_date": "2019-07-16",
+          "last_persisted_date": "2019-12-31",
+          "lineage_id": "lin_ab22a418f4904a50",
+          "max_evidence_count": 26,
+          "max_risk_score": 82.31,
+          "max_threshold_margin": 7.31,
+          "persisted_occurrence_count": 25,
+          "persisted_span_days": 168,
+          "recurrence_gates": [
+            {
+              "min_evidence_gain_after_first": 2,
+              "min_growth_months": 3,
+              "min_growth_span_days": 90,
+              "min_max_evidence": 4,
+              "name": "LHREC_PRIMARY_90D_3M_4E",
+              "passed": true
+            },
+            {
+              "min_evidence_gain_after_first": 3,
+              "min_growth_months": 4,
+              "min_growth_span_days": 120,
+              "min_max_evidence": 5,
+              "name": "LHREC_MODERATE_120D_4M_5E",
+              "passed": true
+            },
+            {
+              "min_evidence_gain_after_first": 4,
+              "min_growth_months": 5,
+              "min_growth_span_days": 180,
+              "min_max_evidence": 6,
+              "name": "LHREC_STRICT_180D_5M_6E",
+              "passed": false
+            }
+          ],
+          "representative_issue": "STEERING — UNSPECIFIED FAILURE",
+          "selection_reason": "highest_max_risk_control_lineage",
+          "signal_scope": "cluster",
+          "target_match_qualified": null
+        }
+      ]
+    },
+    {
+      "benchmark_valid": true,
+      "campaign_number": null,
+      "case_id": "case_b727da6da94fa034",
+      "caveats": [],
+      "detector_status": "CONTROL_QUIET",
+      "expected_role": "negative",
+      "invalid_reason": null,
+      "name": "Toyota RAV4 2019 targetless control",
+      "selected_lineages": [
+        {
+          "best_target_score": null,
+          "ever_alerted": false,
+          "evidence_gain_after_first": 29,
+          "evidence_growth_dates": [
+            "2019-06-28",
+            "2019-07-26",
+            "2019-08-02",
+            "2019-09-27",
+            "2019-10-04",
+            "2019-10-11",
+            "2019-10-18",
+            "2019-10-25",
+            "2019-11-01",
+            "2019-11-08",
+            "2019-12-27",
+            "2019-12-31"
+          ],
+          "evidence_growth_event_count": 12,
+          "evidence_growth_month_count": 7,
+          "evidence_growth_span_days": 186,
+          "first_evidence_count": 1,
+          "first_persisted_date": "2019-06-28",
+          "last_persisted_date": "2019-12-31",
+          "lineage_id": "lin_538bef47be1b5da5",
+          "max_evidence_count": 30,
+          "max_risk_score": 68.31,
+          "max_threshold_margin": -6.69,
+          "persisted_occurrence_count": 21,
+          "persisted_span_days": 186,
+          "recurrence_gates": [
+            {
+              "min_evidence_gain_after_first": 2,
+              "min_growth_months": 3,
+              "min_growth_span_days": 90,
+              "min_max_evidence": 4,
+              "name": "LHREC_PRIMARY_90D_3M_4E",
+              "passed": true
+            },
+            {
+              "min_evidence_gain_after_first": 3,
+              "min_growth_months": 4,
+              "min_growth_span_days": 120,
+              "min_max_evidence": 5,
+              "name": "LHREC_MODERATE_120D_4M_5E",
+              "passed": true
+            },
+            {
+              "min_evidence_gain_after_first": 4,
+              "min_growth_months": 5,
+              "min_growth_span_days": 180,
+              "min_max_evidence": 6,
+              "name": "LHREC_STRICT_180D_5M_6E",
+              "passed": true
+            }
+          ],
+          "representative_issue": "FUEL/PROPULSION SYSTEM — FUEL CUT-OFF SENSOR ACTIVATION",
+          "selection_reason": "highest_max_risk_control_lineage",
+          "signal_scope": "cluster",
+          "target_match_qualified": null
+        }
+      ]
+    },
+    {
+      "benchmark_valid": true,
+      "campaign_number": null,
+      "case_id": "case_3c2598ceba4d9aed",
+      "caveats": [],
+      "detector_status": "CONTROL_QUIET",
+      "expected_role": "negative",
+      "invalid_reason": null,
+      "name": "Ford Explorer 2020 targetless control",
+      "selected_lineages": [
+        {
+          "best_target_score": null,
+          "ever_alerted": false,
+          "evidence_gain_after_first": 13,
+          "evidence_growth_dates": [
+            "2020-01-02",
+            "2020-01-30",
+            "2020-02-13",
+            "2020-02-20",
+            "2020-02-27",
+            "2020-03-12",
+            "2020-03-26",
+            "2020-06-04",
+            "2020-06-25",
+            "2020-07-23",
+            "2020-09-03",
+            "2020-09-17"
+          ],
+          "evidence_growth_event_count": 12,
+          "evidence_growth_month_count": 6,
+          "evidence_growth_span_days": 259,
+          "first_evidence_count": 1,
+          "first_persisted_date": "2020-01-02",
+          "last_persisted_date": "2020-12-31",
+          "lineage_id": "lin_274dc10dd3af8d95",
+          "max_evidence_count": 14,
+          "max_risk_score": 74.05,
+          "max_threshold_margin": -0.95,
+          "persisted_occurrence_count": 49,
+          "persisted_span_days": 364,
+          "recurrence_gates": [
+            {
+              "min_evidence_gain_after_first": 2,
+              "min_growth_months": 3,
+              "min_growth_span_days": 90,
+              "min_max_evidence": 4,
+              "name": "LHREC_PRIMARY_90D_3M_4E",
+              "passed": true
+            },
+            {
+              "min_evidence_gain_after_first": 3,
+              "min_growth_months": 4,
+              "min_growth_span_days": 120,
+              "min_max_evidence": 5,
+              "name": "LHREC_MODERATE_120D_4M_5E",
+              "passed": true
+            },
+            {
+              "min_evidence_gain_after_first": 4,
+              "min_growth_months": 5,
+              "min_growth_span_days": 180,
+              "min_max_evidence": 6,
+              "name": "LHREC_STRICT_180D_5M_6E",
+              "passed": true
+            }
+          ],
+          "representative_issue": "POWER TRAIN — UNSPECIFIED FAILURE",
+          "selection_reason": "highest_max_risk_control_lineage",
+          "signal_scope": "cluster",
+          "target_match_qualified": null
+        }
+      ]
+    },
+    {
+      "benchmark_valid": false,
+      "campaign_number": null,
+      "case_id": "case_516f4bc694b2497e",
+      "caveats": [
+        "Invalid source control excluded from separation statistics."
+      ],
+      "detector_status": "INVALID_CASE",
+      "expected_role": "negative",
+      "invalid_reason": "NIM_EXTRACTION_FAILURE",
+      "name": "Jeep Wrangler 2018 targetless control",
+      "selected_lineages": []
+    },
+    {
+      "benchmark_valid": true,
+      "campaign_number": null,
+      "case_id": "case_71b8aa472d20bd7e",
+      "caveats": [],
+      "detector_status": "CONTROL_QUIET",
+      "expected_role": "negative",
+      "invalid_reason": null,
+      "name": "Nissan Rogue 2018 targetless control",
+      "selected_lineages": [
+        {
+          "best_target_score": null,
+          "ever_alerted": false,
+          "evidence_gain_after_first": 11,
+          "evidence_growth_dates": [
+            "2018-06-05",
+            "2018-06-19",
+            "2018-06-26",
+            "2018-09-18",
+            "2018-09-25",
+            "2018-10-16",
+            "2018-10-23",
+            "2018-10-30",
+            "2018-11-06"
+          ],
+          "evidence_growth_event_count": 9,
+          "evidence_growth_month_count": 4,
+          "evidence_growth_span_days": 154,
+          "first_evidence_count": 1,
+          "first_persisted_date": "2018-06-05",
+          "last_persisted_date": "2018-12-11",
+          "lineage_id": "lin_e4a5681b0d4156ba",
+          "max_evidence_count": 12,
+          "max_risk_score": 71.6,
+          "max_threshold_margin": -3.4,
+          "persisted_occurrence_count": 20,
+          "persisted_span_days": 189,
+          "recurrence_gates": [
+            {
+              "min_evidence_gain_after_first": 2,
+              "min_growth_months": 3,
+              "min_growth_span_days": 90,
+              "min_max_evidence": 4,
+              "name": "LHREC_PRIMARY_90D_3M_4E",
+              "passed": true
+            },
+            {
+              "min_evidence_gain_after_first": 3,
+              "min_growth_months": 4,
+              "min_growth_span_days": 120,
+              "min_max_evidence": 5,
+              "name": "LHREC_MODERATE_120D_4M_5E",
+              "passed": true
+            },
+            {
+              "min_evidence_gain_after_first": 4,
+              "min_growth_months": 5,
+              "min_growth_span_days": 180,
+              "min_max_evidence": 6,
+              "name": "LHREC_STRICT_180D_5M_6E",
+              "passed": false
+            }
+          ],
+          "representative_issue": "SERVICE BRAKES — UNSPECIFIED FAILURE",
+          "selection_reason": "highest_max_risk_control_lineage",
+          "signal_scope": "cluster",
+          "target_match_qualified": null
+        }
+      ]
+    },
+    {
+      "benchmark_valid": true,
+      "campaign_number": null,
+      "case_id": "case_2c53b3da44187646",
+      "caveats": [],
+      "detector_status": "CONTROL_ALERT_REQUIRES_ADJUDICATION",
+      "expected_role": "negative",
+      "invalid_reason": null,
+      "name": "Subaru Forester 2019 targetless control",
+      "selected_lineages": [
+        {
+          "best_target_score": null,
+          "ever_alerted": true,
+          "evidence_gain_after_first": 58,
+          "evidence_growth_dates": [
+            "2019-02-05",
+            "2019-03-12",
+            "2019-03-19",
+            "2019-03-26",
+            "2019-04-02",
+            "2019-04-09",
+            "2019-04-16",
+            "2019-04-23",
+            "2019-04-30",
+            "2019-05-21",
+            "2019-06-04",
+            "2019-06-11",
+            "2019-09-17",
+            "2019-10-01",
+            "2019-10-15",
+            "2019-10-22",
+            "2019-10-29",
+            "2019-11-12",
+            "2019-11-26",
+            "2019-12-03",
+            "2019-12-10",
+            "2019-12-17",
+            "2019-12-24",
+            "2019-12-31"
+          ],
+          "evidence_growth_event_count": 24,
+          "evidence_growth_month_count": 9,
+          "evidence_growth_span_days": 329,
+          "first_evidence_count": 1,
+          "first_persisted_date": "2019-02-05",
+          "last_persisted_date": "2019-12-31",
+          "lineage_id": "lin_91616d1360b5b1bf",
+          "max_evidence_count": 59,
+          "max_risk_score": 81.09,
+          "max_threshold_margin": 6.09,
+          "persisted_occurrence_count": 48,
+          "persisted_span_days": 329,
+          "recurrence_gates": [
+            {
+              "min_evidence_gain_after_first": 2,
+              "min_growth_months": 3,
+              "min_growth_span_days": 90,
+              "min_max_evidence": 4,
+              "name": "LHREC_PRIMARY_90D_3M_4E",
+              "passed": true
+            },
+            {
+              "min_evidence_gain_after_first": 3,
+              "min_growth_months": 4,
+              "min_growth_span_days": 120,
+              "min_max_evidence": 5,
+              "name": "LHREC_MODERATE_120D_4M_5E",
+              "passed": true
+            },
+            {
+              "min_evidence_gain_after_first": 4,
+              "min_growth_months": 5,
+              "min_growth_span_days": 180,
+              "min_max_evidence": 6,
+              "name": "LHREC_STRICT_180D_5M_6E",
+              "passed": true
+            }
+          ],
+          "representative_issue": "VISIBILITY — GLASS CRACKING",
+          "selection_reason": "highest_max_risk_control_lineage",
+          "signal_scope": "cluster",
+          "target_match_qualified": null
+        }
+      ]
+    },
+    {
+      "benchmark_valid": true,
+      "campaign_number": null,
+      "case_id": "case_88fad2965d4eb427",
+      "caveats": [],
+      "detector_status": "CONTROL_QUIET",
+      "expected_role": "negative",
+      "invalid_reason": null,
+      "name": "Hyundai Palisade 2020 targetless control",
+      "selected_lineages": [
+        {
+          "best_target_score": null,
+          "ever_alerted": false,
+          "evidence_gain_after_first": 59,
+          "evidence_growth_dates": [
+            "2020-01-23",
+            "2020-03-12",
+            "2020-03-19",
+            "2020-04-02",
+            "2020-04-09",
+            "2020-04-16",
+            "2020-04-23",
+            "2020-05-21",
+            "2020-06-04",
+            "2020-06-11",
+            "2020-06-25",
+            "2020-07-02",
+            "2020-07-09",
+            "2020-07-16",
+            "2020-07-23",
+            "2020-07-30",
+            "2020-08-06",
+            "2020-08-13",
+            "2020-08-20",
+            "2020-08-27",
+            "2020-09-03",
+            "2020-09-10",
+            "2020-09-17",
+            "2020-09-24",
+            "2020-10-01",
+            "2020-10-08",
+            "2020-10-15",
+            "2020-10-29",
+            "2020-12-03",
+            "2020-12-17"
+          ],
+          "evidence_growth_event_count": 30,
+          "evidence_growth_month_count": 10,
+          "evidence_growth_span_days": 329,
+          "first_evidence_count": 1,
+          "first_persisted_date": "2020-01-23",
+          "last_persisted_date": "2020-12-31",
+          "lineage_id": "lin_59b8d9358e06b856",
+          "max_evidence_count": 60,
+          "max_risk_score": 71.39,
+          "max_threshold_margin": -3.61,
+          "persisted_occurrence_count": 47,
+          "persisted_span_days": 343,
+          "recurrence_gates": [
+            {
+              "min_evidence_gain_after_first": 2,
+              "min_growth_months": 3,
+              "min_growth_span_days": 90,
+              "min_max_evidence": 4,
+              "name": "LHREC_PRIMARY_90D_3M_4E",
+              "passed": true
+            },
+            {
+              "min_evidence_gain_after_first": 3,
+              "min_growth_months": 4,
+              "min_growth_span_days": 120,
+              "min_max_evidence": 5,
+              "name": "LHREC_MODERATE_120D_4M_5E",
+              "passed": true
+            },
+            {
+              "min_evidence_gain_after_first": 4,
+              "min_growth_months": 5,
+              "min_growth_span_days": 180,
+              "min_max_evidence": 6,
+              "name": "LHREC_STRICT_180D_5M_6E",
+              "passed": true
+            }
+          ],
+          "representative_issue": "VISIBILITY — GLASS CRACKING",
+          "selection_reason": "highest_max_risk_control_lineage",
+          "signal_scope": "cluster",
+          "target_match_qualified": null
+        }
+      ]
+    },
+    {
+      "benchmark_valid": true,
+      "campaign_number": null,
+      "case_id": "case_343cb71ef01aa475",
+      "caveats": [],
+      "detector_status": "CONTROL_QUIET",
+      "expected_role": "negative",
+      "invalid_reason": null,
+      "name": "Kia Telluride 2020 targetless control",
+      "selected_lineages": [
+        {
+          "best_target_score": null,
+          "ever_alerted": false,
+          "evidence_gain_after_first": 22,
+          "evidence_growth_dates": [
+            "2020-01-02",
+            "2020-01-09",
+            "2020-01-30",
+            "2020-02-13",
+            "2020-02-27",
+            "2020-03-05",
+            "2020-03-12",
+            "2020-03-19",
+            "2020-03-26",
+            "2020-04-30",
+            "2020-06-04",
+            "2020-06-18",
+            "2020-06-25",
+            "2020-07-02"
+          ],
+          "evidence_growth_event_count": 14,
+          "evidence_growth_month_count": 6,
+          "evidence_growth_span_days": 182,
+          "first_evidence_count": 38,
+          "first_persisted_date": "2020-01-02",
+          "last_persisted_date": "2020-12-31",
+          "lineage_id": "lin_9bd199404bf6cc34",
+          "max_evidence_count": 60,
+          "max_risk_score": 70.02,
+          "max_threshold_margin": -4.98,
+          "persisted_occurrence_count": 53,
+          "persisted_span_days": 364,
+          "recurrence_gates": [
+            {
+              "min_evidence_gain_after_first": 2,
+              "min_growth_months": 3,
+              "min_growth_span_days": 90,
+              "min_max_evidence": 4,
+              "name": "LHREC_PRIMARY_90D_3M_4E",
+              "passed": true
+            },
+            {
+              "min_evidence_gain_after_first": 3,
+              "min_growth_months": 4,
+              "min_growth_span_days": 120,
+              "min_max_evidence": 5,
+              "name": "LHREC_MODERATE_120D_4M_5E",
+              "passed": true
+            },
+            {
+              "min_evidence_gain_after_first": 4,
+              "min_growth_months": 5,
+              "min_growth_span_days": 180,
+              "min_max_evidence": 6,
+              "name": "LHREC_STRICT_180D_5M_6E",
+              "passed": true
+            }
+          ],
+          "representative_issue": "VISIBILITY — GLASS CRACKING",
+          "selection_reason": "highest_max_risk_control_lineage",
+          "signal_scope": "cluster",
+          "target_match_qualified": null
+        }
+      ]
+    },
+    {
+      "benchmark_valid": true,
+      "campaign_number": null,
+      "case_id": "case_bc6ffc6d07a218f9",
+      "caveats": [],
+      "detector_status": "CONTROL_QUIET",
+      "expected_role": "negative",
+      "invalid_reason": null,
+      "name": "Chevrolet Equinox 2019 targetless control",
+      "selected_lineages": [
+        {
+          "best_target_score": null,
+          "ever_alerted": false,
+          "evidence_gain_after_first": 10,
+          "evidence_growth_dates": [
+            "2019-06-11",
+            "2019-06-18",
+            "2019-07-02",
+            "2019-07-16",
+            "2019-08-13",
+            "2019-09-17",
+            "2019-10-15",
+            "2019-11-12",
+            "2019-12-17"
+          ],
+          "evidence_growth_event_count": 9,
+          "evidence_growth_month_count": 7,
+          "evidence_growth_span_days": 189,
+          "first_evidence_count": 3,
+          "first_persisted_date": "2019-06-11",
+          "last_persisted_date": "2019-12-31",
+          "lineage_id": "lin_79ad3e8d22394e83",
+          "max_evidence_count": 13,
+          "max_risk_score": 62.68,
+          "max_threshold_margin": -12.32,
+          "persisted_occurrence_count": 30,
+          "persisted_span_days": 203,
+          "recurrence_gates": [
+            {
+              "min_evidence_gain_after_first": 2,
+              "min_growth_months": 3,
+              "min_growth_span_days": 90,
+              "min_max_evidence": 4,
+              "name": "LHREC_PRIMARY_90D_3M_4E",
+              "passed": true
+            },
+            {
+              "min_evidence_gain_after_first": 3,
+              "min_growth_months": 4,
+              "min_growth_span_days": 120,
+              "min_max_evidence": 5,
+              "name": "LHREC_MODERATE_120D_4M_5E",
+              "passed": true
+            },
+            {
+              "min_evidence_gain_after_first": 4,
+              "min_growth_months": 5,
+              "min_growth_span_days": 180,
+              "min_max_evidence": 6,
+              "name": "LHREC_STRICT_180D_5M_6E",
+              "passed": true
+            }
+          ],
+          "representative_issue": "META — Charging system",
+          "selection_reason": "highest_max_risk_control_lineage",
+          "signal_scope": "meta",
+          "target_match_qualified": null
+        }
+      ]
+    },
+    {
+      "benchmark_valid": true,
+      "campaign_number": null,
+      "case_id": "case_b5c4fe65311704d5",
+      "caveats": [],
+      "detector_status": "CONTROL_QUIET",
+      "expected_role": "negative",
+      "invalid_reason": null,
+      "name": "Tesla Model 3 2020 targetless control",
+      "selected_lineages": [
+        {
+          "best_target_score": null,
+          "ever_alerted": false,
+          "evidence_gain_after_first": 6,
+          "evidence_growth_dates": [
+            "2020-01-23",
+            "2020-02-06",
+            "2020-02-13",
+            "2020-04-23",
+            "2020-05-14",
+            "2020-06-18"
+          ],
+          "evidence_growth_event_count": 6,
+          "evidence_growth_month_count": 5,
+          "evidence_growth_span_days": 147,
+          "first_evidence_count": 1,
+          "first_persisted_date": "2020-01-23",
+          "last_persisted_date": "2020-12-31",
+          "lineage_id": "lin_249841ed0b9687a9",
+          "max_evidence_count": 7,
+          "max_risk_score": 73.25,
+          "max_threshold_margin": -1.75,
+          "persisted_occurrence_count": 50,
+          "persisted_span_days": 343,
+          "recurrence_gates": [
+            {
+              "min_evidence_gain_after_first": 2,
+              "min_growth_months": 3,
+              "min_growth_span_days": 90,
+              "min_max_evidence": 4,
+              "name": "LHREC_PRIMARY_90D_3M_4E",
+              "passed": true
+            },
+            {
+              "min_evidence_gain_after_first": 3,
+              "min_growth_months": 4,
+              "min_growth_span_days": 120,
+              "min_max_evidence": 5,
+              "name": "LHREC_MODERATE_120D_4M_5E",
+              "passed": true
+            },
+            {
+              "min_evidence_gain_after_first": 4,
+              "min_growth_months": 5,
+              "min_growth_span_days": 180,
+              "min_max_evidence": 6,
+              "name": "LHREC_STRICT_180D_5M_6E",
+              "passed": false
+            }
+          ],
+          "representative_issue": "VEHICLE SPEED CONTROL — UNINTENDED ACCELERATION",
+          "selection_reason": "highest_max_risk_control_lineage",
+          "signal_scope": "cluster",
+          "target_match_qualified": null
+        }
+      ]
+    }
+  ],
+  "caveats": [
+    "Development diagnostic only: the source validation cohort is exposed and cannot serve as a fresh validation set.",
+    "Positive lineage selection uses post-hoc target recall information only for offline diagnosis; it must never feed live Detector v1/v2 scoring.",
+    "Control lineage selection uses the highest frozen max-risk lineage per valid control case to stress-test false-alert separation.",
+    "Recurrence counts only dates where the running maximum independent evidence count increases; repeated weekly persistence without new evidence is not counted as recurrence.",
+    "Raw benchmark snapshots persist top-N-by-risk candidates plus every alert, not every detector signal. Absence from this experiment is not proof that no target-related signal existed.",
+    "Because a lineage may first enter the persisted top-N after several complaints already exist, evidence-growth month counts are conservative and may undercount earlier recurrence.",
+    "Gate thresholds are fixed screening definitions for this development experiment, not tuned Detector v2 parameters."
+  ],
+  "control_selection": "highest_max_risk_lineage_per_valid_control",
+  "detector_recomputed": false,
+  "embedding_calls_required": 0,
+  "experiment_id": "long-horizon-recurrence-experiment-a",
+  "gate_separation": [
+    {
+      "control_pass_count": 9,
+      "control_pass_rate": 1.0,
+      "gate_name": "LHREC_PRIMARY_90D_3M_4E",
+      "positive_minus_control_rate": -0.6,
+      "positive_pass_count": 4,
+      "positive_pass_rate": 0.4,
+      "target_matched_positive_count": 4,
+      "target_matched_positive_minus_control_rate": -0.25,
+      "target_matched_positive_pass_count": 3,
+      "target_matched_positive_pass_rate": 0.75,
+      "valid_control_count": 9,
+      "valid_positive_count": 10
+    },
+    {
+      "control_pass_count": 9,
+      "control_pass_rate": 1.0,
+      "gate_name": "LHREC_MODERATE_120D_4M_5E",
+      "positive_minus_control_rate": -0.7,
+      "positive_pass_count": 3,
+      "positive_pass_rate": 0.3,
+      "target_matched_positive_count": 4,
+      "target_matched_positive_minus_control_rate": -0.5,
+      "target_matched_positive_pass_count": 2,
+      "target_matched_positive_pass_rate": 0.5,
+      "valid_control_count": 9,
+      "valid_positive_count": 10
+    },
+    {
+      "control_pass_count": 6,
+      "control_pass_rate": 0.6667,
+      "gate_name": "LHREC_STRICT_180D_5M_6E",
+      "positive_minus_control_rate": -0.3667,
+      "positive_pass_count": 3,
+      "positive_pass_rate": 0.3,
+      "target_matched_positive_count": 4,
+      "target_matched_positive_minus_control_rate": -0.1667,
+      "target_matched_positive_pass_count": 2,
+      "target_matched_positive_pass_rate": 0.5,
+      "valid_control_count": 9,
+      "valid_positive_count": 10
+    }
+  ],
+  "gate_specs": [
+    {
+      "min_evidence_gain_after_first": 2,
+      "min_growth_months": 3,
+      "min_growth_span_days": 90,
+      "min_max_evidence": 4,
+      "name": "LHREC_PRIMARY_90D_3M_4E"
+    },
+    {
+      "min_evidence_gain_after_first": 3,
+      "min_growth_months": 4,
+      "min_growth_span_days": 120,
+      "min_max_evidence": 5,
+      "name": "LHREC_MODERATE_120D_4M_5E"
+    },
+    {
+      "min_evidence_gain_after_first": 4,
+      "min_growth_months": 5,
+      "min_growth_span_days": 180,
+      "min_max_evidence": 6,
+      "name": "LHREC_STRICT_180D_5M_6E"
+    }
+  ],
+  "invalid_control_case_count": 1,
+  "invalid_positive_case_count": 0,
+  "llm_calls_required": 0,
+  "metric_separation": [
+    {
+      "control_median": 6.0,
+      "metric": "evidence_growth_month_count",
+      "positive_median": 2.0,
+      "positive_vs_control_pairwise_auc": 0.1667,
+      "target_matched_positive_median": 5.0,
+      "target_matched_positive_vs_control_pairwise_auc": 0.3056
+    },
+    {
+      "control_median": 186.0,
+      "metric": "evidence_growth_span_days",
+      "positive_median": 122.5,
+      "positive_vs_control_pairwise_auc": 0.2611,
+      "target_matched_positive_median": 213.5,
+      "target_matched_positive_vs_control_pairwise_auc": 0.4444
+    },
+    {
+      "control_median": 12.0,
+      "metric": "evidence_growth_event_count",
+      "positive_median": 2.0,
+      "positive_vs_control_pairwise_auc": 0.0667,
+      "target_matched_positive_median": 7.5,
+      "target_matched_positive_vs_control_pairwise_auc": 0.1528
+    },
+    {
+      "control_median": 19.0,
+      "metric": "evidence_gain_after_first",
+      "positive_median": 1.5,
+      "positive_vs_control_pairwise_auc": 0.0611,
+      "target_matched_positive_median": 8.0,
+      "target_matched_positive_vs_control_pairwise_auc": 0.125
+    },
+    {
+      "control_median": 26.0,
+      "metric": "max_evidence_count",
+      "positive_median": 7.5,
+      "positive_vs_control_pairwise_auc": 0.15,
+      "target_matched_positive_median": 13.0,
+      "target_matched_positive_vs_control_pairwise_auc": 0.3056
+    }
+  ],
+  "persisted_candidate_scope": "top_n_by_risk_plus_all_alerts",
+  "positive_lineage_available_count": 10,
+  "positive_selection": "best_posthoc_target_lineage_per_valid_positive",
+  "risk_recomputed": false,
+  "scope": "development_diagnostic_only",
+  "source_benchmark_run_id": "bench_8ada9ea5802accc6",
+  "source_freeze_id": "recallzero-detector-v1",
+  "source_freeze_verified": true,
+  "source_lock_verified": true,
+  "target_match_threshold": 0.45,
+  "target_matched_positive_case_count": 4,
+  "valid_control_case_count": 9,
+  "valid_positive_case_count": 10
+}

@@ -1,19 +1,21 @@
 RecallZero release manifest
 ===========================
 
-Version: 0.3.5.post4
-Purpose: read-only Target Risk Audit diagnostic over frozen Detector v1 benchmark artifacts.
+Version: 0.3.5.post5
+Purpose: read-only Long-Horizon Recurrence Separation Experiment over frozen Detector v1 benchmark artifacts.
 
 New diagnostic-only code:
-- src/recallzero/benchmark_risk_audit.py
-  - reads persisted raw benchmark candidate/risk-factor records only
-  - groups repeated snapshots by lineage
-  - separates best target attribution from maximum frozen risk
-  - reports deterministic weighted risk-factor headroom
+- src/recallzero/benchmark_recurrence_experiment.py
+  - reads persisted raw benchmark candidate lineages only
+  - selects the best post-hoc target lineage per valid positive case
+  - selects the highest frozen max-risk lineage per valid control case
+  - counts recurrence only when the running maximum independent evidence count increases
+  - reports fixed screening gates plus continuous separation statistics
   - performs zero LLM, embedding, detector, clustering, or risk recomputation calls
-- CLI command: recallzero benchmark-target-risk-audit
+- CLI command: recallzero benchmark-recurrence-separation
+- docs/LONG_HORIZON_RECURRENCE_EXPERIMENT.md
 
-Unchanged Detector v1 logic versus 0.3.5.post3:
+Unchanged Detector v1 logic versus 0.3.5.post4:
 - src/recallzero/intelligence/extractor.py
 - src/recallzero/intelligence/taxonomy.py
 - src/recallzero/intelligence/clustering.py
@@ -27,20 +29,9 @@ Unchanged Detector v1 logic versus 0.3.5.post3:
 - Time Machine scoring and anti-leakage logic
 
 Historical provenance:
-- Detector v1 Validation Run 1 remains the 0.3.5.post2 result.
+- Detector v1 Validation Run 1 remains the 0.3.5.post2 failed-but-informative result.
 - The exposed 20-case cohort is development/audit evidence, not a fresh holdout.
-- Exact post2 and post3 detector freeze manifests are preserved in benchmarks/archive/.
+- Exact post2, post3, and post4 detector freeze manifests are preserved in benchmarks/archive/.
 
 Build validation:
-- 108 tests collected; 107 passed; 1 optional NAT integration skipped; 0 failed.
-- compileall PASS.
-- freeze verification PASS.
-- benchmark-target-risk-audit CLI help PASS.
-- read-only CLI smoke PASS.
-- wheel/ZIP validation details and SHA-256 values are recorded after packaging.
-- wheel build PASS.
-- isolated --target wheel import PASS (0.3.5.post4).
-- wheel SHA-256: 03e7ceddad19d9702273bc0fcbc20197d3da9a8bf4d23831150c8c3eaa735984
-- current freeze manifest SHA-256: b6348e5b59b96d3e9404f075ff8c33bddeb34483a74c03dd7215a1ef4198895b
-- archived post2 freeze SHA-256: e3aaa9eef94aa30ea41770281d62792d585c4415499e8e6ca87b81e7f918ade9
-- archived post3 freeze SHA-256: a6a6fed0016d0a079af492e65310322d3f8d3c426e4d293d93dd326657dd7807
+- Full pytest, compileall, freeze verification, CLI smoke, clean ZIP, wheel build, and isolated wheel import are recorded in RELEASE_VALIDATION.md after packaging.
