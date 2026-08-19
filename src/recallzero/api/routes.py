@@ -11,6 +11,14 @@ from recallzero.backtest import RecallTimeMachine
 from recallzero.config import Settings
 from recallzero.demo import build_demo_records
 from recallzero.demo_runtime import DemoRuntimeError, demo_readiness, run_fresh_nvidia_trace
+from recallzero.demo_actions import (
+    DemoActionError,
+    agent_readiness,
+    alert_readiness,
+    build_investigation_packet,
+    run_investigator_agent,
+    send_investigation_alert,
+)
 from recallzero.investigation import EngineeringBriefRenderer
 from recallzero.models import AnalyzeRequest, BacktestRequest, IngestRequest, NvidiaTraceRequest
 from recallzero.pipeline import build_pipeline
@@ -85,6 +93,54 @@ async def live_nvidia_trace(payload: NvidiaTraceRequest, request: Request) -> di
         raise HTTPException(status_code=503, detail=str(exc)) from exc
     except Exception as exc:
         raise HTTPException(status_code=502, detail=f"Fresh NVIDIA demo trace failed: {exc}") from exc
+
+
+@router.get("/api/v1/demo/action-readiness")
+async def demo_action_readiness() -> dict[str, object]:
+    return {
+        "alert": alert_readiness(),
+        "agent": agent_readiness(),
+    }
+
+
+@router.post("/api/v1/demo/investigation-brief")
+async def demo_investigation_brief(payload: dict[str, object]) -> dict[str, object]:
+    signal = payload.get("signal")
+    if not isinstance(signal, dict):
+        raise HTTPException(status_code=422, detail="signal must be a persisted DefectSignal JSON object")
+    source_label = str(payload.get("source_label") or "RecallZero demo")
+    outcome = payload.get("historical_outcome")
+    historical_outcome = outcome if isinstance(outcome, dict) else None
+    try:
+        return build_investigation_packet(
+            signal,
+            source_label=source_label,
+            historical_outcome=historical_outcome,
+        )
+    except DemoActionError as exc:
+        raise HTTPException(status_code=422, detail=str(exc)) from exc
+
+
+@router.post("/api/v1/demo/send-alert")
+async def demo_send_alert(payload: dict[str, object]) -> dict[str, object]:
+    signal = payload.get("signal")
+    if not isinstance(signal, dict):
+        raise HTTPException(status_code=422, detail="signal must be a persisted DefectSignal JSON object")
+    source_label = str(payload.get("source_label") or "RecallZero demo")
+    try:
+        packet = build_investigation_packet(signal, source_label=source_label)
+        return await send_investigation_alert(packet)
+    except DemoActionError as exc:
+        raise HTTPException(status_code=503, detail=str(exc)) from exc
+
+
+@router.post("/api/v1/demo/agent-investigate")
+async def demo_agent_investigate(payload: dict[str, object]) -> dict[str, object]:
+    prompt = str(payload.get("prompt") or "")
+    try:
+        return await run_investigator_agent(prompt)
+    except DemoActionError as exc:
+        raise HTTPException(status_code=503, detail=str(exc)) from exc
 
 
 @router.post("/api/v1/ingest")

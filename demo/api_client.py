@@ -47,6 +47,60 @@ class RecallZeroApi:
             timeout=max(self.timeout, 240.0),
         )
 
+    def action_readiness(self) -> dict[str, Any]:
+        return self._request("GET", "/api/v1/demo/action-readiness")
+
+    def investigation_brief(
+        self,
+        signal: dict[str, Any],
+        *,
+        source_label: str,
+        historical_outcome: dict[str, Any] | None = None,
+    ) -> dict[str, Any]:
+        payload: dict[str, Any] = {"signal": signal, "source_label": source_label}
+        if historical_outcome:
+            payload["historical_outcome"] = historical_outcome
+        return self._request("POST", "/api/v1/demo/investigation-brief", payload=payload)
+
+    def send_alert(self, signal: dict[str, Any], *, source_label: str) -> dict[str, Any]:
+        return self._request(
+            "POST",
+            "/api/v1/demo/send-alert",
+            payload={"signal": signal, "source_label": source_label},
+        )
+
+    def agent_investigate(self, prompt: str) -> dict[str, Any]:
+        return self._request(
+            "POST",
+            "/api/v1/demo/agent-investigate",
+            payload={"prompt": prompt},
+            timeout=max(self.timeout, 200.0),
+        )
+
+    def analyze(
+        self,
+        *,
+        make: str,
+        model: str,
+        model_years: list[int],
+        cutoff_date: str | None = None,
+        refresh: bool = False,
+        use_nim: bool = True,
+        max_complaints: int | None = None,
+    ) -> dict[str, Any]:
+        payload: dict[str, Any] = {
+            "make": make.strip(),
+            "model": model.strip(),
+            "model_years": model_years,
+            "refresh": refresh,
+            "use_nim": use_nim,
+        }
+        if cutoff_date:
+            payload["cutoff_date"] = cutoff_date
+        if max_complaints is not None:
+            payload["max_complaints"] = max_complaints
+        return self._request("POST", "/api/v1/analyze", payload=payload, timeout=max(self.timeout, 600.0))
+
     def backtest(self, query: BacktestQuery) -> dict[str, Any]:
         payload: dict[str, Any] = {
             "make": query.make,

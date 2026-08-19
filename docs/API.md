@@ -93,3 +93,44 @@ The bundled API is an engineering prototype. Before broader deployment:
 - Store evidence in a governed database/object store.
 - Redact sensitive narrative content.
 - Add upstream schema monitoring and circuit breakers.
+
+## Live presentation endpoints
+
+The following endpoints are presentation helpers around the frozen detector. They do not modify Detector v1 scoring.
+
+### `GET /api/v1/demo/readiness`
+
+Reports whether the local NIM, NVIDIA embedding endpoint, and cached demo ODI are ready for the fresh-inference demonstration.
+
+### `POST /api/v1/demo/nvidia-trace`
+
+```json
+{
+  "odi_number": "11466150"
+}
+```
+
+Runs one fresh NIM structured extraction and one fresh NVIDIA embedding for a cached real complaint. The endpoint deliberately avoids signature-cache writes and detector risk recalculation.
+
+### `GET /api/v1/demo/action-readiness`
+
+Reports optional business-action integrations:
+
+- alert webhook configured or off;
+- NeMo Agent Toolkit available or missing;
+- agent execution enabled or safe-off;
+- tool catalog and configured agent model.
+
+No secret webhook URL is returned.
+
+### `POST /api/v1/demo/investigation-brief`
+
+Accepts one persisted `DefectSignal` under `signal` and returns a deterministic Engineering Investigation Packet. It copies the existing detector risk values, summarizes traceable evidence, adds a fixed workflow recommendation, and renders the existing evidence-critic engineering brief. It does not call an LLM or recalculate risk.
+
+### `POST /api/v1/demo/send-alert`
+
+Accepts one persisted `DefectSignal`, rebuilds the investigation packet server-side, and sends an optional evidence-grounded summary to the configured webhook. Delivery is disabled when `RECALLZERO_DEMO_ALERT_WEBHOOK_URL` is unset.
+
+### `POST /api/v1/demo/agent-investigate`
+
+Runs the existing `configs/aiq/recallzero_agent.yml` NeMo Agent Toolkit `tool_calling_agent` workflow. This endpoint is fail-closed and disabled unless `RECALLZERO_DEMO_ENABLE_AGENT=true`. The subprocess uses an argument list rather than a shell, limits prompt length, and enforces a 180-second timeout.

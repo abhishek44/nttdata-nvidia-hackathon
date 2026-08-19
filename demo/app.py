@@ -37,6 +37,11 @@ def fetch_readiness(base_url: str) -> dict[str, Any]:
     return RecallZeroApi(base_url, timeout=10).readiness()
 
 
+@st.cache_data(ttl=5, show_spinner=False)
+def fetch_action_readiness(base_url: str) -> dict[str, Any]:
+    return RecallZeroApi(base_url, timeout=10).action_readiness()
+
+
 def api() -> RecallZeroApi:
     return RecallZeroApi(DEFAULT_API_URL)
 
@@ -65,6 +70,12 @@ def inject_style() -> None:
                      border-radius:12px; padding:14px; }
         .rz-note { color:#94a3b8; font-size:.9rem; }
         .rz-ai { border-left:4px solid #76b900; padding-left:14px; }
+        .rz-action { border:1px solid rgba(56,189,248,.28); background:rgba(56,189,248,.05);
+                     border-radius:14px; padding:16px; margin:.35rem 0 .8rem; }
+        .rz-action-high { border-color:rgba(245,158,11,.38); background:rgba(245,158,11,.06); }
+        .rz-workflow { display:flex; gap:8px; align-items:center; flex-wrap:wrap; margin:.5rem 0 1rem; }
+        .rz-step { border:1px solid rgba(148,163,184,.2); border-radius:10px; padding:7px 10px; color:#cbd5e1; background:#0c1726; }
+        .rz-arrow { color:#64748b; font-weight:800; }
         div[data-testid="stMetric"] { background:#0c1726; border:1px solid rgba(148,163,184,.16);
                                       padding:12px; border-radius:12px; }
         div[data-testid="stTabs"] button { font-weight:700; }
@@ -290,6 +301,15 @@ def render_backtest(backtest: dict[str, Any], source_label: str) -> None:
 
     signal = selected_signal(snapshot)
     if signal:
+        st.session_state["selected_demo_signal"] = signal
+        st.session_state["selected_demo_signal_source"] = source_label
+        st.session_state["selected_demo_backtest_meta"] = {
+            "target_campaign_number": backtest.get("target_campaign_number"),
+            "official_recall_date": backtest.get("official_recall_date"),
+            "first_qualified_alert_date": backtest.get("first_qualified_alert_date"),
+            "first_matching_alert_date": backtest.get("first_matching_alert_date"),
+            "lead_time_days": backtest.get("lead_time_days"),
+        }
         issue, score, evidence_count, alerted = signal_summary(signal)
         st.markdown(f"### {'🚨' if alerted else '◌'} {issue}")
         m1, m2, m3 = st.columns(3)
@@ -408,8 +428,240 @@ def render_time_machine() -> None:
     render_backtest(st.session_state["active_backtest"], st.session_state["active_backtest_source"])
 
 
+def reference_alert_signal() -> dict[str, Any] | None:
+    backtest = load_json(str(REFERENCE_BACKTEST))
+    target_date = backtest.get("first_qualified_alert_date") or backtest.get("first_matching_alert_date")
+    snapshots = backtest.get("snapshots") or []
+    for snapshot in snapshots:
+        if target_date and snapshot.get("cutoff_date") != target_date:
+            continue
+        alerts = snapshot.get("alerts") or []
+        if alerts:
+            return alerts[0]
+    for snapshot in snapshots:
+        alerts = snapshot.get("alerts") or []
+        if alerts:
+            return alerts[0]
+    return None
+
+
+def render_action_center() -> None:
+    st.subheader("3 · Engineering Action Center")
+    st.caption(
+        "Turn a detected signal into a human investigation workflow: deterministic quality brief, traceable evidence package, optional webhook escalation, and optional NVIDIA NeMo Agent Toolkit orchestration."
+    )
+    st.markdown(
+        '<div class="rz-workflow"><span class="rz-step">Detect</span><span class="rz-arrow">→</span>'
+        '<span class="rz-step">Inspect evidence</span><span class="rz-arrow">→</span>'
+        '<span class="rz-step">Create engineering brief</span><span class="rz-arrow">→</span>'
+        '<span class="rz-step">Escalate / investigate</span></div>',
+        unsafe_allow_html=True,
+    )
+
+    with st.expander("Optional · investigate another vehicle live"):
+        st.caption(
+            "This uses the real /api/v1/analyze path. Keep refresh off for a presentation so cached NHTSA records and cached NIM signatures are reused where available."
+        )
+        q1, q2, q3 = st.columns([1, 1.3, 2])
+        live_year = q1.number_input("Model year", min_value=1990, max_value=date.today().year + 1, value=2021, step=1)
+        live_make = q2.text_input("Make", value="FORD")
+        live_model = q3.text_input("Model", value="MUSTANG MACH-E")
+        max_complaints = st.number_input(
+            "Maximum complaints for optional live investigation",
+            min_value=10,
+            max_value=1000,
+            value=100,
+            step=10,
+            help="A presentation guardrail. Cached signatures are reused; embeddings/clustering may still execute.",
+        )
+        if st.button("Analyze selected vehicle", use_container_width=True):
+            try:
+                with st.status("Running RecallZero vehicle investigation…", expanded=True) as status:
+                    st.write("Fetching/reusing NHTSA complaint and recall data")
+                    st.write("Reusing cached NVIDIA signatures where present")
+                    st.write("Running deterministic clustering, trend, evidence, severity and risk analytics")
+                    result = api().analyze(
+                        make=live_make,
+                        model=live_model,
+                        model_years=[int(live_year)],
+                        refresh=False,
+                        use_nim=True,
+                        max_complaints=int(max_complaints),
+                    )
+                    status.update(label="Vehicle investigation complete", state="complete")
+                st.session_state["live_analysis"] = result
+                signals = result.get("signals") or []
+                if signals:
+                    st.session_state["action_signal_override"] = signals[0]
+                    st.session_state["action_signal_override_source"] = f'Live analysis · run {result.get("run_id", "current")}'
+                    st.session_state.pop("investigation_packet", None)
+            except ApiError as exc:
+                st.error(f"Live vehicle analysis failed: {exc}")
+        if st.session_state.get("live_analysis"):
+            result = st.session_state["live_analysis"]
+            signals = result.get("signals") or []
+            x1, x2, x3 = st.columns(3)
+            x1.metric("Complaints", result.get("complaint_count", 0))
+            x2.metric("Signals", len(signals))
+            x3.metric("Alerts", sum(1 for item in signals if (item.get("risk") or {}).get("alert")))
+            if signals:
+                labels = [signal_summary(item)[0] for item in signals[:10]]
+                chosen = st.selectbox("Choose a signal for the Action Center", range(len(labels)), format_func=lambda i: labels[i])
+                st.session_state["action_signal_override"] = signals[chosen]
+                st.session_state["action_signal_override_source"] = f'Live analysis · run {result.get("run_id", "current")}'
+
+    if st.session_state.get("action_signal_override") and st.button("Use Time Machine signal instead", use_container_width=True):
+        st.session_state.pop("action_signal_override", None)
+        st.session_state.pop("action_signal_override_source", None)
+        st.session_state.pop("investigation_packet", None)
+        st.rerun()
+
+    signal = st.session_state.get("action_signal_override") or st.session_state.get("selected_demo_signal") or reference_alert_signal()
+    source_label = st.session_state.get("action_signal_override_source") or st.session_state.get(
+        "selected_demo_signal_source",
+        "Audited reference replay · Detector v1 historical artifact",
+    )
+    if not signal:
+        st.warning("No persisted signal is available for the Action Center.")
+        return
+
+    issue, score, evidence_count, alerted = signal_summary(signal)
+    trend = signal.get("trend") or {}
+    recall_match = signal.get("recall_match") or {}
+    recommendation = "Escalate for engineering review" if alerted else ("Priority monitoring" if score >= 60 else "Continue monitoring")
+    st.markdown(
+        f'<div class="rz-action {"rz-action-high" if alerted else ""}"><b>{recommendation}</b><br>'
+        f'{issue}<br><span class="rz-note">Risk {score:.1f}/100 · {evidence_count} supporting complaints · '
+        f'{float(trend.get("trend_ratio") or 0):.2f}x recent/baseline ratio</span></div>',
+        unsafe_allow_html=True,
+    )
+
+    c1, c2, c3, c4 = st.columns(4)
+    c1.metric("Risk", f"{score:.1f} / 100")
+    c2.metric("Evidence", evidence_count)
+    c3.metric("Trend", f'{float(trend.get("trend_ratio") or 0):.2f}x')
+    c4.metric("Visible recall match", "YES" if recall_match.get("matched") else "NO")
+
+    st.markdown("#### Quality Engineering Brief")
+    st.write(
+        "The brief is generated from the already-computed detector signal. It does not call an LLM, invent a new score, or change the detector."
+    )
+    if st.button("Generate engineering investigation packet", type="primary", use_container_width=True):
+        try:
+            historical_outcome = None
+            if st.session_state.get("reveal_recall"):
+                historical_outcome = st.session_state.get("selected_demo_backtest_meta")
+            with st.spinner("Building deterministic investigation packet…"):
+                packet = api().investigation_brief(
+                    signal,
+                    source_label=source_label,
+                    historical_outcome=historical_outcome,
+                )
+            st.session_state["investigation_packet"] = packet
+        except ApiError as exc:
+            st.error(f"Could not generate the engineering packet: {exc}")
+
+    packet = st.session_state.get("investigation_packet")
+    if packet:
+        action = packet.get("recommended_action") or {}
+        st.success(f'{action.get("title", "Investigation packet ready")} — {action.get("summary", "")}')
+        top = (packet.get("risk_factors") or [])[:3]
+        if top:
+            st.markdown("**Top deterministic reasons**")
+            for row in top:
+                st.write(
+                    f'• {str(row.get("name", "factor")).replace("_", " ").title()}: '
+                    f'{float(row.get("score") or 0):.1f}/100 · contribution {float(row.get("contribution") or 0):.1f}'
+                )
+        with st.expander("Open the full engineering brief", expanded=True):
+            st.markdown(packet.get("markdown", ""))
+        d1, d2 = st.columns(2)
+        d1.download_button(
+            "Download brief (.md)",
+            data=packet.get("markdown", ""),
+            file_name="recallzero_engineering_investigation.md",
+            mime="text/markdown",
+            use_container_width=True,
+        )
+        d2.download_button(
+            "Download evidence packet (.json)",
+            data=json.dumps({k: v for k, v in packet.items() if k != "markdown"}, indent=2),
+            file_name="recallzero_engineering_investigation.json",
+            mime="application/json",
+            use_container_width=True,
+        )
+
+    st.divider()
+    st.markdown("#### Proactive escalation")
+    try:
+        action_ready = fetch_action_readiness(DEFAULT_API_URL)
+    except ApiError as exc:
+        action_ready = {"alert": {"configured": False}, "agent": {"available": False, "execution_enabled": False}}
+        st.caption(f"Action readiness unavailable: {exc}")
+
+    alert_state = action_ready.get("alert") or {}
+    left, right = st.columns([1, 2])
+    with left:
+        st.metric("Webhook", "READY" if alert_state.get("configured") else "OPTIONAL / OFF")
+    with right:
+        if alert_state.get("configured"):
+            st.caption(f'Provider: {alert_state.get("provider")} · destination credentials are never rendered in the UI.')
+        else:
+            st.caption(
+                "Optional: configure RECALLZERO_DEMO_ALERT_WEBHOOK_URL to send the same evidence-grounded investigation summary to a Slack/Teams/generic webhook."
+            )
+    if st.button(
+        "Send investigation alert",
+        disabled=not bool(alert_state.get("configured")),
+        use_container_width=True,
+    ):
+        try:
+            result = api().send_alert(signal, source_label=source_label)
+            st.success(f'Alert sent through {result.get("provider")} · HTTP {result.get("http_status")}')
+        except ApiError as exc:
+            st.error(f"Alert delivery failed: {exc}")
+
+    st.divider()
+    st.markdown("#### NVIDIA Investigator Agent · optional live orchestration")
+    agent = action_ready.get("agent") or {}
+    a1, a2, a3 = st.columns(3)
+    a1.metric("NeMo Agent Toolkit", "AVAILABLE" if agent.get("available") else "NOT INSTALLED")
+    a2.metric("Agent execution", "ENABLED" if agent.get("execution_enabled") else "SAFE-OFF")
+    a3.metric("Workflow", agent.get("workflow") or "tool_calling_agent")
+    st.caption(
+        "The agent orchestrates existing RecallZero tools. It does not replace deterministic trend, evidence, risk, or anti-leakage calculations."
+    )
+    with st.expander("Agent tool map"):
+        st.write("NVIDIA model:", agent.get("agent_model", "—"))
+        for tool in agent.get("tools") or []:
+            st.write(f"✓ {tool}")
+
+    default_prompt = (
+        "Investigate the 2021 and 2022 Ford Mustang Mach-E. Summarize the highest-priority emerging signal, "
+        "cite source ODI evidence, and explain what RecallZero recommends an engineer review."
+    )
+    prompt = st.text_area("Investigator prompt", value=default_prompt, height=100)
+    can_agent = bool(agent.get("available") and agent.get("execution_enabled"))
+    if st.button("Run NVIDIA Investigator Agent", disabled=not can_agent, use_container_width=True):
+        try:
+            with st.status("NVIDIA Investigator Agent is orchestrating RecallZero tools…", expanded=True) as status:
+                result = api().agent_investigate(prompt)
+                status.update(label="Investigator workflow complete", state="complete")
+            st.session_state["agent_result"] = result
+        except ApiError as exc:
+            st.error(f"Agent workflow failed: {exc}")
+    if not can_agent:
+        st.info(
+            "Keep this optional path disabled for the main demo unless NAT has been rehearsed on GB10. Enable it with RECALLZERO_DEMO_ENABLE_AGENT=true after installing the [aiq] extra."
+        )
+    if st.session_state.get("agent_result"):
+        result = st.session_state["agent_result"]
+        st.markdown("**Agent response**")
+        st.code(result.get("output", ""), language="text")
+
+
 def render_validation() -> None:
-    st.subheader("3 · Validation Lab")
+    st.subheader("4 · Validation Lab")
     summary = load_json(str(VALIDATION_SUMMARY))
     agg = summary["aggregate"]
     st.caption("Frozen preregistered Detector v1 validation. This screen is intentionally a read-only research artifact.")
@@ -456,7 +708,7 @@ def main() -> None:
         <div class="rz-hero">
           <div class="rz-kicker">RECALLZERO · LIVE DEFECT INTELLIGENCE DEMO</div>
           <div class="rz-title">Can safety-relevant complaint patterns be surfaced before a recall is public?</div>
-          <p class="rz-sub">NVIDIA AI understands the complaint language. RecallZero's deterministic engine decides the risk. Historical outcomes stay locked until evaluation.</p>
+          <p class="rz-sub">NVIDIA AI understands the complaint language. RecallZero's deterministic engine decides the risk. Evidence becomes an engineering action packet, while historical outcomes stay locked until evaluation.</p>
         </div>
         """,
         unsafe_allow_html=True,
@@ -475,12 +727,14 @@ def main() -> None:
         if readiness:
             st.json(readiness)
 
-    tab1, tab2, tab3 = st.tabs(["1 · LIVE NVIDIA", "2 · TIME MACHINE", "3 · VALIDATION"])
+    tab1, tab2, tab3, tab4 = st.tabs(["1 · LIVE NVIDIA", "2 · TIME MACHINE", "3 · ACTION CENTER", "4 · VALIDATION"])
     with tab1:
         render_live_investigation(readiness)
     with tab2:
         render_time_machine()
     with tab3:
+        render_action_center()
+    with tab4:
         render_validation()
 
 

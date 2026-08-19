@@ -20,6 +20,7 @@ def main() -> int:
     parser.add_argument("--api", default=os.getenv("RECALLZERO_API_URL", "http://127.0.0.1:8080"))
     parser.add_argument("--live", action="store_true", help="Also run one fresh NVIDIA trace")
     parser.add_argument("--odi", default=os.getenv("RECALLZERO_DEMO_ODI", "11466150"))
+    parser.add_argument("--agent", action="store_true", help="Also run the optional NVIDIA Investigator Agent")
     args = parser.parse_args()
     base = args.api.rstrip("/")
 
@@ -32,6 +33,18 @@ def main() -> int:
         if not readiness.get("ready_for_live_trace"):
             print("[FAIL] Live NVIDIA trace is not ready")
             return 2
+
+        actions = request("GET", f"{base}/api/v1/demo/action-readiness")
+        alert = actions.get("alert", {})
+        agent = actions.get("agent", {})
+        print(f"[INFO] Engineering alert webhook: {'READY' if alert.get('configured') else 'optional/off'}")
+        print(
+            "[INFO] NVIDIA Investigator Agent: %s | execution %s"
+            % (
+                "AVAILABLE" if agent.get("available") else "not installed",
+                "ENABLED" if agent.get("execution_enabled") else "safe-off",
+            )
+        )
 
         if args.live:
             print(f"[RUN ] Fresh NVIDIA trace for ODI {args.odi} ...")
@@ -50,6 +63,20 @@ def main() -> int:
                     trace["cache_write"],
                 )
             )
+        if args.agent:
+            print("[RUN ] NVIDIA Investigator Agent ...")
+            result = request(
+                "POST",
+                f"{base}/api/v1/demo/agent-investigate",
+                {
+                    "prompt": (
+                        "Investigate the 2021 and 2022 Ford Mustang Mach-E. Summarize the highest-priority "
+                        "emerging signal and cite source ODI evidence."
+                    )
+                },
+                timeout=210,
+            )
+            print(f"[PASS] Agent workflow {result.get('workflow')} completed with {len(result.get('tools', []))} tools available")
         return 0
     except HTTPError as exc:
         detail = exc.read().decode("utf-8", errors="replace")
