@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.3.5.post4 — Read-only target-risk audit diagnostic
+
+- Keep Detector v1 extraction, taxonomy, clustering, severity, trend, risk, live recall-gap matching, post-hoc target matching, alert threshold, weights, and Time Machine behavior unchanged from 0.3.5.post3.
+- Add `recallzero benchmark-target-risk-audit` to inspect deterministic risk-factor breakdowns already persisted in a freeze/lock-verified raw benchmark.
+- The audit performs zero LLM calls, zero embedding calls, zero detector replays, and zero risk recomputation. It reads only persisted top-N-by-risk candidates plus every alert.
+- Group candidate occurrences by lineage, separate best target score from maximum frozen risk on the same lineage, and report the largest weighted factor headroom without treating that headroom as a tuning recommendation.
+- Add explicit diagnoses such as `TARGET_MATCHED_BUT_RISK_GATE_NOT_MET` and `BEST_TARGET_LINEAGE_NOT_ALERTED_AND_OFF_TARGET_ALERTS_PRESENT`.
+- Preserve archived 0.3.5.post2 and 0.3.5.post3 freeze manifests under `benchmarks/archive/` for historical provenance.
+- Add three regression tests covering target-vs-off-target lineage separation, weighted risk-headroom arithmetic, and rejection of unverified source benchmarks.
+
 ## 0.3.5.post3 — Stability normalization + isolated embedding attribution experiment
 
 - Keep Detector v1 calibration, live visible-recall matching, risk weights, 75-point alert threshold, taxonomy, clustering, severity scoring, trend windows, and Time Machine leakage rules unchanged.

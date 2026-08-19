@@ -35,6 +35,7 @@ from recallzero.benchmark_adjudication import (
     write_validation_report_csv,
 )
 from recallzero.benchmark_attribution import run_attribution_experiment
+from recallzero.benchmark_risk_audit import build_target_risk_audit
 from recallzero.config import get_settings
 from recallzero.demo import build_demo_records
 from recallzero.freeze import verify_freeze
@@ -635,6 +636,71 @@ def benchmark_attribution_experiment(
         console.print(f"Saved attribution experiment JSON: {json_output}")
 
     _run_cli_async(_run(), "Target attribution experiment")
+
+
+@app.command("benchmark-target-risk-audit")
+def benchmark_target_risk_audit(
+    raw_result: Path = typer.Argument(..., exists=True, readable=True),
+    json_output: Path = typer.Option(
+        Path("data/runs/target_risk_audit.json"),
+        "--json",
+        help="Development-only deterministic risk audit for persisted positive-case target candidates.",
+    ),
+    target_match_threshold: float = typer.Option(
+        0.45,
+        "--target-match-threshold",
+        min=0.0,
+        max=1.0,
+        help="Post-hoc target qualification threshold used only to label audit diagnoses.",
+    ),
+    top_lineages: int = typer.Option(
+        8,
+        "--top-lineages",
+        min=1,
+        max=50,
+        help="Number of highest target-scoring persisted lineages to retain per positive case.",
+    ),
+) -> None:
+    """Explain why persisted target-plausible positive-case lineages did or did not cross the risk gate."""
+    result = build_target_risk_audit(
+        raw_result_path=raw_result,
+        target_match_threshold=target_match_threshold,
+        top_lineages=top_lineages,
+    )
+    json_output.parent.mkdir(parents=True, exist_ok=True)
+    json_output.write_text(dumps_json(result.model_dump(mode="json")), encoding="utf-8")
+
+    console.print(f"[bold]Audit:[/bold] {result.audit_id}")
+    console.print(f"[bold]Source benchmark:[/bold] {result.source_benchmark_run_id}")
+    console.print(
+        f"[bold]Positive cases:[/bold] {result.positive_case_count} "
+        f"([bold]valid[/bold] {result.valid_positive_case_count}, "
+        f"[bold]invalid[/bold] {result.invalid_positive_case_count})"
+    )
+    console.print(
+        f"[bold]Frozen gates:[/bold] risk {result.alert_threshold:.2f}, "
+        f"target attribution {result.target_match_threshold:.2f}"
+    )
+    table = Table(title="Target risk audit")
+    table.add_column("Case")
+    table.add_column("Best target")
+    table.add_column("Max risk")
+    table.add_column("Top risk headroom")
+    table.add_column("Diagnosis")
+    for case in result.cases:
+        best = case.best_persisted_target_lineage
+        table.add_row(
+            case.name,
+            f"{case.best_persisted_target_score:.3f}" if case.best_persisted_target_score is not None else "n/a",
+            f"{best.max_risk_score:.2f}" if best is not None else "n/a",
+            ", ".join(best.dominant_risk_headroom[:2]) if best is not None else "n/a",
+            case.diagnosis,
+        )
+    console.print(table)
+    console.print(
+        "[yellow]Diagnostic only: candidates are the raw benchmark's persisted top-N-by-risk plus alerts, not every detector signal.[/yellow]"
+    )
+    console.print(f"Saved target risk audit JSON: {json_output}")
 
 
 @app.command("benchmark-adjudicate")

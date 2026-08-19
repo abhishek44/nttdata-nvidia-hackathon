@@ -1,15 +1,16 @@
 freeze_id: recallzero-detector-v1
 detector_source_release: 0.3.3a2
-benchmark_release: 0.3.5.post4
+benchmark_release: 0.3.5.post3
 input_adapter_revision: nhtsa-complaint-catalog-v2
 provenance:
   git_commit: null
   note: Recovered/build archive contains no .git metadata; module SHA-256 values are
     the authoritative source freeze.
-  benchmark_note: 0.3.5.post4 preserves Detector v1 live scoring and evaluation behavior
-    while adding a read-only target-risk audit over persisted raw benchmark candidates.
-    Detector v1 Validation Run 1 remains the historical 0.3.5.post2 result and must
-    not be retroactively rewritten.
+  benchmark_note: 0.3.5.post3 preserves Detector v1 calibration/live recall-gap behavior
+    while adding auxiliary severity-label tolerance in the semantic extraction adapter
+    and a separate evaluation-only embedding attribution experiment. Detector v1 Validation
+    Run 1 remains the historical 0.3.5.post2 result and must not be retroactively
+    rewritten.
 runtime:
   models:
     llm_model: nvidia/nemotron-3.5-lightning-30b-a3b
@@ -114,7 +115,7 @@ evaluation_modules:
     sha256: 3c8d4362ff120c404bbcd907d56a67759490228d3e67163bdc9fdff4e088b0e4
   benchmark_cli:
     path: src/recallzero/cli.py
-    sha256: ddf04908dcb441e5fdb080aa89f609f3ec8c48cf291669aa94e40b9e2ff46bda
+    sha256: f74e001895c1184ab656014410367f4c7a08b9b384fe20ae64e4aa584549f001
   freeze_verifier:
     path: src/recallzero/freeze.py
     sha256: 7b10409c3187399dc5d3a42f40216ff6a8ddefbee71d7012b76ac69d3f25fc8c
@@ -124,9 +125,6 @@ evaluation_modules:
   target_attributor:
     path: src/recallzero/recall/target_attributor.py
     sha256: d968bd611d8b27b0d86e498d569251600097e13ac1358ea5908ca5baef986d04
-  target_risk_audit:
-    path: src/recallzero/benchmark_risk_audit.py
-    sha256: 3dae15a00d4897e917a81265b6bae5ab4c1cd42b252a4ceb475d84ec849479f2
 known_gaps:
 - id: TAX-001
   status: deferred_until_benchmark

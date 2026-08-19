@@ -1,49 +1,46 @@
 RecallZero release manifest
 ===========================
 
-Version: 0.3.5.post3
-Purpose: stable Detector v1 research baseline maintenance + isolated Target Attribution Experiment A.
+Version: 0.3.5.post4
+Purpose: read-only Target Risk Audit diagnostic over frozen Detector v1 benchmark artifacts.
 
-Intentional runtime source change versus 0.3.5.post2:
+New diagnostic-only code:
+- src/recallzero/benchmark_risk_audit.py
+  - reads persisted raw benchmark candidate/risk-factor records only
+  - groups repeated snapshots by lineage
+  - separates best target attribution from maximum frozen risk
+  - reports deterministic weighted risk-factor headroom
+  - performs zero LLM, embedding, detector, clustering, or risk recomputation calls
+- CLI command: recallzero benchmark-target-risk-audit
+
+Unchanged Detector v1 logic versus 0.3.5.post3:
 - src/recallzero/intelligence/extractor.py
-  - unsupported auxiliary severity labels are logged and dropped from the canonical NIM signature
-  - core structured fields remain strict and benchmark fail-closed behavior is unchanged
-
-New evaluation-only code:
-- src/recallzero/recall/target_attributor.py
-  - separate target-attribution scorer; not used by live recall-gap scoring
-  - Experiment A substitutes only the 10% TF-IDF semantic term with NIM embedding cosine
-- src/recallzero/benchmark_attribution.py
-  - cache-only experiment over frozen benchmark candidates/member IDs
-  - zero LLM calls, zero detector replays, bounded embedding calls
-- CLI command: recallzero benchmark-attribution-experiment
-
-Unchanged live detector logic:
+- src/recallzero/intelligence/taxonomy.py
+- src/recallzero/intelligence/clustering.py
+- src/recallzero/analytics/severity.py
+- src/recallzero/analytics/trend_engine.py
+- src/recallzero/analytics/risk_engine.py
+- src/recallzero/pipeline.py
+- src/recallzero/recall/matcher.py
 - config/risk.yml
-- severity scoring
-- taxonomy
-- clustering and meta-signal construction
-- trend engine
-- risk engine
-- pipeline.py
-- recall/matcher.py and find_best_match live recall-gap path
 - alert threshold / weights / windows
-- Time Machine anti-leakage rules
+- Time Machine scoring and anti-leakage logic
 
-Historical validation note:
-- Detector v1 Validation Run 1 was executed on 0.3.5.post2 and remains a failed-but-informative historical artifact.
-- post3 must not be used to retroactively rewrite that result.
-- the current 20 validation cases are development evidence for attribution work, not a fresh holdout.
-
-Input adapter: nhtsa-complaint-catalog-v2
-Semantic extraction revision: local-nim-structured-contract-v3-aux-label-tolerant
-Attribution experiment revision: target-attribution-experiment-a
+Historical provenance:
+- Detector v1 Validation Run 1 remains the 0.3.5.post2 result.
+- The exposed 20-case cohort is development/audit evidence, not a fresh holdout.
+- Exact post2 and post3 detector freeze manifests are preserved in benchmarks/archive/.
 
 Build validation:
-- 105 tests collected; 104 passed; 1 optional NAT integration skipped; 0 failed.
+- 108 tests collected; 107 passed; 1 optional NAT integration skipped; 0 failed.
 - compileall PASS.
 - freeze verification PASS.
-- detector comparison vs post2: 14 same / 1 changed (extractor only).
-- pipeline.py, recall/matcher.py, severity.py, risk_engine.py, and config/risk.yml are byte-identical to post2.
-- wheel install smoke reports 0.3.5.post3.
-- wheel SHA-256: 38c7d5571befd3f0dc4fbbcb2f6587ccd04265cab1a1aa837a099594fa53bb7c
+- benchmark-target-risk-audit CLI help PASS.
+- read-only CLI smoke PASS.
+- wheel/ZIP validation details and SHA-256 values are recorded after packaging.
+- wheel build PASS.
+- isolated --target wheel import PASS (0.3.5.post4).
+- wheel SHA-256: 03e7ceddad19d9702273bc0fcbc20197d3da9a8bf4d23831150c8c3eaa735984
+- current freeze manifest SHA-256: b6348e5b59b96d3e9404f075ff8c33bddeb34483a74c03dd7215a1ef4198895b
+- archived post2 freeze SHA-256: e3aaa9eef94aa30ea41770281d62792d585c4415499e8e6ca87b81e7f918ade9
+- archived post3 freeze SHA-256: a6a6fed0016d0a079af492e65310322d3f8d3c426e4d293d93dd326657dd7807

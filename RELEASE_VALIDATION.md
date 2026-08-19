@@ -1,66 +1,55 @@
 # RecallZero v2 Release Validation
 
-Release version: **0.3.5.post3** — stability normalization and isolated embedding target-attribution experiment.
+Release version: **0.3.5.post4** — read-only Target Risk Audit diagnostic.
 
 ## Scope
 
-Detector v1 Validation Run 1 on 0.3.5.post2 is preserved as the historical validation result. It did not pass the preregistered acceptance bar. post3 does not reinterpret that outcome and does not tune the live detector against the exposed validation cohort.
+0.3.5.post4 does not tune Detector v1. It adds one offline diagnostic command over an already completed raw benchmark artifact. The historical Detector v1 Validation Run 1 remains the 0.3.5.post2 failed-but-informative result; post4 must not be used to rewrite it.
 
-The maintenance release addresses one concrete runtime robustness failure and adds one isolated development experiment:
+The command is:
 
-1. The Jeep Wrangler control failed because local Nemotron emitted an otherwise valid signature containing an unsupported auxiliary severity label, `airbag_deployed`, even after the repair attempt. post3 makes unsupported auxiliary labels non-fatal while keeping core structured extraction strict.
-2. The detailed matcher audit showed that the current post-hoc semantic term is TF-IDF cosine at exactly 10% weight. post3 adds an evaluation-only embedding substitution experiment without changing live recall-gap matching or detector risk.
-
-## Wrangler stability correction
-
-- `severity_indicators` remains prompt-constrained to the canonical RecallZero vocabulary, but the guided schema accepts strings rather than enforcing a hard enum at Pydantic validation time.
-- Unsupported labels are logged with the ODI and dropped before the `FailureSignature` enters canonical detector semantics.
-- No unsupported label is mapped to a recognized safety indicator. In particular, `airbag_deployed` is **not** promoted to `restraint_failure`.
-- Deterministic `SeverityEngine` validation remains authoritative.
-- Invalid JSON, missing/empty `system` or `failure_mode`, malformed field types, or other core schema failures still receive one NIM-only repair attempt and remain fail-closed in strict validation.
-
-## Target Attribution Experiment A
-
-`TargetAttributor` is a new evaluation-only class and is not wired into `RecallMatcher.find_best_match`, the live detector path used by `pipeline.py` to calculate recall-gap risk.
-
-Experiment A changes exactly one term:
-
-```text
-baseline:     0.10 * TF-IDF cosine
-experiment:   0.10 * NIM embedding cosine
+```bash
+recallzero benchmark-target-risk-audit RAW_RESULT \
+  --target-match-threshold 0.45 \
+  --top-lineages 8 \
+  --json target_risk_audit.json
 ```
 
-Everything else remains the frozen post-hoc formula: mechanism 30%, consequence family 20%, component 20%, subsystem 10%, consequence text 10%, the component gate, and target threshold 0.45.
+## Diagnostic boundary
 
-The `benchmark-attribution-experiment` command:
+The Target Risk Audit:
 
-- reads a freeze/lock-verified raw benchmark artifact;
-- selects valid positive `EARLY_ALERT_TARGET_UNMATCHED` cases;
-- includes every alert candidate plus the highest baseline target candidates;
-- reconstructs candidate clusters from persisted `member_ids` and local complaint/signature/recall caches;
-- recomputes the original TF-IDF target score and refuses to continue if it differs from the frozen raw score by more than 0.002;
-- performs zero LLM calls and zero detector replays;
-- batches unique texts through the configured NIM embedding model;
-- writes before/after candidate-level scores for discrimination analysis.
+- requires the source raw benchmark to report both `freeze_verified=true` and `lock_verified=true`;
+- performs zero LLM calls;
+- performs zero embedding calls;
+- performs zero detector replays;
+- performs zero clustering or risk recomputation;
+- reads the frozen `risk_factors`, risk scores, target scores, evidence counts, alert flags, and lineage IDs already persisted in the raw benchmark;
+- groups repeated snapshots by lineage so target attribution and maximum risk are analyzed independently on the same signal lineage;
+- reports weighted factor headroom only as a diagnostic, not as a recommendation to tune weights or scores.
 
-The experiment is development-only. A score increase is not automatically a success; off-target alert candidates must remain below the target threshold.
+The raw benchmark persists the ordinary top-N candidates by risk plus every alert, not every detector signal. Therefore absence from the audit is not proof that no target-related signal existed.
 
-## Scientific boundary
+## Freeze provenance
 
-- The 20-case Detector v1 validation cohort is now exposed and can only be used as a development/audit set.
-- If Experiment A supports Target Attributor v2, a new untouched holdout must be selected and locked before v2 tuning.
-- The 75-point detector threshold and live risk formula remain unchanged in post3.
+- Detector source logic is byte-identical to 0.3.5.post3.
+- `src/recallzero/cli.py` changed only to expose the new read-only diagnostic command.
+- `src/recallzero/benchmark_risk_audit.py` is new diagnostic-only code.
+- `benchmarks/detector_freeze_v1.yaml` records the post4 diagnostic CLI/module hashes.
+- Exact post2/post3 freeze manifests are preserved under `benchmarks/archive/` for historical provenance.
 
 ## Build validation
 
-- `PYTHONPATH=src pytest -q -ra`: **105 collected, 104 passed, 1 skipped, 0 failed**.
+- `PYTHONPATH=src pytest -ra`: **108 collected, 107 passed, 1 skipped, 0 failed**.
 - The one skip is the optional NAT runtime integration because `nat` is not installed in the isolated build environment.
 - `python -m compileall -q src tests`: **PASS**.
-- `PYTHONPATH=src python -m recallzero.cli --version`: **RecallZero 0.3.5.post3**.
-- `freeze-verify --manifest benchmarks/detector_freeze_v1.yaml`: **PASS** against live Settings, `risk.yml`, detector hashes, and evaluation hashes.
-- `benchmark-attribution-experiment --help`: **PASS**; command is present and explicitly described as no-detector-replay evaluation.
+- `PYTHONPATH=src python -m recallzero.cli --version`: **RecallZero 0.3.5.post4**.
+- `freeze-verify --manifest benchmarks/detector_freeze_v1.yaml`: **PASS**.
+- `benchmark-target-risk-audit --help`: **PASS**.
+- CLI smoke against an available freeze/lock-verified raw benchmark artifact: **PASS**.
 - Wheel build via `pip wheel --no-deps --no-build-isolation`: **PASS**.
-- Isolated-target wheel import reports **0.3.5.post3** and exposes `TargetAttributor`.
-- Detector-module comparison against 0.3.5.post2: **14 unchanged / 1 changed**. The sole detector-section change is `intelligence/extractor.py`; `pipeline.py`, `recall/matcher.py`, severity, risk engine, and `config/risk.yml` are byte-identical.
-- Ruff is not installed in the isolated build environment, so no Ruff result is claimed.
-- Wheel SHA-256: `38c7d5571befd3f0dc4fbbcb2f6587ccd04265cab1a1aa837a099594fa53bb7c`.
+- Isolated `--target` wheel import reports **0.3.5.post4** and imports `build_target_risk_audit`: **PASS**.
+- Wheel SHA-256: `03e7ceddad19d9702273bc0fcbc20197d3da9a8bf4d23831150c8c3eaa735984`.
+- Current post4 freeze manifest SHA-256: `b6348e5b59b96d3e9404f075ff8c33bddeb34483a74c03dd7215a1ef4198895b`.
+- Archived post2 freeze SHA-256: `e3aaa9eef94aa30ea41770281d62792d585c4415499e8e6ca87b81e7f918ade9`.
+- Archived post3 freeze SHA-256: `a6a6fed0016d0a079af492e65310322d3f8d3c426e4d293d93dd326657dd7807`.
