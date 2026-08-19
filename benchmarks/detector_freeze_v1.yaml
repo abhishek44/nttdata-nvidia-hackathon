@@ -1,12 +1,15 @@
 freeze_id: recallzero-detector-v1
 detector_source_release: 0.3.3a2
-benchmark_release: 0.3.5.post1
+benchmark_release: 0.3.5.post2
 input_adapter_revision: nhtsa-complaint-catalog-v2
 provenance:
   git_commit: null
   note: Recovered/build archive contains no .git metadata; module SHA-256 values are
     the authoritative source freeze.
-  benchmark_note: 0.3.5.post1 changes the NHTSA complaint input adapter and evaluation provenance before validation locking; Detector v1 scoring/representation remains the 0.3.3a2 state.
+  benchmark_note: 0.3.5.post2 keeps Detector v1 calibration/downstream scoring frozen
+    while revising the pre-validation local-NIM structured extraction contract and
+    strict all-NIM benchmark gate; candidate lock must be recreated after this freeze
+    refresh.
 runtime:
   models:
     llm_model: nvidia/nemotron-3.5-lightning-30b-a3b
@@ -68,7 +71,7 @@ detector_modules:
     sha256: 954997bcea4c01f57b6b88e19f5ec3f5642f1efabb7e96805fb81979d5faba8a
   extractor:
     path: src/recallzero/intelligence/extractor.py
-    sha256: 4bee9d8d5eaf90fc1afac7d021be8e053af31767af4d7855e49f113d750e0464
+    sha256: d488ef4dc6bf6aee14f5047d4adeaedc51242a7d397aa806401fa0acd34e2de8
   embeddings:
     path: src/recallzero/intelligence/embeddings.py
     sha256: 413c297e97cd70b3182c14ee125f61ed7fbee87bc3ca694e5a5e5b7e39bcef93
@@ -105,7 +108,7 @@ evaluation_modules:
     sha256: 5394ef155f4f57ad323d664c8002be7b6ec3877f5d34a2e65d4d9755e2216dcb
   benchmark_harness:
     path: src/recallzero/benchmark.py
-    sha256: e7fba8cd806bc6fa0f35f4f3fde429c5b76dafa87fe05c823427a4578ab55f8f
+    sha256: 7d82b8af2e1bcd34804c3947af2fb5c62fec01470c24deedd1d71b3e2a8433c5
   benchmark_adjudication:
     path: src/recallzero/benchmark_adjudication.py
     sha256: 3c8d4362ff120c404bbcd907d56a67759490228d3e67163bdc9fdff4e088b0e4
@@ -124,3 +127,4 @@ known_gaps:
   status: deferred_until_benchmark
   summary: mechanism meta-signals may over-aggregate evidence in mature current-state
     populations
+semantic_extraction_revision: local-nim-structured-contract-v2

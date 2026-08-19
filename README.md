@@ -23,13 +23,15 @@ This repository is a clean rebuild based on the supplied RecallZero design docum
 ## Architecture
 
 
-### Detector Freeze v1 and 0.3.5.post1 validation phase
+### Detector Freeze v1 and 0.3.5.post2 validation phase
 
-Detector Freeze v1 is the 0.3.3a2 detection state. RecallZero 0.3.5 adds validation infrastructure without changing detector math or eligibility rules. The 0.3.5.post1 maintenance patch changes only the NHTSA complaint input adapter and benchmark provenance/tests; detector scoring and representation logic remain frozen. The 75-point alert threshold, 30/25/15/20/10 risk weights, 28/84-day windows, DBSCAN parameters, severity validator, taxonomy, meta construction, recall matcher, and anti-leakage rules remain frozen.
+Detector Freeze v1 keeps the 0.3.3a2 calibration and downstream detection logic; before validation locking, 0.3.5.post2 revises only the semantic extraction contract needed to make local NIM output schema-safe and all-NIM in strict validation. RecallZero 0.3.5 adds validation infrastructure without changing detector math or eligibility rules. The 0.3.5.post1 maintenance patch corrected NHTSA complaint addressing. The 0.3.5.post2 pre-validation patch additionally hardens the local-NIM structured extraction contract and makes strict benchmark runs fail closed instead of accepting heuristic fallback. Detector calibration, taxonomy, clustering, severity, meta construction, trend/risk math, matcher logic, thresholds, weights, windows, and leakage rules remain frozen. The 75-point alert threshold, 30/25/15/20/10 risk weights, 28/84-day windows, DBSCAN parameters, severity validator, taxonomy, meta construction, recall matcher, and anti-leakage rules remain frozen.
 
 The freeze manifest hashes detector-critical modules (including `analytics/severity.py`, `analytics/risk_engine.py`, `pipeline.py`, and `recall/matcher.py`) and verifies the *live loaded* risk/clustering/trend/model settings. The validation harness adds preregistered `development` / `validation` / `holdout` splits, preflight, manifest locking, signed threshold margins, input fingerprints, semantic provenance, alert persistence, Wilson confidence intervals, and post-hoc control adjudication. Deferred TAX-001 and META-001 issues remain documented under `benchmarks/KNOWN_GAPS.md`; they are not silently fixed against validation cases.
 
 Before the validation cohort is locked, 0.3.5.post1 resolves the NHTSA complaint product catalog (`issueType=c`) and aggregates conservative marketed-model variants by ODI number. This prevents a generic model lookup failure or body/configuration split from being misread as zero complaint evidence. Preflight records requested/resolved/query model names and per-variant counts and requires refreshed `nhtsa-complaint-catalog-v2` provenance before validation locking.
+
+For local Nemotron validation, 0.3.5.post2 requires non-empty structured `failure_mode` output, attempts one NIM-only schema repair on invalid structured responses, and refuses heuristic fallback during a benchmark whose preregistered minimum NIM fraction is 1.0. A benchmark case therefore either remains semantically all-NIM or is explicitly invalidated.
 
 ### 0.3.3a scientific slice
 

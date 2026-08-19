@@ -2,7 +2,7 @@
 
 ## Purpose
 
-RecallZero 0.3.5/0.3.5.post1 evaluates **Detector Freeze v1** without changing detector scoring or representation behavior. 0.3.5.post1 revises only the NHTSA complaint input adapter before the cohort is locked. The benchmark layer may add provenance, locking, reporting, confidence intervals, and post-hoc adjudication, but it must not alter extraction, taxonomy, clustering, severity, trend, risk, meta-signal construction, recall-gap scoring, alert eligibility, or Time Machine leakage rules.
+RecallZero 0.3.5.post2 evaluates **Detector Freeze v1** after two pre-validation infrastructure corrections: the post1 NHTSA complaint-address adapter and the post2 local-NIM structured-extraction reliability contract. The post2 change does not alter taxonomy, clustering, severity, trend, risk, meta-signal construction, recall-gap scoring, alert eligibility, thresholds, weights, windows, or Time Machine leakage rules. Because extraction semantics are detector input, the freeze manifest is refreshed before the validation cohort is locked.
 
 Mach-E / 22V412000 is a **development** case because it was repeatedly inspected while Detector v1 was being built. It is excluded from the clean Detector v1 validation sensitivity estimate.
 
@@ -33,6 +33,13 @@ The default validation manifest records these criteria before scoring:
 - configured minimum NIM signature fraction is met
 
 These are prototype engineering criteria, not regulatory performance claims. Proportions are reported with Wilson 95% confidence intervals.
+
+
+## Strict semantic validation
+
+The validation manifest preregisters `minimum_nim_fraction: 1.0`. In 0.3.5.post2 this is enforced fail-closed during benchmark execution: structured NIM output receives at most one NIM-only schema repair attempt; if it still cannot validate, the case is marked `NIM_EXTRACTION_FAILURE`. Heuristic fallback is not permitted inside strict Detector v1 validation. Interactive analysis outside the benchmark retains heuristic fallback for engineering continuity.
+
+A valid validation case must therefore report `nim_fraction = 1.0`, `heuristic_count = 0`, and no degraded semantic snapshots.
 
 ## Freeze and lock
 

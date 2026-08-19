@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.3.5.post2 — Local NIM structured-extraction reliability gate
+
+- Keep Detector v1 calibration and downstream scoring behavior frozen: no changes to severity, taxonomy, clustering, meta-signal construction, trend/risk math, recall matching, alert threshold, weights, windows, or Time Machine leakage rules.
+- Strengthen the NIM guided JSON schema with explicit non-empty constraints for `system` and `failure_mode`; the extraction prompt now forbids null/empty failure modes and uses `UNSPECIFIED FAILURE` when the complaint cannot support a more specific label.
+- Add exactly one deterministic NIM schema-repair attempt when an HTTP-success response is invalid JSON or fails Pydantic validation. A successful repair remains `extraction_method=nim`; a second invalid response raises `NIMStructuredExtractionError`.
+- Make validation benchmarks with `minimum_nim_fraction: 1.0` fail closed on any NIM extraction or transient NIM failure instead of continuing through heuristic fallback. Interactive/non-benchmark analysis retains the existing heuristic fallback behavior.
+- Add regressions for the five observed local-NIM null-`failure_mode` ODIs (11443132, 11443932, 11448380, 11459714, 11466251), failed repair behavior, schema `minLength`, and strict-vs-interactive fallback semantics.
+- Refresh Detector Freeze v1 source hashes before validation locking and record `semantic_extraction_revision: local-nim-structured-contract-v2`.
+
 ## 0.3.5.post1 — Complaint catalog adapter correction + NAT compatibility test fix
 
 - Detector v1 scoring/representation logic remains frozen; no changes to severity, taxonomy, clustering, meta-signal construction, trend, risk, recall matching, thresholds, weights, or Time Machine leakage rules.

@@ -157,3 +157,10 @@ Do not create the validation lock until preflight reports `READY FOR VALIDATION`
 In 0.3.5, the NAT compatibility test dynamically created a function with plain `exec()` inside a test module that has `from __future__ import annotations`. Python inherited that future flag, so the test function carried the string annotation `"VehicleToolInput"`. NAT 1.8 then synthesized a streaming wrapper in its own module and attempted to resolve that string in the wrong globals, producing the reported `NameError`.
 
 The production `src/recallzero/aiq/register.py` deliberately does **not** enable deferred annotations, so its nested tool functions carry concrete runtime Pydantic classes. 0.3.5.post1 fixes the regression fixture by compiling it with `dont_inherit=True`, matching the production registration semantics. No detector logic or NAT YAML behavior changes are involved.
+
+
+## Local NIM returns HTTP 200 but structured extraction is invalid
+
+If logs show `NIM returned an invalid structured extraction` with fields such as `failure_mode: null`, the service is reachable; the failure is the semantic output contract rather than transport availability. RecallZero 0.3.5.post2 sends an explicit non-empty JSON-schema constraint, requests exactly one NIM-only repair, and then raises `NIMStructuredExtractionError` if the repair still fails.
+
+For Detector v1 validation, do not enable heuristic fallback and do not lower `minimum_nim_fraction`. Clear or isolate the signature cache, rerun a smoke case, and require all signatures to report `extraction_method=nim` before recreating the validation lock.

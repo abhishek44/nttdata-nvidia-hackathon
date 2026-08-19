@@ -1,0 +1,21 @@
+case_id,name,expected_role,benchmark_valid,invalid_reason,status,first_alert_date,last_alert_date,max_consecutive_alert_snapshots,max_alert_duration_days,first_alert_risk_score,first_alert_threshold_margin,first_alert_evidence_count,first_qualified_alert_date,lead_time_days,max_risk_score,max_threshold_margin,alert_snapshot_count,unique_alert_lineages,target_recall_associated,future_recall_associated,visible_recall_associated,unconfirmed_alerts,complaint_count_eligible,nim_signature_fraction
+case_2fc0e691db1fa2b1,Chevrolet Bolt EV high-voltage battery fire recall,positive,True,,NO_EARLY_SIGNAL,,,0,0,,,,,,69.23,-5.77,0,0,0,0,0,0,45,1.0
+case_d8e964268da5faf4,Tesla Model Y windshield defrost heat-pump recall,positive,True,,EARLY_ALERT_TARGET_UNMATCHED,2021-11-16,2021-12-28,7,42,80.5,5.5,8,,,92.41,17.41,7,2,0,0,1,1,164,1.0
+case_26d977ae1ccb623a,Volkswagen ID.4 exterior door handle recall,positive,True,,EARLY_ALERT_TARGET_UNMATCHED,2023-04-25,2023-04-25,1,0,77.3,2.3,24,,,77.3,2.3,1,1,0,0,0,1,137,1.0
+case_01fe68acba645eaf,Ford Escape cracked fuel injector fire recall,positive,True,,NO_EARLY_SIGNAL,,,0,0,,,,,,68.89,-6.11,0,0,0,0,0,0,245,1.0
+case_5424e1117a13f0e6,Ford Fusion steering wheel fastening recall,positive,True,,EARLY_ALERT_TARGET_UNMATCHED,2017-09-03,2017-09-10,2,7,75.94,0.94,7,,,75.94,0.94,2,1,0,0,0,1,69,1.0
+case_febda2afdc119daa,Toyota Camry low-pressure fuel pump stall recall,positive,True,,NO_EARLY_SIGNAL,,,0,0,,,,,,59.21,-15.79,0,0,0,0,0,0,54,1.0
+case_6bce6fe3365050e7,Hyundai Sonata engine bearing wear stall recall,positive,True,,EARLY_ALERT_TARGET_UNMATCHED,2016-09-22,2017-03-23,5,28,79.42,4.42,54,,,85.04,10.04,17,4,0,0,0,4,463,1.0
+case_3f34c3b212bd59b0,Jeep Grand Cherokee crank position sensor tone-wheel recall,positive,True,,EARLY_ALERT_TARGET_UNMATCHED,2019-09-18,2020-08-12,9,56,76.18,1.18,18,,,89.98,14.98,21,3,0,0,0,3,871,1.0
+case_46c0f16060cb563b,Ford F-150 brake master cylinder recall,positive,True,,EARLY_SIGNAL_DETECTED,2019-06-09,2020-04-19,5,28,81.4,6.4,40,2019-06-09,365,88.52,13.52,7,2,1,0,0,1,1050,1.0
+case_a792beada8ba5cc3,Honda Odyssey power sliding door latch recall,positive,True,,NO_EARLY_SIGNAL,,,0,0,,,,,,64.76,-10.24,0,0,0,0,0,0,70,1.0
+case_131e28dedfe2ad22,Honda CR-V 2019 targetless control,negative,True,,CONTROL_ALERT_REQUIRES_ADJUDICATION,2019-07-30,2019-08-20,2,7,77.07,2.07,10,,,82.31,7.31,3,1,0,0,1,0,161,1.0
+case_b727da6da94fa034,Toyota RAV4 2019 targetless control,negative,True,,CONTROL_QUIET,,,0,0,,,,,,68.31,-6.69,0,0,0,0,0,0,151,1.0
+case_3c2598ceba4d9aed,Ford Explorer 2020 targetless control,negative,True,,CONTROL_QUIET,,,0,0,,,,,,74.05,-0.95,0,0,0,0,0,0,118,1.0
+case_516f4bc694b2497e,Jeep Wrangler 2018 targetless control,negative,False,NIM_EXTRACTION_FAILURE,INVALID_CASE,,,0,0,,,,,,0.0,,0,0,0,0,0,0,0,
+case_71b8aa472d20bd7e,Nissan Rogue 2018 targetless control,negative,True,,CONTROL_QUIET,,,0,0,,,,,,71.6,-3.4,0,0,0,0,0,0,74,1.0
+case_2c53b3da44187646,Subaru Forester 2019 targetless control,negative,True,,CONTROL_ALERT_REQUIRES_ADJUDICATION,2019-04-09,2019-11-12,2,7,77.31,2.31,11,,,81.09,6.09,3,1,0,0,0,1,186,1.0
+case_88fad2965d4eb427,Hyundai Palisade 2020 targetless control,negative,True,,CONTROL_QUIET,,,0,0,,,,,,71.39,-3.61,0,0,0,0,0,0,116,1.0
+case_343cb71ef01aa475,Kia Telluride 2020 targetless control,negative,True,,CONTROL_QUIET,,,0,0,,,,,,70.02,-4.98,0,0,0,0,0,0,144,1.0
+case_bc6ffc6d07a218f9,Chevrolet Equinox 2019 targetless control,negative,True,,CONTROL_QUIET,,,0,0,,,,,,62.68,-12.32,0,0,0,0,0,0,62,1.0
+case_b5c4fe65311704d5,Tesla Model 3 2020 targetless control,negative,True,,CONTROL_QUIET,,,0,0,,,,,,73.25,-1.75,0,0,0,0,0,0,36,1.0

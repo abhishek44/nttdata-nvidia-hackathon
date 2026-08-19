@@ -1,72 +1,37 @@
-RecallZero v2 release manifest
-==============================
+RecallZero release manifest
+===========================
 
-Version: 0.3.5.post1
-Release date: 2026-08-18
-Target: NVIDIA GB10 compute system / Python 3.11-3.13 environment
+Version: 0.3.5.post2
+Purpose: local-NIM structured-extraction reliability gate before Detector v1 validation locking.
 
-Release focus: pre-validation input-integrity maintenance patch
-- Keep Detector v1 scoring, representation, clustering, severity, risk, recall matching, and anti-leakage behavior frozen at the 0.3.3a2 detector state.
-- Revise only NHTSA complaint vehicle addressing before the validation cohort is locked/scored.
-- Resolve NHTSA complaint product-catalog models (`issueType=c`), query every conservative model-family variant, and de-duplicate complaints by ODI number.
-- Preserve complaint query provenance in raw cache and surface it in benchmark preflight.
-- Reject stale preflight complaint caches that lack the frozen `nhtsa-complaint-catalog-v2` adapter marker; rerun with `--refresh`.
-- Fix the NAT compatibility regression test so its dynamically-created function uses eager runtime annotations, matching production `recallzero.aiq.register` semantics.
-- Keep TAX-001 and META-001 explicitly deferred until validation data justifies Detector v2 work.
+Intentional runtime source changes versus 0.3.5.post1:
+- src/recallzero/intelligence/extractor.py
+  - explicit non-empty structured schema for core fields
+  - one NIM-only schema repair attempt
+  - NIMStructuredExtractionError after failed repair
+- src/recallzero/benchmark.py
+  - validation cohorts requiring NIM fraction 1.0 fail closed instead of continuing through heuristic fallback
 
-Freeze/diff check against 0.3.5:
-- `config/risk.yml`: SAME.
-- 15 entries in the prior detector-module freeze set: 14 SAME; 1 intentionally changed input adapter (`src/recallzero/data/nhtsa_client.py`).
-- Detector algorithm modules (taxonomy, clustering, severity, trend, risk, pipeline/meta construction, recall matcher, extraction/embeddings/NIM, config/normalizer/repository/utils): SAME.
-- Production NAT registration (`src/recallzero/aiq/register.py`): SAME.
-- Evaluation modules intentionally changed: `src/recallzero/benchmark.py`, `src/recallzero/cli.py`.
-- Freeze manifest now records `benchmark_release: 0.3.5.post1` and `input_adapter_revision: nhtsa-complaint-catalog-v2`.
-- `detector_source_release` remains 0.3.3a2.
+Unchanged detector calibration/downstream logic:
+- config/risk.yml
+- severity
+- taxonomy
+- clustering
+- meta-signal construction
+- trend engine
+- risk engine
+- recall matcher
+- alert threshold / weights / windows
+- Time Machine anti-leakage rules
 
-Complaint adapter behavior:
-- Uses `/products/vehicle/models` with `issueType=c` to identify exact/catalog-family complaint model names.
-- Exact punctuation-insensitive identity is preferred.
-- Broader family inclusion is allowed only when requested model tokens are a complete prefix of catalog model tokens; arbitrary substring/fuzzy matching is not used.
-- Queries all accepted variants and de-duplicates the union by ODI number.
-- HTTP 400 for one model variant is treated as a rejected address and other resolved variants are tried.
-- If all resolved variants are rejected, preflight remains a hard failure.
-- Non-400 HTTP failures remain fatal to avoid accepting a partial complaint population.
-- Valid HTTP 200 empty results remain a legitimate empty complaint partition.
-- Raw cache records requested/resolved/queried/successful/rejected model variants and per-variant complaint counts.
+Input adapter remains: nhtsa-complaint-catalog-v2
+Semantic extraction revision: local-nim-structured-contract-v2
 
-NAT regression-test correction:
-- 0.3.5's test module enabled `from __future__ import annotations`; plain `exec()` inherited that compiler flag and created a string `VehicleToolInput` annotation.
-- NAT 1.8 then attempted to resolve the wrapper annotation outside the dynamically-created function's globals, producing the observed `NameError`.
-- 0.3.5.post1 compiles the fixture with `dont_inherit=True`, producing the concrete Pydantic runtime type used by production registration.
-- Production NAT registration code is unchanged.
+The validation lock must be recreated after installing this release because the freeze-manifest hash changes.
 
-Offline validation:
-- 90 automated tests collected: 89 passed; 1 optional NAT-runtime integration test skipped because `nat` is not installed in the build container.
-- Added complaint-adapter regression coverage for Model Y family variants, F-150 body variants, ODI de-duplication, family-match protection, all-400 hard failure, valid empty populations, and Mach-E punctuation alias behavior.
-- Added benchmark-preflight regression coverage for complaint adapter provenance and stale-cache rejection.
-- Python compilation passed.
-- Detector freeze verification passed against source hashes, active `risk.yml`, and live Settings-loaded values.
-- CLI version reports `RecallZero 0.3.5.post1`.
-- Ruff was not installed in the build container, so no Ruff claim is made.
-- Wheel build succeeded offline with the installed build toolchain and isolated-target installation reports version 0.3.5.post1.
-- Wheel SHA-256: 05b59a7f6df37f3213f710618be361dbb4b7b47e9bd6824bab7d740eaa816b0a.
-
-Validation cohort shipped in config/candidates.yml:
-- Development: 1 known-answer positive (Mach-E; not a validation/holdout claim).
-- Validation: 20 preregistered cases = 10 positives + 10 targetless controls.
-- Holdout: none selected yet.
-
-Required target-environment flow:
-1. Upgrade to 0.3.5.post1 while preserving `.env` and existing data/cache.
-2. Run `pytest -q`; the NAT compatibility test should execute on environments where `nat` is installed.
-3. Run freeze verification.
-4. Run validation preflight with `--refresh` so complaint data is re-addressed through the new adapter and raw provenance is written.
-5. Inspect any remaining metadata/data errors. Correct only candidate identity/date/data metadata before locking; do not change Detector v1.
-6. Do not create the validation lock unless preflight prints `READY FOR VALIDATION`.
-7. Once clean, lock and run the validation cohort exactly once, then adjudicate/report.
-
-Non-claims:
-- The build environment did not run the live 20-case NHTSA/NVIDIA validation benchmark.
-- Live Tesla Model Y and Ford F-150 complaint resolution must be confirmed by refreshed preflight on the target GB10 environment.
-- Mock regression success is input-adapter validation, not a vehicle-safety finding.
-- 0.3.5.post1 does not claim Detector v1 has passed generalization validation.
+Build validation:
+- 100 tests collected; 99 passed; 1 optional NAT integration skipped; 0 failed.
+- compileall PASS.
+- freeze verification PASS.
+- wheel install smoke reports 0.3.5.post2.
+- wheel SHA-256: bfc2dfa98b958a356fb7e8e5daec272d09fac69ba074fa50f41d42d9f7ff64b9

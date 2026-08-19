@@ -1,0 +1,810 @@
+{
+  "benchmark_id": "detector-v1-validation-01",
+  "case_count": 20,
+  "cases": [
+    {
+      "benchmark_split": "validation",
+      "campaign_found_for_vehicle": true,
+      "campaign_number": "21V560000",
+      "case_id": "case_2fc0e691db1fa2b1",
+      "complaint_adapter_revision": "nhtsa-complaint-catalog-v2",
+      "complaint_count_by_model_variant": {
+        "2019:BOLT EV": 175
+      },
+      "complaint_count_eligible": 45,
+      "complaint_count_raw": 175,
+      "complaint_models_queried": [
+        "BOLT EV"
+      ],
+      "complaint_models_requested": [
+        "BOLT EV"
+      ],
+      "complaint_models_resolved": [
+        "BOLT EV"
+      ],
+      "errors": [],
+      "expected_boundary_date": "2021-07-23",
+      "expected_role": "positive",
+      "name": "Chevrolet Bolt EV high-voltage battery fire recall",
+      "observed_campaign_date": "2021-07-23",
+      "recall_count_raw": 6,
+      "valid": true,
+      "vehicle": {
+        "make": "CHEVROLET",
+        "model": "BOLT EV",
+        "model_years": [
+          2019
+        ]
+      },
+      "warnings": []
+    },
+    {
+      "benchmark_split": "validation",
+      "campaign_found_for_vehicle": true,
+      "campaign_number": "22V050000",
+      "case_id": "case_d8e964268da5faf4",
+      "complaint_adapter_revision": "nhtsa-complaint-catalog-v2",
+      "complaint_count_by_model_variant": {
+        "2021:MODEL Y 5-SEAT": 1053,
+        "2021:MODEL Y 7-SEAT": 1053
+      },
+      "complaint_count_eligible": 164,
+      "complaint_count_raw": 1053,
+      "complaint_models_queried": [
+        "MODEL Y 5-SEAT",
+        "MODEL Y 7-SEAT"
+      ],
+      "complaint_models_requested": [
+        "MODEL Y"
+      ],
+      "complaint_models_resolved": [
+        "MODEL Y 5-SEAT",
+        "MODEL Y 7-SEAT"
+      ],
+      "errors": [],
+      "expected_boundary_date": "2022-02-02",
+      "expected_role": "positive",
+      "name": "Tesla Model Y windshield defrost heat-pump recall",
+      "observed_campaign_date": "2022-02-02",
+      "recall_count_raw": 23,
+      "valid": true,
+      "vehicle": {
+        "make": "TESLA",
+        "model": "MODEL Y",
+        "model_years": [
+          2021
+        ]
+      },
+      "warnings": []
+    },
+    {
+      "benchmark_split": "validation",
+      "campaign_found_for_vehicle": true,
+      "campaign_number": "23V312000",
+      "case_id": "case_26d977ae1ccb623a",
+      "complaint_adapter_revision": "nhtsa-complaint-catalog-v2",
+      "complaint_count_by_model_variant": {
+        "2021:ID.4": 326,
+        "2022:ID.4": 134
+      },
+      "complaint_count_eligible": 137,
+      "complaint_count_raw": 460,
+      "complaint_models_queried": [
+        "ID.4"
+      ],
+      "complaint_models_requested": [
+        "ID.4"
+      ],
+      "complaint_models_resolved": [
+        "ID.4"
+      ],
+      "errors": [],
+      "expected_boundary_date": "2023-05-03",
+      "expected_role": "positive",
+      "name": "Volkswagen ID.4 exterior door handle recall",
+      "observed_campaign_date": "2023-05-03",
+      "recall_count_raw": 14,
+      "valid": true,
+      "vehicle": {
+        "make": "VOLKSWAGEN",
+        "model": "ID.4",
+        "model_years": [
+          2021,
+          2022
+        ]
+      },
+      "warnings": []
+    },
+    {
+      "benchmark_split": "validation",
+      "campaign_found_for_vehicle": true,
+      "campaign_number": "22V859000",
+      "case_id": "case_01fe68acba645eaf",
+      "complaint_adapter_revision": "nhtsa-complaint-catalog-v2",
+      "complaint_count_by_model_variant": {
+        "2020:ESCAPE": 1509,
+        "2020:ESCAPE HEV": 283,
+        "2020:ESCAPE PHEV": 1,
+        "2021:ESCAPE": 332,
+        "2021:ESCAPE HEV": 332,
+        "2021:ESCAPE HYBRID": 5,
+        "2021:ESCAPE PHEV": 21,
+        "2022:ESCAPE": 227,
+        "2022:ESCAPE HEV": 66,
+        "2022:ESCAPE PHEV": 78
+      },
+      "complaint_count_eligible": 245,
+      "complaint_count_raw": 2520,
+      "complaint_models_queried": [
+        "ESCAPE",
+        "ESCAPE HEV",
+        "ESCAPE PHEV",
+        "ESCAPE HYBRID"
+      ],
+      "complaint_models_requested": [
+        "ESCAPE"
+      ],
+      "complaint_models_resolved": [
+        "ESCAPE",
+        "ESCAPE HEV",
+        "ESCAPE PHEV",
+        "ESCAPE HYBRID"
+      ],
+      "errors": [],
+      "expected_boundary_date": "2022-11-18",
+      "expected_role": "positive",
+      "name": "Ford Escape cracked fuel injector fire recall",
+      "observed_campaign_date": "2022-11-18",
+      "recall_count_raw": 29,
+      "valid": true,
+      "vehicle": {
+        "make": "FORD",
+        "model": "ESCAPE",
+        "model_years": [
+          2020,
+          2021,
+          2022
+        ]
+      },
+      "warnings": []
+    },
+    {
+      "benchmark_split": "validation",
+      "campaign_found_for_vehicle": true,
+      "campaign_number": "18V167000",
+      "case_id": "case_5424e1117a13f0e6",
+      "complaint_adapter_revision": "nhtsa-complaint-catalog-v2",
+      "complaint_count_by_model_variant": {
+        "2017:FUSION": 1101,
+        "2017:FUSION ENERGI": 1030,
+        "2017:FUSION HEV": 1081,
+        "2018:FUSION": 434,
+        "2018:FUSION ENERGI": 7,
+        "2018:FUSION HEV": 59
+      },
+      "complaint_count_eligible": 69,
+      "complaint_count_raw": 1683,
+      "complaint_models_queried": [
+        "FUSION",
+        "FUSION HEV",
+        "FUSION ENERGI"
+      ],
+      "complaint_models_requested": [
+        "FUSION"
+      ],
+      "complaint_models_resolved": [
+        "FUSION",
+        "FUSION HEV",
+        "FUSION ENERGI"
+      ],
+      "errors": [],
+      "expected_boundary_date": "2018-03-12",
+      "expected_role": "positive",
+      "name": "Ford Fusion steering wheel fastening recall",
+      "observed_campaign_date": "2018-03-12",
+      "recall_count_raw": 4,
+      "valid": true,
+      "vehicle": {
+        "make": "FORD",
+        "model": "FUSION",
+        "model_years": [
+          2017,
+          2018
+        ]
+      },
+      "warnings": []
+    },
+    {
+      "benchmark_split": "validation",
+      "campaign_found_for_vehicle": true,
+      "campaign_number": "20V012000",
+      "case_id": "case_febda2afdc119daa",
+      "complaint_adapter_revision": "nhtsa-complaint-catalog-v2",
+      "complaint_count_by_model_variant": {
+        "2019:CAMRY": 389,
+        "2019:CAMRY HYBRID": 11
+      },
+      "complaint_count_eligible": 54,
+      "complaint_count_raw": 400,
+      "complaint_models_queried": [
+        "CAMRY",
+        "CAMRY HYBRID"
+      ],
+      "complaint_models_requested": [
+        "CAMRY"
+      ],
+      "complaint_models_resolved": [
+        "CAMRY",
+        "CAMRY HYBRID"
+      ],
+      "errors": [],
+      "expected_boundary_date": "2020-01-13",
+      "expected_role": "positive",
+      "name": "Toyota Camry low-pressure fuel pump stall recall",
+      "observed_campaign_date": "2020-01-13",
+      "recall_count_raw": 6,
+      "valid": true,
+      "vehicle": {
+        "make": "TOYOTA",
+        "model": "CAMRY",
+        "model_years": [
+          2019
+        ]
+      },
+      "warnings": []
+    },
+    {
+      "benchmark_split": "validation",
+      "campaign_found_for_vehicle": true,
+      "campaign_number": "17V226000",
+      "case_id": "case_6bce6fe3365050e7",
+      "complaint_adapter_revision": "nhtsa-complaint-catalog-v2",
+      "complaint_count_by_model_variant": {
+        "2013:SONATA": 1902,
+        "2013:SONATA HYBRID": 106,
+        "2014:SONATA": 743,
+        "2014:SONATA HYBRID": 28
+      },
+      "complaint_count_eligible": 463,
+      "complaint_count_raw": 2778,
+      "complaint_models_queried": [
+        "SONATA",
+        "SONATA HYBRID"
+      ],
+      "complaint_models_requested": [
+        "SONATA"
+      ],
+      "complaint_models_resolved": [
+        "SONATA",
+        "SONATA HYBRID"
+      ],
+      "errors": [],
+      "expected_boundary_date": "2017-03-31",
+      "expected_role": "positive",
+      "name": "Hyundai Sonata engine bearing wear stall recall",
+      "observed_campaign_date": "2017-03-31",
+      "recall_count_raw": 9,
+      "valid": true,
+      "vehicle": {
+        "make": "HYUNDAI",
+        "model": "SONATA",
+        "model_years": [
+          2013,
+          2014
+        ]
+      },
+      "warnings": []
+    },
+    {
+      "benchmark_split": "validation",
+      "campaign_found_for_vehicle": true,
+      "campaign_number": "20V475000",
+      "case_id": "case_3f34c3b212bd59b0",
+      "complaint_adapter_revision": "nhtsa-complaint-catalog-v2",
+      "complaint_count_by_model_variant": {
+        "2015:GRAND CHEROKEE": 1351,
+        "2016:GRAND CHEROKEE": 308,
+        "2016:GRAND CHEROKEE SRT": 290
+      },
+      "complaint_count_eligible": 871,
+      "complaint_count_raw": 1659,
+      "complaint_models_queried": [
+        "GRAND CHEROKEE",
+        "GRAND CHEROKEE SRT"
+      ],
+      "complaint_models_requested": [
+        "GRAND CHEROKEE"
+      ],
+      "complaint_models_resolved": [
+        "GRAND CHEROKEE",
+        "GRAND CHEROKEE SRT"
+      ],
+      "errors": [],
+      "expected_boundary_date": "2020-08-13",
+      "expected_role": "positive",
+      "name": "Jeep Grand Cherokee crank position sensor tone-wheel recall",
+      "observed_campaign_date": "2020-08-13",
+      "recall_count_raw": 12,
+      "valid": true,
+      "vehicle": {
+        "make": "JEEP",
+        "model": "GRAND CHEROKEE",
+        "model_years": [
+          2015,
+          2016
+        ]
+      },
+      "warnings": []
+    },
+    {
+      "benchmark_split": "validation",
+      "campaign_found_for_vehicle": true,
+      "campaign_number": "20V332000",
+      "case_id": "case_46c0f16060cb563b",
+      "complaint_adapter_revision": "nhtsa-complaint-catalog-v2",
+      "complaint_count_by_model_variant": {
+        "2016:F-150": 33,
+        "2016:F-150 REGULAR CAB": 1686,
+        "2016:F-150 SUPER CREW": 1686,
+        "2016:F-150 SUPERCAB": 1686,
+        "2017:F-150": 23,
+        "2017:F-150 CREW CAB": 1066,
+        "2017:F-150 REGULAR CAB": 1066,
+        "2017:F-150 SUPERCAB": 1066
+      },
+      "complaint_count_eligible": 1050,
+      "complaint_count_raw": 2808,
+      "complaint_models_queried": [
+        "F-150",
+        "F-150 SUPERCAB",
+        "F-150 SUPER CREW",
+        "F-150 REGULAR CAB",
+        "F-150 CREW CAB"
+      ],
+      "complaint_models_requested": [
+        "F-150"
+      ],
+      "complaint_models_resolved": [
+        "F-150",
+        "F-150 SUPERCAB",
+        "F-150 SUPER CREW",
+        "F-150 REGULAR CAB",
+        "F-150 CREW CAB"
+      ],
+      "errors": [],
+      "expected_boundary_date": "2020-06-08",
+      "expected_role": "positive",
+      "name": "Ford F-150 brake master cylinder recall",
+      "observed_campaign_date": "2020-06-08",
+      "recall_count_raw": 22,
+      "valid": true,
+      "vehicle": {
+        "make": "FORD",
+        "model": "F-150",
+        "model_years": [
+          2016,
+          2017
+        ]
+      },
+      "warnings": []
+    },
+    {
+      "benchmark_split": "validation",
+      "campaign_found_for_vehicle": true,
+      "campaign_number": "18V795000",
+      "case_id": "case_a792beada8ba5cc3",
+      "complaint_adapter_revision": "nhtsa-complaint-catalog-v2",
+      "complaint_count_by_model_variant": {
+        "2018:ODYSSEY": 960,
+        "2019:ODYSSEY": 923
+      },
+      "complaint_count_eligible": 70,
+      "complaint_count_raw": 1883,
+      "complaint_models_queried": [
+        "ODYSSEY"
+      ],
+      "complaint_models_requested": [
+        "ODYSSEY"
+      ],
+      "complaint_models_resolved": [
+        "ODYSSEY"
+      ],
+      "errors": [],
+      "expected_boundary_date": "2018-11-09",
+      "expected_role": "positive",
+      "name": "Honda Odyssey power sliding door latch recall",
+      "observed_campaign_date": "2018-11-09",
+      "recall_count_raw": 21,
+      "valid": true,
+      "vehicle": {
+        "make": "HONDA",
+        "model": "ODYSSEY",
+        "model_years": [
+          2018,
+          2019
+        ]
+      },
+      "warnings": []
+    },
+    {
+      "benchmark_split": "validation",
+      "campaign_found_for_vehicle": null,
+      "campaign_number": null,
+      "case_id": "case_131e28dedfe2ad22",
+      "complaint_adapter_revision": "nhtsa-complaint-catalog-v2",
+      "complaint_count_by_model_variant": {
+        "2019:CR-V": 1079
+      },
+      "complaint_count_eligible": 161,
+      "complaint_count_raw": 1079,
+      "complaint_models_queried": [
+        "CR-V"
+      ],
+      "complaint_models_requested": [
+        "CR-V"
+      ],
+      "complaint_models_resolved": [
+        "CR-V"
+      ],
+      "errors": [],
+      "expected_boundary_date": "2020-01-01",
+      "expected_role": "negative",
+      "name": "Honda CR-V 2019 targetless control",
+      "observed_campaign_date": null,
+      "recall_count_raw": 8,
+      "valid": true,
+      "vehicle": {
+        "make": "HONDA",
+        "model": "CR-V",
+        "model_years": [
+          2019
+        ]
+      },
+      "warnings": []
+    },
+    {
+      "benchmark_split": "validation",
+      "campaign_found_for_vehicle": null,
+      "campaign_number": null,
+      "case_id": "case_b727da6da94fa034",
+      "complaint_adapter_revision": "nhtsa-complaint-catalog-v2",
+      "complaint_count_by_model_variant": {
+        "2019:RAV4": 873,
+        "2019:RAV4 HYBRID": 22
+      },
+      "complaint_count_eligible": 151,
+      "complaint_count_raw": 895,
+      "complaint_models_queried": [
+        "RAV4",
+        "RAV4 HYBRID"
+      ],
+      "complaint_models_requested": [
+        "RAV4"
+      ],
+      "complaint_models_resolved": [
+        "RAV4",
+        "RAV4 HYBRID"
+      ],
+      "errors": [],
+      "expected_boundary_date": "2020-01-01",
+      "expected_role": "negative",
+      "name": "Toyota RAV4 2019 targetless control",
+      "observed_campaign_date": null,
+      "recall_count_raw": 7,
+      "valid": true,
+      "vehicle": {
+        "make": "TOYOTA",
+        "model": "RAV4",
+        "model_years": [
+          2019
+        ]
+      },
+      "warnings": []
+    },
+    {
+      "benchmark_split": "validation",
+      "campaign_found_for_vehicle": null,
+      "campaign_number": null,
+      "case_id": "case_3c2598ceba4d9aed",
+      "complaint_adapter_revision": "nhtsa-complaint-catalog-v2",
+      "complaint_count_by_model_variant": {
+        "2020:EXPLORER": 1187,
+        "2020:EXPLORER HEV": 4
+      },
+      "complaint_count_eligible": 118,
+      "complaint_count_raw": 1191,
+      "complaint_models_queried": [
+        "EXPLORER",
+        "EXPLORER HEV"
+      ],
+      "complaint_models_requested": [
+        "EXPLORER"
+      ],
+      "complaint_models_resolved": [
+        "EXPLORER",
+        "EXPLORER HEV"
+      ],
+      "errors": [],
+      "expected_boundary_date": "2021-01-01",
+      "expected_role": "negative",
+      "name": "Ford Explorer 2020 targetless control",
+      "observed_campaign_date": null,
+      "recall_count_raw": 33,
+      "valid": true,
+      "vehicle": {
+        "make": "FORD",
+        "model": "EXPLORER",
+        "model_years": [
+          2020
+        ]
+      },
+      "warnings": []
+    },
+    {
+      "benchmark_split": "validation",
+      "campaign_found_for_vehicle": null,
+      "campaign_number": null,
+      "case_id": "case_516f4bc694b2497e",
+      "complaint_adapter_revision": "nhtsa-complaint-catalog-v2",
+      "complaint_count_by_model_variant": {
+        "2018:WRANGLER": 1801
+      },
+      "complaint_count_eligible": 463,
+      "complaint_count_raw": 1801,
+      "complaint_models_queried": [
+        "WRANGLER"
+      ],
+      "complaint_models_requested": [
+        "WRANGLER"
+      ],
+      "complaint_models_resolved": [
+        "WRANGLER"
+      ],
+      "errors": [],
+      "expected_boundary_date": "2019-01-01",
+      "expected_role": "negative",
+      "name": "Jeep Wrangler 2018 targetless control",
+      "observed_campaign_date": null,
+      "recall_count_raw": 14,
+      "valid": true,
+      "vehicle": {
+        "make": "JEEP",
+        "model": "WRANGLER",
+        "model_years": [
+          2018
+        ]
+      },
+      "warnings": []
+    },
+    {
+      "benchmark_split": "validation",
+      "campaign_found_for_vehicle": null,
+      "campaign_number": null,
+      "case_id": "case_71b8aa472d20bd7e",
+      "complaint_adapter_revision": "nhtsa-complaint-catalog-v2",
+      "complaint_count_by_model_variant": {
+        "2018:ROGUE": 609,
+        "2018:ROGUE SPORT": 92
+      },
+      "complaint_count_eligible": 74,
+      "complaint_count_raw": 701,
+      "complaint_models_queried": [
+        "ROGUE",
+        "ROGUE SPORT"
+      ],
+      "complaint_models_requested": [
+        "ROGUE"
+      ],
+      "complaint_models_resolved": [
+        "ROGUE",
+        "ROGUE SPORT"
+      ],
+      "errors": [],
+      "expected_boundary_date": "2019-01-01",
+      "expected_role": "negative",
+      "name": "Nissan Rogue 2018 targetless control",
+      "observed_campaign_date": null,
+      "recall_count_raw": 3,
+      "valid": true,
+      "vehicle": {
+        "make": "NISSAN",
+        "model": "ROGUE",
+        "model_years": [
+          2018
+        ]
+      },
+      "warnings": []
+    },
+    {
+      "benchmark_split": "validation",
+      "campaign_found_for_vehicle": null,
+      "campaign_number": null,
+      "case_id": "case_2c53b3da44187646",
+      "complaint_adapter_revision": "nhtsa-complaint-catalog-v2",
+      "complaint_count_by_model_variant": {
+        "2019:FORESTER": 831
+      },
+      "complaint_count_eligible": 186,
+      "complaint_count_raw": 831,
+      "complaint_models_queried": [
+        "FORESTER"
+      ],
+      "complaint_models_requested": [
+        "FORESTER"
+      ],
+      "complaint_models_resolved": [
+        "FORESTER"
+      ],
+      "errors": [],
+      "expected_boundary_date": "2020-01-01",
+      "expected_role": "negative",
+      "name": "Subaru Forester 2019 targetless control",
+      "observed_campaign_date": null,
+      "recall_count_raw": 3,
+      "valid": true,
+      "vehicle": {
+        "make": "SUBARU",
+        "model": "FORESTER",
+        "model_years": [
+          2019
+        ]
+      },
+      "warnings": []
+    },
+    {
+      "benchmark_split": "validation",
+      "campaign_found_for_vehicle": null,
+      "campaign_number": null,
+      "case_id": "case_88fad2965d4eb427",
+      "complaint_adapter_revision": "nhtsa-complaint-catalog-v2",
+      "complaint_count_by_model_variant": {
+        "2020:PALISADE": 522
+      },
+      "complaint_count_eligible": 116,
+      "complaint_count_raw": 522,
+      "complaint_models_queried": [
+        "PALISADE"
+      ],
+      "complaint_models_requested": [
+        "PALISADE"
+      ],
+      "complaint_models_resolved": [
+        "PALISADE"
+      ],
+      "errors": [],
+      "expected_boundary_date": "2021-01-01",
+      "expected_role": "negative",
+      "name": "Hyundai Palisade 2020 targetless control",
+      "observed_campaign_date": null,
+      "recall_count_raw": 5,
+      "valid": true,
+      "vehicle": {
+        "make": "HYUNDAI",
+        "model": "PALISADE",
+        "model_years": [
+          2020
+        ]
+      },
+      "warnings": []
+    },
+    {
+      "benchmark_split": "validation",
+      "campaign_found_for_vehicle": null,
+      "campaign_number": null,
+      "case_id": "case_343cb71ef01aa475",
+      "complaint_adapter_revision": "nhtsa-complaint-catalog-v2",
+      "complaint_count_by_model_variant": {
+        "2020:TELLURIDE": 744
+      },
+      "complaint_count_eligible": 144,
+      "complaint_count_raw": 744,
+      "complaint_models_queried": [
+        "TELLURIDE"
+      ],
+      "complaint_models_requested": [
+        "TELLURIDE"
+      ],
+      "complaint_models_resolved": [
+        "TELLURIDE"
+      ],
+      "errors": [],
+      "expected_boundary_date": "2021-01-01",
+      "expected_role": "negative",
+      "name": "Kia Telluride 2020 targetless control",
+      "observed_campaign_date": null,
+      "recall_count_raw": 7,
+      "valid": true,
+      "vehicle": {
+        "make": "KIA",
+        "model": "TELLURIDE",
+        "model_years": [
+          2020
+        ]
+      },
+      "warnings": []
+    },
+    {
+      "benchmark_split": "validation",
+      "campaign_found_for_vehicle": null,
+      "campaign_number": null,
+      "case_id": "case_bc6ffc6d07a218f9",
+      "complaint_adapter_revision": "nhtsa-complaint-catalog-v2",
+      "complaint_count_by_model_variant": {
+        "2019:EQUINOX": 295
+      },
+      "complaint_count_eligible": 62,
+      "complaint_count_raw": 295,
+      "complaint_models_queried": [
+        "EQUINOX"
+      ],
+      "complaint_models_requested": [
+        "EQUINOX"
+      ],
+      "complaint_models_resolved": [
+        "EQUINOX"
+      ],
+      "errors": [],
+      "expected_boundary_date": "2020-01-01",
+      "expected_role": "negative",
+      "name": "Chevrolet Equinox 2019 targetless control",
+      "observed_campaign_date": null,
+      "recall_count_raw": 4,
+      "valid": true,
+      "vehicle": {
+        "make": "CHEVROLET",
+        "model": "EQUINOX",
+        "model_years": [
+          2019
+        ]
+      },
+      "warnings": []
+    },
+    {
+      "benchmark_split": "validation",
+      "campaign_found_for_vehicle": null,
+      "campaign_number": null,
+      "case_id": "case_b5c4fe65311704d5",
+      "complaint_adapter_revision": "nhtsa-complaint-catalog-v2",
+      "complaint_count_by_model_variant": {
+        "2020:MODEL 3": 446
+      },
+      "complaint_count_eligible": 36,
+      "complaint_count_raw": 446,
+      "complaint_models_queried": [
+        "MODEL 3"
+      ],
+      "complaint_models_requested": [
+        "MODEL 3"
+      ],
+      "complaint_models_resolved": [
+        "MODEL 3"
+      ],
+      "errors": [],
+      "expected_boundary_date": "2021-01-01",
+      "expected_role": "negative",
+      "name": "Tesla Model 3 2020 targetless control",
+      "observed_campaign_date": null,
+      "recall_count_raw": 21,
+      "valid": true,
+      "vehicle": {
+        "make": "TESLA",
+        "model": "MODEL 3",
+        "model_years": [
+          2020
+        ]
+      },
+      "warnings": []
+    }
+  ],
+  "control_count": 10,
+  "created_at": "2026-08-18T16:21:36.979126Z",
+  "distinct_manufacturers": 11,
+  "distinct_selection_strata": 10,
+  "duplicate_case_ids": [],
+  "freeze_id": "recallzero-detector-v1",
+  "freeze_verified": true,
+  "manifest_sha256": "c691ad8ec02fd1f8431da8b958d837183773556059ec0873d7357c52b3e2c47a",
+  "positive_count": 10,
+  "ready": true,
+  "split": "validation"
+}

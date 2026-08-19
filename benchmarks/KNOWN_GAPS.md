@@ -1,6 +1,6 @@
 # Detector Freeze v1 — known deferred gaps
 
-These items are deliberately **not fixed in 0.3.5/0.3.5.post1**. Detector v1 is frozen; the validation cohort should determine whether these are systemic generalization problems before Detector v2 changes are proposed.
+These items are deliberately **not fixed in 0.3.5 through 0.3.5.post2**. Detector v1 is frozen; the validation cohort should determine whether these are systemic generalization problems before Detector v2 changes are proposed.
 
 ## TAX-001 — `OTHER` consequence consistency bypass
 

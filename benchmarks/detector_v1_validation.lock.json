@@ -25,9 +25,9 @@
     "case_b5c4fe65311704d5"
   ],
   "control_count": 10,
-  "created_at": "2026-08-18T12:34:25.132529Z",
+  "created_at": "2026-08-18T16:22:08.950055Z",
   "freeze_id": "recallzero-detector-v1",
-  "freeze_manifest_sha256": "e40979f1f0c2786f34c64aaf8ad1bd90e29467d540803b2d79a35c89b0fc3773",
+  "freeze_manifest_sha256": "e3aaa9eef94aa30ea41770281d62792d585c4415499e8e6ca87b81e7f918ade9",
   "positive_count": 10,
   "split": "validation"
 }

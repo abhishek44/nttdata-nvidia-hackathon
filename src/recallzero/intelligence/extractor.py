@@ -8,7 +8,7 @@ from collections import Counter
 from collections.abc import Iterable, Sequence
 from typing import Any, Callable, Literal, Protocol
 
-from pydantic import BaseModel, ConfigDict, ValidationError, field_validator
+from pydantic import BaseModel, ConfigDict, Field, ValidationError, field_validator
 
 from recallzero.intelligence.nim_client import NIMClient, NIMError, NIMTransientError
 from recallzero.models import Complaint, ExtractionMethod, FailureSignature
@@ -159,7 +159,8 @@ causation, complaint count, or risk score. Return exactly one JSON object and no
 Required JSON keys:
 - system: broad vehicle system in concise uppercase terminology
 - subsystem: narrower subsystem or null
-- failure_mode: concise normalized failure mode
+- failure_mode: REQUIRED non-empty concise normalized failure mode. Never return null or an empty string.
+  If the complaint does not support a more specific failure, use UNSPECIFIED FAILURE rather than inventing a cause.
 - symptom: observed symptom or null
 - operating_state: condition such as VEHICLE IN MOTION, PARKED, STARTUP, CHARGING, or null
 - consequence: observed or directly stated consequence, or null
@@ -191,13 +192,18 @@ SeverityIndicator = Literal[
 
 
 class NIMFailureSignaturePayload(BaseModel):
-    """Schema supplied to NIM guided generation for one complaint."""
+    """Schema supplied to NIM guided generation for one complaint.
+
+    The explicit ``min_length`` constraints are intentional. Pydantic validators
+    protect Python-side parsing, while these constraints are also exported into
+    the JSON Schema sent to NIM guided decoding.
+    """
 
     model_config = ConfigDict(extra="forbid")
 
-    system: str
+    system: str = Field(min_length=1)
     subsystem: str | None
-    failure_mode: str
+    failure_mode: str = Field(min_length=1)
     symptom: str | None
     operating_state: str | None
     consequence: str | None
@@ -223,6 +229,18 @@ class NIMFailureSignaturePayload(BaseModel):
 NIM_FAILURE_SIGNATURE_SCHEMA: dict[str, Any] = NIMFailureSignaturePayload.model_json_schema()
 
 
+class NIMStructuredExtractionError(NIMError):
+    """NIM responded, but a valid failure signature could not be obtained."""
+
+
+STRUCTURED_REPAIR_PROMPT = """The previous extraction did not satisfy the required JSON schema.
+Repair it using only the original complaint evidence. Return exactly one JSON object and no markdown.
+All required keys must be present. ``system`` and ``failure_mode`` must be non-empty strings.
+``failure_mode`` MUST NOT be null. If the complaint does not support a specific failure mode, use
+``UNSPECIFIED FAILURE``. Do not invent a root cause, defect, recall status, count, trend, or risk score.
+"""
+
+
 class NIMFailureExtractor:
     def __init__(self, client: NIMClient, model_name: str):
         self.client = client
@@ -244,6 +262,55 @@ class NIMFailureExtractor:
         if not isinstance(value, dict):
             raise ValueError("Extraction response must be a JSON object")
         return value
+
+    @classmethod
+    def _validate_content(cls, content: str) -> NIMFailureSignaturePayload:
+        # Guided generation should already produce pure JSON. Keep the tolerant
+        # parser for hosted/local endpoints that still wrap JSON in fences.
+        parsed = cls._extract_json(content)
+        return NIMFailureSignaturePayload.model_validate(parsed)
+
+    async def _repair_structured_extraction(
+        self,
+        *,
+        complaint: Complaint,
+        incident_context: dict[str, Any],
+        invalid_content: str,
+        validation_error: Exception,
+    ) -> NIMFailureSignaturePayload:
+        repair_context = {
+            "original_complaint": incident_context,
+            "invalid_response": invalid_content[:2000],
+            "validation_error": str(validation_error)[:2000],
+        }
+        repaired_content = await self.client.chat_completion(
+            model=self.model_name,
+            messages=[
+                {"role": "system", "content": EXTRACTION_SYSTEM_PROMPT + "\n" + STRUCTURED_REPAIR_PROMPT},
+                {"role": "user", "content": json.dumps(repair_context, ensure_ascii=False)},
+            ],
+            temperature=0.0,
+            max_tokens=900,
+            guided_json=NIM_FAILURE_SIGNATURE_SCHEMA,
+            disable_thinking=True,
+        )
+        try:
+            payload = self._validate_content(repaired_content)
+        except (ValidationError, ValueError, json.JSONDecodeError) as repair_error:
+            logger.error(
+                "NIM structured extraction repair failed for ODI %s; repaired response prefix=%r",
+                complaint.odi_number,
+                repaired_content[:500],
+            )
+            raise NIMStructuredExtractionError(
+                f"NIM structured extraction failed after one repair attempt for ODI {complaint.odi_number}: "
+                f"{repair_error}"
+            ) from repair_error
+        logger.info(
+            "NIM structured extraction repaired successfully for ODI %s after schema validation failure",
+            complaint.odi_number,
+        )
+        return payload
 
     async def extract(self, complaint: Complaint) -> FailureSignature:
         incident_context = {
@@ -267,17 +334,19 @@ class NIMFailureExtractor:
             disable_thinking=True,
         )
         try:
-            # Guided generation should already produce pure JSON. Keep the tolerant
-            # parser for hosted/local endpoints that still wrap JSON in fences.
-            parsed = self._extract_json(content)
-            payload = NIMFailureSignaturePayload.model_validate(parsed)
-        except (ValidationError, ValueError, json.JSONDecodeError):
+            payload = self._validate_content(content)
+        except (ValidationError, ValueError, json.JSONDecodeError) as exc:
             logger.warning(
-                "NIM returned an invalid structured extraction for ODI %s; raw response prefix=%r",
+                "NIM returned an invalid structured extraction for ODI %s; attempting one schema repair; raw response prefix=%r",
                 complaint.odi_number,
                 content[:500],
             )
-            raise
+            payload = await self._repair_structured_extraction(
+                complaint=complaint,
+                incident_context=incident_context,
+                invalid_content=content,
+                validation_error=exc,
+            )
         return FailureSignature(
             complaint_id=complaint.odi_number,
             **payload.model_dump(),

@@ -856,6 +856,28 @@ async def _run_negative_control(
     )
 
 
+
+
+def _enforce_strict_nim_validation(pipeline: RecallZeroPipeline, minimum_nim_fraction: float) -> None:
+    """Fail closed on semantic extraction errors for strict Detector v1 validation.
+
+    The benchmark already requires a 1.0 NIM fraction. Allowing a structured NIM
+    failure to fall through to the heuristic only wastes the rest of the case and
+    creates a MIXED semantic artifact that is invalid anyway. This helper changes
+    no detector math; it only makes the benchmark fail at the point semantic
+    consistency is lost.
+    """
+
+    if minimum_nim_fraction < 1.0:
+        return
+    extractor = getattr(pipeline, "extractor", None)
+    if extractor is None:
+        return
+    if hasattr(extractor, "fallback_on_error"):
+        extractor.fallback_on_error = False
+    if hasattr(extractor, "fallback_on_transient_error"):
+        extractor.fallback_on_transient_error = False
+
 async def run_benchmark(
     *,
     settings: Settings,
@@ -911,6 +933,7 @@ async def run_benchmark(
     for case in selected:
         try:
             pipeline = pipeline_factory(settings, use_nim=settings.use_nim)
+            _enforce_strict_nim_validation(pipeline, minimum_nim_fraction)
             complaints, recalls = await pipeline.ingest(case.vehicle, refresh=refresh)
 
             if case.expected_role == "positive":
