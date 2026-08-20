@@ -1,0 +1,13 @@
+# Manufacturer-wide watch configuration (roadmap capability).
+# Adding a new model requires only a configuration change here.
+manufacturer: Ford
+vehicles:
+  - make: FORD
+    model: MUSTANG MACH-E
+    years: [2021, 2022]
+  - make: FORD
+    model: F-150
+    years: [2021, 2022]
+  - make: FORD
+    model: BRONCO
+    years: [2021, 2022]

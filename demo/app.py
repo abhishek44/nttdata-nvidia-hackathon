@@ -11,6 +11,16 @@ import streamlit as st
 
 from api_client import ApiError, BacktestQuery, RecallZeroApi
 
+try:
+    from recallzero.demo import build_demo_records
+    from recallzero.detector_v2 import build_detector_v2
+    from recallzero.investigation.brief_v2 import EngineeringBriefRendererV2
+    from recallzero.models import Complaint, Vehicle
+
+    _V2_AVAILABLE = True
+except Exception:  # pragma: no cover - optional v2 tab
+    _V2_AVAILABLE = False
+
 
 HERE = Path(__file__).resolve().parent
 ASSETS = HERE / "assets"
@@ -449,6 +459,88 @@ def render_validation() -> None:
     st.write("• RecallZero Detector v1 remains a stable research baseline, not a production-validated detector.")
 
 
+
+
+def _v2_synthetic_fleet():
+    base_vehicle, complaints, recalls, _t, _d = build_demo_records()
+    vins = ["1FMCU9", "3FA6P0", "5YJ3E1", "2C4RC1", "1N4AL3"]
+    years = [2021, 2022, 2023]
+    enriched = []
+    for index, c in enumerate(complaints):
+        year = years[index % len(years)]
+        vin = vins[index % len(vins)] if index % 3 else None
+        enriched.append(
+            c.model_copy(update={
+                "vehicle": Vehicle(make="FORD", model="MUSTANG MACH-E", model_years=(year,)),
+                "vin_prefix": vin,
+            })
+        )
+    return enriched, recalls
+
+
+def render_detector_v2():
+    st.subheader("4 - Detector v2 (beta)")
+    st.info(
+        "**Investigative signal - not a confirmed defect.** Complaint data is self-reported and "
+        "causation is not established. Detector v2 is experimental and shown on clearly synthetic "
+        "data here; Detector v1 remains the frozen, validated baseline."
+    )
+    if not _V2_AVAILABLE:
+        st.warning("Detector v2 modules are unavailable in this environment.")
+        return
+    import asyncio
+
+    if st.button("Run Detector v2 on synthetic fleet", key="v2_run"):
+        complaints, recalls = _v2_synthetic_fleet()
+        async def go():
+            detector = build_detector_v2(use_nim=False)
+            visible = sorted(complaints, key=lambda c: c.received_date)
+            vehicle = visible[0].vehicle
+            sigs = await detector.pipeline.extract_signatures(vehicle, visible, use_cache=False)
+            run = await detector.pipeline.analyze_records(
+                vehicle=vehicle, complaints=visible, recalls=recalls,
+                cutoff_date=max(c.received_date for c in visible),
+                signatures=sigs, risk_config=detector._ordering_risk_config, save=False)
+            byid = {c.odi_number: c for c in visible}
+            return detector._rescore_with_complaints(run, byid)
+        with st.status("Running Detector v2...", expanded=False) as status:
+            result = asyncio.run(go())
+            status.update(label="Detector v2 complete", state="complete")
+        st.session_state["v2_result"] = result
+
+    result = st.session_state.get("v2_result")
+    if result is not None and result.signals_v2:
+        top = result.signals_v2[0]
+        c1, c2, c3, c4 = st.columns(4)
+        c1.metric("v2 Risk", f"{top.risk.final_score:.1f}/100")
+        c2.metric("Tier", top.risk.level.value)
+        c3.metric("Model-year span", top.coverage.distinct_model_years)
+        c4.metric("VIN prefixes", top.coverage.distinct_vin_prefixes)
+        st.markdown("**Six-factor contribution**")
+        st.table([
+            {"factor": f.name, "score": round(f.score, 1), "weight": f.weight,
+             "contribution": round(f.contribution, 1)}
+            for f in top.risk.factors
+        ])
+        with st.expander("Full Detector v2 engineering brief"):
+            st.markdown(EngineeringBriefRendererV2().render_markdown(top))
+        st.markdown("**Signals (sorted by v2 risk)**")
+        st.table([
+            {"issue": it.signal.cluster.label, "risk": round(it.risk.final_score, 1),
+             "alert": "YES" if it.risk.alert else "no",
+             "evidence": it.signal.cluster.evidence_count}
+            for it in result.signals_v2
+        ])
+
+    st.markdown("---")
+    st.subheader("Manufacturer-wide watch (roadmap)")
+    st.caption(
+        "Roadmap / NEXT: Detector v2 extends the single-vehicle analysis to a manufacturer "
+        "radar, crediting failure mechanisms that recur across multiple models in the lineup. "
+        "This is a forward-looking capability, not production functionality."
+    )
+
+
 def main() -> None:
     inject_style()
     st.markdown(
@@ -475,13 +567,15 @@ def main() -> None:
         if readiness:
             st.json(readiness)
 
-    tab1, tab2, tab3 = st.tabs(["1 · LIVE NVIDIA", "2 · TIME MACHINE", "3 · VALIDATION"])
+    tab1, tab2, tab3, tab4 = st.tabs(["1 · LIVE NVIDIA", "2 · TIME MACHINE", "3 · VALIDATION", "4 · DETECTOR V2"])
     with tab1:
         render_live_investigation(readiness)
     with tab2:
         render_time_machine()
     with tab3:
         render_validation()
+    with tab4:
+        render_detector_v2()
 
 
 if __name__ == "__main__":

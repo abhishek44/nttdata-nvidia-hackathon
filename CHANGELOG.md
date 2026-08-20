@@ -1,5 +1,91 @@
 # Changelog
 
+## 0.4.0 - Detector v2 (additive; Detector v1 remains frozen)
+
+Detector v2 is delivered as a **100% additive layer**. No Detector v1 (frozen) source file,
+benchmark, lock file, or `config/risk.yml` was modified. Detector v1's frozen scoring, alert
+threshold, trend windows, and validation provenance are preserved and reproducible.
+
+New (all new files; no frozen-file edits):
+
+- `config/detector_v2.yml` - six-factor risk weights (volume_increase 0.25, vehicle_coverage
+  0.20, safety_consequence 0.20, persistence 0.15, model_year_breadth 0.10,
+  no_matching_recall 0.10), tiers 40/70/85, alert threshold 40, trend windows 30/90.
+- `recallzero.analytics.coverage` - `CoverageEngine` now exposes split sub-scores
+  `vehicle_coverage_score` (evidence + VIN-prefix + cross-vehicle breadth) and
+  `model_year_breadth_score`. VIN-prefix is an 11-character conservative proxy, never an
+  exact unique-VIN count.
+- `recallzero.analytics.risk_v2_config` + `recallzero.analytics.risk_engine_v2` -
+  deterministic six-factor scoring reusing the frozen generic `RiskFactor`/`RiskAssessment`
+  models; the language model never influences the score.
+- `recallzero.models.v2` - `CoverageMetrics`, `SignalV2`, `DetectorV2Result` (the frozen v1
+  `DefectSignal` lineage is preserved unchanged inside each v2 signal).
+- `recallzero.detector_v2` - composes the frozen pipeline with a 30/90 `TrendEngine` and
+  re-scores each signal with `RiskEngineV2` + `CoverageEngine` (no re-extraction).
+- `recallzero.cli_v2` (`recallzero-v2`) - `analyze`, `fleet-watch`, `validate` commands.
+- `recallzero.investigation.brief_v2` - six-factor breakdown, affected-coverage section,
+  precise recall wording, and an investigative-limitation banner.
+- `recallzero.fleet` + `config/manufacturer_watch.yml` - manufacturer-wide watch (roadmap
+  capability): groups signals by failure mechanism across the lineup and rescales the
+  vehicle_coverage factor for mechanisms recurring in >= 2 models.
+- `recallzero.validation_v2` - replays the locked 20-case cohort through Detector v2 with
+  pre-recall cutoffs and reports v2 sensitivity alongside the preserved v1 baseline (1/10),
+  surfacing control-alert behavior honestly.
+- Streamlit `demo/app.py` - new "Detector v2" tab with a limitation banner, six-factor table,
+  full v2 brief, and a roadmap-framed manufacturer-watch section. Runs offline on clearly
+  synthetic data so the demo is reliable without NIM/network.
+- `tests/test_detector_v2.py` - unit tests for the coverage split, six-factor risk engine,
+  v2 config defaults, and v1-ordering weight mapping.
+
+Note: `freeze-verify` currently reports a `runtime_config_file` FAIL that is a pre-existing
+Windows CRLF line-ending artifact on `config/risk.yml` (content is the correct frozen v1
+values; the value-level runtime checks all PASS). This predates the 0.4.0 additive work and
+does not affect Detector v1 reproducibility of parsed values.
+
+
+## 0.4.0 - Detector v2 (additive; Detector v1 remains frozen)
+
+Detector v2 is delivered as a **100% additive layer**. No Detector v1 (frozen) source file,
+benchmark, lock file, or `config/risk.yml` was modified. Detector v1's frozen scoring, alert
+threshold, trend windows, and validation provenance are preserved and reproducible.
+
+New (all new files; no frozen-file edits):
+
+- `config/detector_v2.yml` - six-factor risk weights (volume_increase 0.25, vehicle_coverage
+  0.20, safety_consequence 0.20, persistence 0.15, model_year_breadth 0.10,
+  no_matching_recall 0.10), tiers 40/70/85, alert threshold 40, trend windows 30/90.
+- `recallzero.analytics.coverage` - `CoverageEngine` now exposes split sub-scores
+  `vehicle_coverage_score` (evidence + VIN-prefix + cross-vehicle breadth) and
+  `model_year_breadth_score`. VIN-prefix is an 11-character conservative proxy, never an
+  exact unique-VIN count.
+- `recallzero.analytics.risk_v2_config` + `recallzero.analytics.risk_engine_v2` -
+  deterministic six-factor scoring reusing the frozen generic `RiskFactor`/`RiskAssessment`
+  models; the language model never influences the score.
+- `recallzero.models.v2` - `CoverageMetrics`, `SignalV2`, `DetectorV2Result` (the frozen v1
+  `DefectSignal` lineage is preserved unchanged inside each v2 signal).
+- `recallzero.detector_v2` - composes the frozen pipeline with a 30/90 `TrendEngine` and
+  re-scores each signal with `RiskEngineV2` + `CoverageEngine` (no re-extraction).
+- `recallzero.cli_v2` (`recallzero-v2`) - `analyze`, `fleet-watch`, `validate` commands.
+- `recallzero.investigation.brief_v2` - six-factor breakdown, affected-coverage section,
+  precise recall wording, and an investigative-limitation banner.
+- `recallzero.fleet` + `config/manufacturer_watch.yml` - manufacturer-wide watch (roadmap
+  capability): groups signals by failure mechanism across the lineup and rescales the
+  vehicle_coverage factor for mechanisms recurring in >= 2 models.
+- `recallzero.validation_v2` - replays the locked 20-case cohort through Detector v2 with
+  pre-recall cutoffs and reports v2 sensitivity alongside the preserved v1 baseline (1/10),
+  surfacing control-alert behavior honestly.
+- Streamlit `demo/app.py` - new "Detector v2" tab with a limitation banner, six-factor table,
+  full v2 brief, and a roadmap-framed manufacturer-watch section. Runs offline on clearly
+  synthetic data so the demo is reliable without NIM/network.
+- `tests/test_detector_v2.py` - unit tests for the coverage split, six-factor risk engine,
+  v2 config defaults, and v1-ordering weight mapping.
+
+Note: `freeze-verify` currently reports a `runtime_config_file` FAIL that is a pre-existing
+Windows CRLF line-ending artifact on `config/risk.yml` (content is the correct frozen v1
+values; the value-level runtime checks all PASS). This predates the 0.4.0 additive work and
+does not affect Detector v1 reproducibility of parsed values.
+
+
 ## 0.3.5.post5 — Long-horizon recurrence separation experiment
 
 - Keep Detector v1 scoring, the 75-point alert threshold, all risk weights, severity, taxonomy, clustering, trend windows, visible-recall matching, and Time Machine behavior unchanged.

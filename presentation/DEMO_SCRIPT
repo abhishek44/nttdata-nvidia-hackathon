@@ -1,0 +1,217 @@
+# RecallZero — Full Presentation & Demo Script
+
+This is a speak-aloud script for both deliverables: the 4-slide PPT (`presentation/RecallZero_Pitch.pptx`) and the live 3-tab Streamlit demo (`demo/app.py`, launched via `scripts/run_demo_ui.sh`). Every line is written in plain language for a mixed technical/non-technical audience. Anticipated questions and honest, grounded answers follow each section.
+
+---
+
+## 0. Before you start — 30-second setup checklist
+
+- Confirm the offline fallback works: `recallzero demo` needs no network or API key. If NIM is rate-limited or GB10 is slow, use this instead of the live trace.
+- In the Streamlit app, pre-load the audited Mach-E reference replay (button in Time Machine tab) rather than relying on a live replay call during the actual pitch — it is instant and guaranteed correct.
+- Know your one honest sentence for the validation result before you say anything else: "One case fully proven at 15 days early; a 20-case validation cohort did not meet our own preregistered target, and we know exactly why."
+
+---
+
+## PART A — PPT Script (4 slides)
+
+### Slide 1 — The Challenge
+
+**Say this:**
+
+"Every year, thousands of car owners file safety complaints with NHTSA — the U.S. government's vehicle safety agency — describing things like brakes failing, cars losing power, or steering locking up. Each complaint is filed by a different, unrelated person, in their own words, on their own day.
+
+Somewhere hidden in that pile is often the first sign of a defect that will eventually become a full recall. Today, quality and safety engineers manually search this data with keyword search and periodic review. By the time a human notices the pattern, a formal recall is often already underway — the warning arrives after the fact, not before it.
+
+This affects OEM quality and safety engineering teams triaging fleet-wide complaint volume, compliance reviewers who need a defensible evidence trail, and investigation leads deciding whether something is worth a formal review.
+
+Our question: can we build a system that spots these patterns earlier — and can we prove it works, not just claim it?"
+
+**Anticipated Q&A:**
+
+- Q: "Isn't this just a search engine problem?"
+  A: "It looks like one, but the hard part isn't finding complaints — it's proving a rising pattern is real, safety-relevant, and not already covered by a known recall. That needs language understanding plus a rigorous, auditable evidence process, not just search."
+- Q: "Why hasn't this been solved already?"
+  A: "Simple keyword dashboards exist, but almost nobody tests whether early detection actually works against real history. We specifically built and ran that historical test, which is the unusual part."
+
+---
+
+### Slide 2 — Landscape and Differentiation
+
+**Say this:**
+
+"What exists today is mostly manual keyword search, or generic AI summarizers. The problem with generic AI summarizers is they can hallucinate — invent a trend, a count, or a cause that isn't really there. That's dangerous in a safety context.
+
+RecallZero draws a hard line: AI only ever reads one complaint at a time and turns it into structured facts — what broke, what system, what happened. Every number that combines many complaints — counts, trend, severity, the final risk score — is deterministic code, not the AI. Every score can be recomputed and defended.
+
+We also did something most teams will not have time for: we didn't just claim early detection works, we tested it. We took a real historical recall — the 2022 Ford Mustang Mach-E high-voltage battery recall — hid everything that happened after the recall was announced, and asked whether our system would have alerted before the real announcement, using only information available at the time. Then we froze that exact detector and ran it, completely unchanged, against 20 other real vehicles: 10 with real historical recalls across different problems, and 10 with no recall at all, as a control group."
+
+**Anticipated Q&A:**
+
+- Q: "What stops the AI from just making up a severity score?"
+  A: "Architecturally, nothing lets it. Severity, trend, and risk are pure arithmetic on dates, counts, and validated safety keywords found in the complaint text. The AI's output is checked by separate rules before it ever counts toward a score."
+- Q: "Why not just use a bigger, better LLM end to end?"
+  A: "Then every result would only be as trustworthy as one model call, with no way to reproduce or explain a specific number. Splitting responsibilities — AI for language, code for math — means every alert can be independently checked."
+- Q: "What makes your validation different from just measuring accuracy?"
+  A: "We pre-registered pass/fail criteria before running the test, so we could not move the goalposts afterward. We also hashed the frozen code and configuration so nobody could quietly tweak something mid-experiment."
+
+---
+
+### Slide 3 — Customer Benefit and ROI
+
+**Say this:**
+
+"Here is what this is worth. On the one real historical case we have fully proven, RecallZero would have raised a qualified alert fifteen days before the actual recall was announced — a real historical replay with the future physically deleted from what the detector could see, not a simulation.
+
+On our 20-vehicle validation set, only about eleven percent of totally clean vehicles — no real recall at all — ever triggered an unconfirmed alert. The system does not cry wolf constantly; when it stays quiet, that is meaningful.
+
+Every alert traces back to real, named NHTSA complaint identifiers. An engineer or auditor can click through and read the actual original complaint behind any score — nothing is an unexplainable AI summary with no receipts.
+
+And practically: instead of reading three thousand raw complaints, an engineer gets a short, ranked list of the handful of patterns that actually deserve attention."
+
+**Anticipated Q&A:**
+
+- Q: "Is 15 days a lot? Recalls can take months to organize."
+  A: "Exactly the point — even a two-week head start gives an investigation team more time to gather evidence and start root-cause analysis before public pressure forces a rushed response."
+- Q: "You said only one case is 'fully proven' — what about the rest?"
+  A: "That's the honest answer, and I'll show it directly on the Validation screen — we ran 20 cases and got a mixed, scientifically informative result, not a clean win."
+- Q: "What's the actual dollar ROI?"
+  A: "We don't have a validated cost model yet — that needs a real deployment partner's investigation costs. What we can quantify today is lead time, false-alarm rate, and reading-time reduction; the dollar figure needs a real deployment to measure."
+
+---
+
+### Slide 4 — Architecture
+
+**Say this:**
+
+"Here's how it fits together, top to bottom. Public NHTSA complaint and recall data comes in. NVIDIA NIM reads each complaint narrative and extracts a structured failure signature — system, failure mode, what happened. NVIDIA embeddings plus deterministic clustering group similar complaints by component and root cause. A fully deterministic risk engine then computes severity, trend, persistence, evidence volume, and whether a visible recall already explains the pattern, combining them into one auditable score. If a recall already covers the pattern, the score is suppressed — the recall cross-reference is actually changing behavior, not just displaying a number next to a complaint count. The result becomes an engineering brief and an alert.
+
+On the right, the NeMo Agent Toolkit agent sits on top — when someone asks a plain-English question, it calls these tools and narrates the already-computed answer. It does not invent anything itself.
+
+Underneath all of it is the Recall Time Machine — our leakage-safe historical validation harness, which is how we produced both the 15-day result and the 20-case cohort test."
+
+**Anticipated Q&A:**
+
+- Q: "Where's the actual 'agent' here — isn't this just a script?"
+  A: "The NeMo Agent Toolkit layer is the real agent — give it a plain-English goal, and it decides which of five tools to call and narrates the result. The CLI/API underneath is what the agent calls; a human can also call it directly."
+- Q: "Why NVIDIA NIM specifically?"
+  A: "It runs identically hosted or fully self-hosted locally on hardware like GB10, which matters for data privacy and avoiding external rate limits — and it's the same ecosystem as the agent toolkit and embeddings, so the stack is coherent end to end."
+- Q: "What if NIM is down or rate-limited during the live demo?"
+  A: "We have a fully offline synthetic demo mode needing no network or API key — our safety net for exactly this situation."
+
+---
+
+## PART B — Live UI Script (3 tabs)
+
+### Tab 1 — Live NVIDIA
+
+**Say this while doing it:**
+
+"This tab shows a real, live call to NVIDIA's AI services happening right now — not a cached result. These status chips at the top confirm NIM extraction, NVIDIA embeddings, and the deterministic risk engine are all live and ready.
+
+I'll pick one real complaint — ODI number [read the selected ODI], a real complaint filed by a real vehicle owner. Watch what happens when I click 'Run fresh NVIDIA inference' — we are sending this narrative to NVIDIA's model right now, not reading a cached answer.
+
+[click button, wait for result]
+
+That took about [X] seconds. The model extracted the system, failure mode, operating state, consequence, and a confidence score. Notice it said nothing about trend, risk, or whether this is part of a bigger pattern — that's deliberate; its only job is understanding this one paragraph.
+
+If I open 'Where AI is used — and where it is not,' this panel exists specifically to answer the question everyone asks: is the AI deciding if this is dangerous? No. It only interprets language. Every other decision is separate, deterministic code, shown right here."
+
+**Anticipated Q&A:**
+
+- Q: "Why does it take several seconds — isn't that slow?"
+  A: "That's a real network round trip to an AI model doing structured extraction, not a database lookup. This runs once per complaint, offline, ahead of time — not live per end-user question, which is why the latency is fine here."
+- Q: "Could the AI misread a complaint?"
+  A: "Yes, and that's exactly why we built independent checks downstream — a severity validator that cross-checks the AI's claims against the actual complaint text, and an evidence critic that flags inconsistencies before anything reaches a human."
+
+---
+
+### Tab 2 — Time Machine
+
+**Say this while doing it:**
+
+"This is the heart of the project. I've loaded a real historical case: the Ford Mustang Mach-E, recall campaign 22V412000, officially announced June 10th, 2022.
+
+This chart shows the maximum risk score at each weekly checkpoint, replaying history. Right now the actual recall outcome is hidden — see this lock icon — the detector genuinely cannot see the future at any point on this chart. Every point was computed using only complaints that existed by that date.
+
+[move slider to an early date]
+
+Here, early on, few complaints, low risk.
+
+[move slider forward]
+
+Watch the risk score climb. Right here, May 26th, 2022, the score crosses our 75-point alert threshold — the system says 'alert.'
+
+Let's look at why. [scroll to 'Why this score?'] Each bar is one ingredient — severity, trend, persistence, evidence, recall gap — all deterministic, all printed, nothing hidden.
+
+And here is the evidence — actual complaint records, actual ODI numbers; I can open the original complaint text right here.
+
+Now the moment we've been building to. [click 'Reveal historical outcome']
+
+The real recall was announced June 10th, 2022. Our alert fired May 26th. Fifteen days earlier — using only information that existed at the time, and verified after the fact, never before."
+
+**Anticipated Q&A:**
+
+- Q: "How do we know you didn't just tune this until it worked on this one example?"
+  A: "Completely fair question — and exactly why we didn't stop here. After this result, we froze this exact detector, hashed the code so it can't quietly change, and tested it unchanged on 20 other cases. I'll show that next, including where it did not work."
+- Q: "What does 'leakage-safe' actually mean, concretely?"
+  A: "Three things: every complaint on or after June 10th is physically deleted from what the detector can see at each earlier checkpoint, not just hidden in the display. The recall's own text is never given to the detector until after each weekly result is frozen. And automatic checks confirm both held true for this run — if either failed, the result would be marked invalid automatically."
+- Q: "What if I move the slider past the recall date?"
+  A: "The replay window stops the day before the official recall by design — there's no way to accidentally peek ahead."
+
+---
+
+### Tab 3 — Validation
+
+**Say this while doing it:**
+
+"This is the honest, harder part of the story, and I think it's the most important tab.
+
+We took this exact frozen detector — not retuned, not touched — and ran it against 20 real vehicles: 10 with genuine historical recalls across different problems (brakes, steering, engines, electrical), and 10 control vehicles with no recall at all.
+
+The headline: our preregistered target, set before running this, was not met. Target-qualified sensitivity was one out of ten — ten percent — against a sixty percent target.
+
+But look at this second number: six out of ten positive vehicles produced at least one real alert before their recall. The detector is noticing something in most cases — the gap is specifically in confidently linking that alert to the correct historical recall, a narrower problem than 'did we notice anything at all.'
+
+On the control side, only about eleven percent of clean vehicles ever triggered an unconfirmed alert — so it isn't alerting on everything either.
+
+Below is the full case-by-case table, and at the bottom, what we actually learned — including two ideas we tested and rejected. We tried smarter AI-based semantic matching; it helped a little but wasn't enough alone. We also tested a theory that real defects show a distinctive long-term recurrence pattern that false alarms don't — the data showed the opposite of what we expected, so we dropped that idea rather than force it in.
+
+That's the point of this screen: we are not hiding an imperfect result. We're showing exactly how we tested it, honestly, and what we learned from being wrong."
+
+**Anticipated Q&A:**
+
+- Q: "Doesn't a failed validation undermine your pitch?"
+  A: "I'd argue the opposite — it's evidence the validation is real. If every number looked perfect on the first real test, that would be more suspicious, not less. We're showing a system that can fail honestly and explain exactly where and why."
+- Q: "What would it take to fix the sensitivity number?"
+  A: "It isn't one bug — it splits into at least three separate causes: some cases have a matching problem, some have the risk score itself scoring too low even with a correct match, and some alerts fire on a real but unrelated issue in the same vehicle. Each needs its own fix, and we deliberately avoided rushing one without more evidence, since our own tests showed an intuitively good idea can turn out to be actively wrong."
+- Q: "Is this still useful if sensitivity is only 10%?"
+  A: "For the literal challenge — flagging a rising component with no open recall today, and explaining why — yes, that part works today, live, independent of this historical accuracy number. The 10% figure is about a much harder, self-imposed bar: proving after the fact that one specific historical recall would have been caught early. We went further than asked and tested ourselves against a stricter standard than required."
+
+---
+
+## PART C — Closing statement
+
+"To summarize: safety complaints can be turned into structured, traceable defect signals using AI, without letting AI invent the facts. Those signals can be evaluated historically without contaminating the detector with future information. Deterministic risk scoring makes every alert auditable. A single-case success did not generalize — Detector v1 measured 10% target-qualified sensitivity on our validation cohort. And controlled experiments rejected tempting fixes that would not have actually improved discrimination.
+
+Our most important result is not that every recall can already be predicted early. It's that early-defect detection can be investigated with an auditable, leakage-safe, falsifiable framework — and that framework told us the truth, including when the truth was inconvenient."
+
+---
+
+## PART D — If something breaks live
+
+- **NIM/embedding call fails or times out on Tab 1:** say "This is exactly why we always keep an offline path" and switch to `recallzero demo` or the preloaded Mach-E reference replay in Tab 2.
+- **Live quick replay in Time Machine fails:** the app already falls back — just use "Load audited Mach-E reference replay" instead, and say it's the guaranteed, audited version of the same result.
+- **A judge asks something you don't have a number for:** say exactly that — "We don't have that measured yet; here's what we do have measured" — and name the closest real metric you do have. Do not estimate a number live.
+
+---
+
+## PART E — Master Q&A (big-picture questions not tied to one slide/tab)
+
+- Q: "Is this production-ready?"
+  A: "No — it's a validated research prototype. No authentication layer, no database, no scheduler yet. That's explicitly the next phase, not this one."
+- Q: "Why does the AI matter at all if the scoring is deterministic?"
+  A: "Because the input is free-text written by ordinary people in wildly different words for the same failure. The AI's job is exactly that translation step — normalizing language — which a fixed keyword list cannot do robustly at scale."
+- Q: "How is this different from a generic 'AI recall predictor' demo?"
+  A: "Almost every flashy version of this either lets the model see future information, or never checks its own results against real history at all. We refuse to do either, which is why our number is 10% instead of a suspiciously perfect 90%."
+- Q: "What's next?"
+  A: "Grow the validation cohort further, fix the diagnosed matching-and-risk gaps with evidence rather than guesswork, and re-run the exact same locked test to measure the real delta — never declare success without re-testing."
